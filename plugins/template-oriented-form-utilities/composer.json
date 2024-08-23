@@ -1,0 +1,26 @@
+{
+    "name": "sushat4692/template-oriented-form-utilities",
+    "description": "Template-Oriented Form Utilities",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "TofuPlugin\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SUSH",
+            "email": "sush@sus-happy.net"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "require": {
+        "ramsey/uuid": "^4.2",
+        "monolog/monolog": "^2.9"
+    }
+}
