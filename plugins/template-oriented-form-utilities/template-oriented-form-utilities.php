@@ -33,22 +33,33 @@ define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
 // Load autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
-use TofuPlugin\Init\Activate;
-use TofuPlugin\Init\Deactivate;
+use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
+use TofuPlugin\Init\Migrate;
 use TofuPlugin\Logger;
-
-// Register hooks that are fired when the plugin is activated or deactivated.
-register_activation_hook(__FILE__, function () {
-    Activate::activate();
-});
-
-register_deactivation_hook(__FILE__, function () {
-    Deactivate::deactivate();
-});
 
 // Prepare Logger
 Logger::init('tofu');
+
+// Prepare Migrate Class
+Migrate::prepareWpdb();
+
+// Register hooks that are fired when the plugin is activated or deactivated.
+register_activation_hook(__FILE__, function () {
+    Initializer::activate();
+});
+
+register_deactivation_hook(__FILE__, function () {
+    Initializer::deactivate();
+});
+
+// Register hooks that are fired when the plugin is upgraded.
+add_action('upgrade_process_complete', function ($upgrader_object, $options) {
+    $current_plugin_path_name = plugin_basename(__FILE__);
+    if ($options['action'] === 'update' && $options['type'] === 'plugin' && in_array($current_plugin_path_name, $options['plugins'])) {
+        Initializer::upgrade();
+    }
+}, 10, 2);
 
 // Initialize endpoint
 Endpoint::init();

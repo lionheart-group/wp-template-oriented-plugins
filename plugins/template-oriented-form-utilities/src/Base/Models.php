@@ -1,9 +1,8 @@
 <?php
 
-namespace TofuPlugin\Models;
+namespace TofuPlugin\Base;
 
-
-abstract class AbstractModels {
+abstract class Models {
     const TABLE_SUFFIX = '';
 
     /** @var \wpdb */
@@ -18,12 +17,11 @@ abstract class AbstractModels {
         $this->table = static::getTableName();
     }
 
-    protected static function getTableName()
+    public static function getTableName()
     {
         global $wpdb;
         return esc_sql($wpdb->prefix . static::TABLE_SUFFIX);
     }
 
-    abstract public static function generateTable();
     abstract public static function dropTable();
 }
