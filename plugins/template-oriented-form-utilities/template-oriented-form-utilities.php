@@ -1,20 +1,20 @@
 <?php
 
 /**
- * @link https://sus-happy.net/
+ * @link https://www.lionheart.co.jp/
  * @since 0.0.1
  * @package Tofu
  *
  * @wordpress-plugin
  * Plugin Name: TOFU
- * Plugin URI: https://tofu.sus-happy.net
+ * Plugin URI: https://www.lionheart.co.jp/
  * Description: Template-Oriented Form Utilities
  * Version: 0.0.1
- * Author: SUSH
- * Author URI: https://sus-happy.net/
+ * Author: LionHeart Group
+ * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
  * Domain Path: /languages
- * Requires PHP: 7.4
+ * Requires PHP: 8.0
  */
 
 // If this file is called directly, abort.

@@ -2,7 +2,7 @@
 
 namespace TofuPlugin\Models;
 
-use TofuPlugin\Base\Models as AbstractModels;
+use TofuPlugin\Base\DatabaseModels as AbstractModels;
 use TofuPlugin\Logger;
 
 class Record extends AbstractModels {

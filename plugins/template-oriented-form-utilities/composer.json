@@ -1,5 +1,5 @@
 {
-    "name": "sushat4692/template-oriented-form-utilities",
+    "name": "lionheart-group/template-oriented-form-utilities",
     "description": "Template-Oriented Form Utilities",
     "type": "library",
     "license": "MIT",
@@ -10,17 +10,18 @@
     },
     "authors": [
         {
-            "name": "SUSH",
-            "email": "sush@sus-happy.net"
+            "name": "LionHeart Group",
+            "email": "info@lionheart.co.jp"
         }
     ],
     "config": {
         "platform": {
-            "php": "7.4"
+            "php": "8.0"
         }
     },
     "require": {
         "ramsey/uuid": "^4.2",
-        "monolog/monolog": "^2.9"
+        "monolog/monolog": "^2.9",
+        "respect/validation": "^2.2"
     }
 }

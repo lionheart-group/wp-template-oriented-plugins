@@ -2,7 +2,7 @@
 
 namespace TofuPlugin\Base;
 
-abstract class Models {
+abstract class DatabaseModels {
     const TABLE_SUFFIX = '';
 
     /** @var \wpdb */

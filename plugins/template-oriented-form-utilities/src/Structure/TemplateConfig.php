@@ -3,22 +3,13 @@
 namespace TofuPlugin\Structure;
 
 /**
- * Class Config
- *
- * This class is used to define the configuration for a form item.
+ * Template configuration class.
  *
  * @package TofuPlugin\Structure
  */
-class Config
+class TemplateConfig
 {
     public function __construct(
-        /**
-         * Key for the form item.
-         *
-         * @var string
-         */
-        public readonly string $key,
-
         /**
          * Input page path.
          *
@@ -40,7 +31,13 @@ class Config
          * @var string
          */
         public readonly string $resultPath,
-    )
-    {
-    }
+
+        /**
+         * Error page path.
+         * If you want to display the input page, set this to null.
+         *
+         * @var string|null
+         */
+        public readonly string | null $errorPath = null,
+    ) {}
 }

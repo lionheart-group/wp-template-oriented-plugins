@@ -22,7 +22,7 @@ class Logger
         }
     }
 
-    public static function getLogFilePath(): string
+    public static function getLogFilePath(): string | null
     {
         if (WP_DEBUG) {
             if (!self::$logger) {
