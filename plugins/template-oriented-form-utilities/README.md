@@ -79,3 +79,68 @@ add_action('init', function () {
     ));
 });
 ```
+
+You can then use the form in your templates:
+
+**Input page**
+
+```php
+<?php
+use TofuPlugin\Helpers\Form;
+
+$formKey = 'form';
+$formAction = 'input';
+?>
+<form action="<?php echo Form::action($formKey, $formAction); ?>" method="post">
+    <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" value="<?php echo Form::value($formKey, 'name'); ?>" required>
+    </div>
+
+    <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<?php echo Form::value($formKey, 'email'); ?>" required>
+    </div>
+
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+
+    <?php
+        // Embedding nonce field is required
+        Form::generateNonceField($formKey, $formAction);
+    ?>
+</form>
+```
+
+**Confirmation page**
+
+```php
+<?php
+use TofuPlugin\Helpers\Form;
+
+$formKey = 'form';
+$formAction = 'confirm';
+?>
+<form action="<?php echo Form::action($formKey, $formAction); ?>" method="post">
+    <div>
+        <label for="name">Name</label>
+        <?php echo Form::value($formKey, 'name'); ?>
+    </div>
+
+    <div>
+        <label for="email">Email</label>
+        <?php echo Form::value($formKey, 'email'); ?>
+    </div>
+
+    <div>
+        <a href="<?php echo home_url('/contact/'); ?>">Back</a>
+        <button type="submit">Submit</button>
+    </div>
+
+    <?php
+        // Embedding nonce field is required
+        Form::generateNonceField($formKey, $formAction);
+    ?>
+</form>
+```
