@@ -48,6 +48,13 @@ class FormConfig
          * @var MailConfig
          */
         public readonly MailConfig $mail,
+
+        /**
+         * Validation setting.
+         *
+         * @var ValidationConfig
+         */
+        public readonly ValidationConfig $validation,
     )
     {
     }
