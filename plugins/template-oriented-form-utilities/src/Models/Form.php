@@ -176,12 +176,34 @@ class Form
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
-        /** @todo Send email function */
+
+        // Send email function
+        $url = $this->config->template->resultPath;
+        foreach( $this->config->mail->recipients->recipients as $recipient) {
+            $recipientEmail = str_replace(array('{', '}'), '', $recipient->recipientEmail);
+            if (array_key_exists($recipientEmail, $this->values)) {
+                $recipientEmail = $this->values[$recipientEmail];
+            }
+
+            $headers[] = 'From: ' . $this->config->mail->fromName . ' <' . $this->config->mail->fromEmail . '>';
+            $headers[] = 'Cc: ' . $recipient->recipientCcEmail;
+            $headers[] = 'Bcc: ' . $recipient->recipientBccEmail;
+
+            $subject = $this->getTemplateContent($recipient->subjectPath);
+            $body = $this->getTemplateContent($recipient->mailBodyPath);
+
+            wp_mail($recipientEmail, $subject, $body, $headers);
+        }
 
         // Redirect to the result page
-        $url = $this->config->template->resultPath;
-
         wp_redirect($url);
         exit;
+    }
+
+    public function getTemplateContent(string $path): string
+    {
+        ob_start();
+        include($path);
+        return ob_get_clean();
     }
 }
