@@ -180,14 +180,15 @@ class Form
         // Send email function
         $url = $this->config->template->resultPath;
         foreach( $this->config->mail->recipients->recipients as $recipient) {
-            $recipientEmail = str_replace(array('{', '}'), '', $recipient->recipientEmail);
-            if (array_key_exists($recipientEmail, $this->values)) {
-                $recipientEmail = $this->values[$recipientEmail];
-            }
+            $headers = [];
+
+            $recipientEmail = $this->replaceBracesValue($recipient->recipientEmail, $this->values);
+            $recipientCcEmail = $this->replaceBracesValue($recipient->recipientCcEmail, $this->values);
+            $recipientBccEmail = $this->replaceBracesValue($recipient->recipientBccEmail, $this->values);
 
             $headers[] = 'From: ' . $this->config->mail->fromName . ' <' . $this->config->mail->fromEmail . '>';
-            $headers[] = 'Cc: ' . $recipient->recipientCcEmail;
-            $headers[] = 'Bcc: ' . $recipient->recipientBccEmail;
+            $headers[] = 'Cc: ' . $recipientCcEmail;
+            $headers[] = 'Bcc: ' . $recipientBccEmail;
 
             $subject = $this->getTemplateContent($recipient->subjectPath);
             $body = $this->getTemplateContent($recipient->mailBodyPath);
@@ -205,5 +206,24 @@ class Form
         ob_start();
         include($path);
         return ob_get_clean();
+    }
+
+    public function replaceBracesValue(string $email, array $values)
+    {
+        $startsWithBrace = (substr($email, 0, 1) === '{');
+        $endsWithBrace = (substr($email, -1) === '}');
+        if ($startsWithBrace && $endsWithBrace) {
+            $replacedEmail = str_replace(array('{', '}'), '', $email);
+            if (array_key_exists($replacedEmail, $values)) {
+                $replacedEmail = $values[$replacedEmail];
+            } else {
+                $replacedEmail = '';
+            }
+        }
+        else {
+            $replacedEmail = $email;
+        }
+
+        return $replacedEmail;
     }
 }
