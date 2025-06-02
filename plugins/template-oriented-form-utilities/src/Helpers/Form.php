@@ -141,20 +141,4 @@ class Form
 
         return $cookieValue;
     }
-
-    public static function setError($errors)
-    {
-        set_transient('tofu_error', base64_encode(json_encode($errors)), HOUR_IN_SECONDS);
-    }
-
-    public static function getError()
-    {
-        $error = get_transient('tofu_error');
-        if ($error) {
-            $error = json_decode(base64_decode($error), true);
-            delete_transient('tofu_error');
-            return $error;
-        }
-        return null;
-    }
 }
