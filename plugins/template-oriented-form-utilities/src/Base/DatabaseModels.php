@@ -22,6 +22,4 @@ abstract class DatabaseModels {
         global $wpdb;
         return esc_sql($wpdb->prefix . static::TABLE_SUFFIX);
     }
-
-    abstract public static function dropTable();
 }
