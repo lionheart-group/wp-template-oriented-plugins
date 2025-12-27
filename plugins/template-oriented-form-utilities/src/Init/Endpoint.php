@@ -29,6 +29,11 @@ class Endpoint {
                     wp_die('Invalid key format.', 'TOFU Key Error', ['response' => 400]);
                 }
 
+                // Check required parameters
+                if (!isset($decoded['key']) || !isset($decoded['action'])) {
+                    wp_die('Missing required parameters.', 'TOFU Key Error', ['response' => 400]);
+                }
+
                 // Get the form by key
                 $form = \TofuPlugin\Helpers\Form::get($decoded['key']);
                 if (!$form) {

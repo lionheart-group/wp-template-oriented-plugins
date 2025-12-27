@@ -46,48 +46,25 @@ class Session
         $encryptedValue = Encryptor::encrypt($data);
 
         // Insert or update session record in the database
-        global $wpdb;
-        $current = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM " . SessionModel::getTableName() . " WHERE form_id = %s AND session_key = %s",
-                $form_id,
-                $key
-            )
-        );
-        if ($current > 0) {
-            $wpdb->update(
-                SessionModel::getTableName(),
+        $isExist = SessionModel::exists($form_id, $key);
+        if ($isExist) {
+            SessionModel::update(
                 [
                     'session_value' => $encryptedValue,
-                    'expiration' => $expiration->format('Y-m-d H:i:s'),
+                    'expiration' => $expiration,
                 ],
                 [
                     'form_id' => $form_id,
                     'session_key' => $key,
-                ],
-                [
-                    '%s',
-                    '%s',
-                ],
-                [
-                    '%s',
-                    '%s',
                 ]
             );
         } else {
-            $wpdb->insert(
-                SessionModel::getTableName(),
+            SessionModel::insert(
                 [
                     'form_id' => $form_id,
                     'session_key' => $key,
                     'session_value' => $encryptedValue,
-                    'expiration' => $expiration->format('Y-m-d H:i:s'),
-                ],
-                [
-                    '%s',
-                    '%s',
-                    '%s',
-                    '%s',
+                    'expiration' => $expiration,
                 ]
             );
         }
@@ -105,15 +82,7 @@ class Session
         $key = self::getSessionId();
 
         // Retrieve session record from the database
-        global $wpdb;
-        $table = SessionModel::getTableName();
-        $query = $wpdb->prepare(
-            "SELECT session_value FROM {$table} WHERE form_id = %s AND session_key = %s AND expiration > %s",
-            $form_id,
-            $key,
-            \current_time('mysql')
-        );
-        $row = $wpdb->get_var($query);
+        $row = SessionModel::get($form_id, $key);
 
         if ($row) {
             // Decrypt session value
@@ -121,5 +90,22 @@ class Session
         }
 
         return null;
+    }
+
+    /**
+     * Clear session data
+     *
+     * @param string $form_id
+     * @return void
+     */
+    public static function clear($form_id)
+    {
+        // Session ID
+        $key = self::getSessionId();
+        // Delete session record from the database
+        SessionModel::delete([
+            'form_id' => $form_id,
+            'session_key' => $key,
+        ]);
     }
 }

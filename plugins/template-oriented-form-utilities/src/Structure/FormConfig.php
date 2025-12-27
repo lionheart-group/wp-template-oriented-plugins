@@ -27,15 +27,6 @@ class FormConfig
         public readonly string $name,
 
         /**
-         * Enabeld to save the form data to the database.
-         * If you want to skip saving the form data, set this to false.
-         *
-         * @var bool
-         * @todo Implement the save to database functionality.
-         */
-        public readonly bool $saveToDatabase = false,
-
-        /**
          * Template setting.
          *
          * @var TemplateConfig
@@ -55,6 +46,15 @@ class FormConfig
          * @var ValidationConfig
          */
         public readonly ValidationConfig $validation,
+
+        /**
+         * Enabeld to save the form data to the database.
+         * If you want to skip saving the form data, set this to false.
+         *
+         * @var bool
+         * @todo Implement the save to database functionality.
+         */
+        public readonly bool $saveToDatabase = false,
     )
     {
     }
