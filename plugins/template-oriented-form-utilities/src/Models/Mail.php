@@ -116,7 +116,7 @@ class Mail
     public function setSubjectFromTemplate(string $templatePath): Mail
     {
         $subject = Template::getTemplateContent($templatePath);
-        if (empty($subject) || $subject === '') {
+        if (empty($subject)) {
             throw new \RuntimeException('Mail subject template is empty: ' . $templatePath);
         }
         $this->setSubject($subject);
@@ -144,7 +144,7 @@ class Mail
     public function setBodyFromTemplate(string $templatePath): Mail
     {
         $body = Template::getTemplateContent($templatePath);
-        if (empty($body) || $body === '') {
+        if (empty($body)) {
             throw new \RuntimeException('Mail subject template is empty: ' . $templatePath);
         }
         $this->setBody($body);
@@ -206,7 +206,7 @@ class Mail
         );
     }
 
-    public function __toArray(): array
+    public function toArray(): array
     {
         return [
             'to' => array_map(fn($addr) => (string)$addr, $this->to),

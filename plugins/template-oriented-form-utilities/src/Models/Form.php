@@ -181,7 +181,7 @@ class Form
 
             // Set mail to
             $mail->addTo(
-                Template::replaceBlacesValues(
+                Template::replaceBracesValues(
                     $recipient->recipientEmail,
                     $this->values
                 )
@@ -190,7 +190,7 @@ class Form
             // Set subject
             if ($recipient->subject !== null) {
                 $mail->setSubject(
-                    Template::replaceBlacesValues(
+                    Template::replaceBracesValues(
                         $recipient->subject,
                         $this->values
                     )
@@ -202,7 +202,7 @@ class Form
             // Set body
             if ($recipient->mailBody !== null) {
                 $mail->setBody(
-                    Template::replaceBlacesValues(
+                    Template::replaceBracesValues(
                         $recipient->mailBody,
                         $this->values
                     )
@@ -214,7 +214,7 @@ class Form
             // Set CC
             if ($recipient->recipientCcEmail !== null) {
                 $mail->addCc(
-                    Template::replaceBlacesValues(
+                    Template::replaceBracesValues(
                         $recipient->recipientCcEmail,
                         $this->values
                     )
@@ -224,7 +224,7 @@ class Form
             // Set BCC
             if ($recipient->recipientBccEmail !== null) {
                 $mail->addBcc(
-                    Template::replaceBlacesValues(
+                    Template::replaceBracesValues(
                         $recipient->recipientBccEmail,
                         $this->values
                     )
@@ -232,7 +232,7 @@ class Form
             }
 
             if (!$mail->send()) {
-                Logger::error('Failed to send email', $mail->__toArray());
+                Logger::error('Failed to send email', $mail->toArray());
                 wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
             }
         }

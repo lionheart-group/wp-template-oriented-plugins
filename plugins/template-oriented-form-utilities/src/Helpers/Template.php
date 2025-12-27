@@ -7,7 +7,7 @@ use TofuPlugin\Logger;
 class Template
 {
     /**
-     * Undocumented function
+     * Get the template content as a string by rendering a template part.
      *
      * @param string      $slug The slug name for the generic template.
      * @param string|null $name Optional. The name of the specialized template. Default null.
@@ -19,8 +19,7 @@ class Template
     {
         ob_start();
         get_template_part($slug, $name, $args);
-        $result = ob_get_contents();
-        ob_end_clean();
+        $result = (string) ob_get_clean();
         Logger::info("Loaded template content", ["slug" => $slug, "name" => $name, "args" => $args, 'content' => $result]);
         return $result;
     }
@@ -32,7 +31,7 @@ class Template
      * @param array  $placeholders    An associative array of placeholders and their replacements.
      * @return string The template content with placeholders replaced.
      */
-    public static function replaceBlacesValues(string $templateContent, array $values)
+    public static function replaceBracesValues(string $templateContent, array $values)
     {
         foreach ($values as $key => $value) {
             $templateContent = preg_replace('/\{\s*?' . preg_quote($key, '/') . '\s*?\}/', $value, $templateContent);
