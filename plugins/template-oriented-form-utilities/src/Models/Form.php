@@ -169,8 +169,7 @@ class Form
 
 
         // Send email function
-        $url = $this->config->template->resultPath;
-        foreach( $this->config->mail->recipients->recipients as $recipient) {
+        foreach ( $this->config->mail->recipients->recipients as $recipient) {
             $mail = new Mail();
 
             // Set mail from
@@ -238,6 +237,7 @@ class Form
         }
 
         // Redirect to the result page
+        $url = $this->config->template->resultPath;
         wp_redirect($url);
         exit;
     }

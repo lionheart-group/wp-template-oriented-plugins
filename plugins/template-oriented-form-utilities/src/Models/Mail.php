@@ -145,7 +145,7 @@ class Mail
     {
         $body = Template::getTemplateContent($templatePath);
         if (empty($body)) {
-            throw new \RuntimeException('Mail subject template is empty: ' . $templatePath);
+            throw new \RuntimeException('Mail body template is empty: ' . $templatePath);
         }
         $this->setBody($body);
         return $this;

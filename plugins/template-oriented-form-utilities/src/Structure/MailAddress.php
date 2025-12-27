@@ -16,7 +16,7 @@ class MailAddress
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->name !== '') {
             return sprintf('%s <%s>', $this->name, $this->email);
