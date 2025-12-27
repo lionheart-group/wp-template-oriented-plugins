@@ -14,14 +14,13 @@ class MailRecipientsConfig
     public function __construct(
         /**
          * Recipient email address.
-         * If you want to skip the recipient email, set this to null.
          *
          * If you set `{field}`, it will be replaced with the value of the field.
          * For example, if you set `{email}`, it will be replaced with the value of the `email` field.
          *
-         * @var string|null
+         * @var string
          */
-        public readonly string | null $recipientEmail = null,
+        public readonly string $recipientEmail,
 
         /**
          * Recipient cc email address.
@@ -46,16 +45,31 @@ class MailRecipientsConfig
         public readonly string | null $recipientBccEmail = null,
 
         /**
+         * Recipient email subject.
+         * You can choose to set a static subject here or use a template path.
+         *
+         * @var string|null
+         */
+        public readonly string | null $subject = null,
+
+        /**
          * Recipient email subject template.
-         * If you want to skip the recipient email, set this to null.
+         * You can choose to set a template path here or use a static subject.
          *
          * @var string|null
          */
         public readonly string | null $subjectPath = null,
 
         /**
+         * Recipient email body.
+         * You can choose to set a static mail body here or use a template path.
+         * @var string|null
+         */
+        public readonly string | null $mailBody = null,
+
+        /**
          * Recipient email body template.
-         * If you want to skip the recipient email, set this to null.
+         * You can choose to set a template path here or use a static mail body.
          *
          * @var string|null
          */
@@ -63,13 +77,12 @@ class MailRecipientsConfig
     ) {
         // Validate email address.
         // If you set `{field}`, it will be replaced with the value of the field, so ensure it's a valid email format.
-        if ($recipientEmail) {
-            if (!preg_match('/^\{[a-zA-Z0-9_]+\}$/', $recipientEmail)) {
-                if (!Validate::isValidEmail($recipientEmail)) {
-                    throw new \InvalidArgumentException('Invalid recipient email address.');
-                }
+        if (!preg_match('/^\{[a-zA-Z0-9_]+\}$/', $recipientEmail)) {
+            if (!Validate::isValidEmail($recipientEmail)) {
+                throw new \InvalidArgumentException('Invalid recipient email address.');
             }
         }
+
         if ($recipientCcEmail) {
             if (!preg_match('/^\{[a-zA-Z0-9_]+\}$/', $recipientCcEmail)) {
                 if (!Validate::isValidEmail($recipientCcEmail)) {
@@ -83,6 +96,20 @@ class MailRecipientsConfig
                     throw new \InvalidArgumentException('Invalid recipient bcc email address.');
                 }
             }
+        }
+
+        /**
+         * Ensure that either subject or subjectPath is set.
+         */
+        if ($this->subject === null && $this->subjectPath === null) {
+            throw new \InvalidArgumentException('Either subject or subjectPath must be set.');
+        }
+
+        /**
+         * Ensure that either mailBody or mailBodyPath is set.
+         */
+        if ($this->mailBody === null && $this->mailBodyPath === null) {
+            throw new \InvalidArgumentException('Either mailBody or mailBodyPath must be set.');
         }
     }
 }

@@ -5,7 +5,10 @@ namespace TofuPlugin\Models;
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Form as FormHelper;
 use TofuPlugin\Helpers\Session;
+use TofuPlugin\Helpers\Template;
+use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
+use TofuPlugin\Structure\MailAddress;
 
 class Form
 {
@@ -168,50 +171,74 @@ class Form
         // Send email function
         $url = $this->config->template->resultPath;
         foreach( $this->config->mail->recipients->recipients as $recipient) {
-            $headers = [];
+            $mail = new Mail();
 
-            $recipientEmail = $this->replaceBracesValue($recipient->recipientEmail, $this->values);
-            $recipientCcEmail = $this->replaceBracesValue($recipient->recipientCcEmail, $this->values);
-            $recipientBccEmail = $this->replaceBracesValue($recipient->recipientBccEmail, $this->values);
+            // Set mail from
+            $mail->setFrom(new MailAddress(
+                email: $this->config->mail->fromEmail,
+                name: $this->config->mail->fromName,
+            ));
 
-            $headers[] = 'From: ' . $this->config->mail->fromName . ' <' . $this->config->mail->fromEmail . '>';
-            $headers[] = 'Cc: ' . $recipientCcEmail;
-            $headers[] = 'Bcc: ' . $recipientBccEmail;
+            // Set mail to
+            $mail->addTo(
+                Template::replaceBlacesValues(
+                    $recipient->recipientEmail,
+                    $this->values
+                )
+            );
 
-            $subject = $this->getTemplateContent($recipient->subjectPath);
-            $body = $this->getTemplateContent($recipient->mailBodyPath);
+            // Set subject
+            if ($recipient->subject !== null) {
+                $mail->setSubject(
+                    Template::replaceBlacesValues(
+                        $recipient->subject,
+                        $this->values
+                    )
+                );
+            } else {
+                $mail->setSubjectFromTemplate($recipient->subjectPath);
+            }
 
-            wp_mail($recipientEmail, $subject, $body, $headers);
+            // Set body
+            if ($recipient->mailBody !== null) {
+                $mail->setBody(
+                    Template::replaceBlacesValues(
+                        $recipient->mailBody,
+                        $this->values
+                    )
+                );
+            } else {
+                $mail->setBodyFromTemplate($recipient->mailBodyPath);
+            }
+
+            // Set CC
+            if ($recipient->recipientCcEmail !== null) {
+                $mail->addCc(
+                    Template::replaceBlacesValues(
+                        $recipient->recipientCcEmail,
+                        $this->values
+                    )
+                );
+            }
+
+            // Set BCC
+            if ($recipient->recipientBccEmail !== null) {
+                $mail->addBcc(
+                    Template::replaceBlacesValues(
+                        $recipient->recipientBccEmail,
+                        $this->values
+                    )
+                );
+            }
+
+            if (!$mail->send()) {
+                Logger::error('Failed to send email', $mail->__toArray());
+                wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
+            }
         }
 
         // Redirect to the result page
         wp_redirect($url);
         exit;
-    }
-
-    public function getTemplateContent(string $path): string
-    {
-        ob_start();
-        include($path);
-        return ob_get_clean();
-    }
-
-    public function replaceBracesValue(string $email, array $values)
-    {
-        $startsWithBrace = (substr($email, 0, 1) === '{');
-        $endsWithBrace = (substr($email, -1) === '}');
-        if ($startsWithBrace && $endsWithBrace) {
-            $replacedEmail = str_replace(array('{', '}'), '', $email);
-            if (array_key_exists($replacedEmail, $values)) {
-                $replacedEmail = $values[$replacedEmail];
-            } else {
-                $replacedEmail = '';
-            }
-        }
-        else {
-            $replacedEmail = $email;
-        }
-
-        return $replacedEmail;
     }
 }
