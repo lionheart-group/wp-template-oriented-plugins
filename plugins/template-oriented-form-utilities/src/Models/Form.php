@@ -4,6 +4,7 @@ namespace TofuPlugin\Models;
 
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Form as FormHelper;
+use TofuPlugin\Helpers\Session;
 use TofuPlugin\Structure\FormConfig;
 
 class Form
@@ -14,13 +15,6 @@ class Form
      * @var array
      */
     protected $values = [];
-
-    /**
-     * The key for Transient API.
-     *
-     * @var string
-     */
-    protected $transientKey;
 
     /**
      * Form constructor.
@@ -34,14 +28,8 @@ class Form
         protected readonly FormConfig $config,
     )
     {
-        $this->transientKey = sprintf(
-            Consts::TRANSIENT_FORMAT,
-            $this->config->key,
-            FormHelper::getSessionCookieValue()
-        );
-
-        // Load the session values from Transient API
-        $sessionValues = json_decode(base64_decode(get_transient($this->transientKey)), true);
+        // Load the session values from Session Table
+        $sessionValues = Session::get($this->config->key);
         if ($sessionValues) {
             $this->values = $sessionValues;
         }
@@ -89,11 +77,11 @@ class Form
     }
 
     /**
-     * Store the values in the Transient API.
+     * Store the values in the Session table.
      */
     public function storeValues(): void
     {
-        set_transient($this->transientKey, base64_encode(json_encode($this->values)), HOUR_IN_SECONDS);
+        Session::save($this->config->key, $this->values);
     }
 
     /**
@@ -154,7 +142,7 @@ class Form
         /** @todo Validate input field */
         $validated = $_POST;
 
-        // Store the input values in the transient
+        // Store the input values in the Session table
         $this->values = $validated;
         $this->storeValues();
 
