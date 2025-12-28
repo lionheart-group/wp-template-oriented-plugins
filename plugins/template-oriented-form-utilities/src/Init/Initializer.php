@@ -3,6 +3,7 @@
 namespace TofuPlugin\Init;
 
 use TofuPlugin\Models\Record;
+use TofuPlugin\Models\Session;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -23,6 +24,7 @@ class Initializer {
         // Drop tables
         // Disabled drop table function to prevent data loss
         // Migrate::dropTable(Record::getTableName());
+        // Migrate::dropTable(Session::getTableName());
         // Migrate::dropTable(Migrate::getTableName());
     }
 

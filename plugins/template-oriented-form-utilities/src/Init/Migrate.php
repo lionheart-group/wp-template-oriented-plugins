@@ -59,6 +59,7 @@ class Migrate
 
         foreach ([
             '2024-08-29_00-00-00_init-records',
+            '2025-12-23_00-00-00_session-tables',
         ] as $migrate) {
             Logger::info("Migration {$migrate} start.");
             $migrateKey = static::getMigrateKey($migrate);

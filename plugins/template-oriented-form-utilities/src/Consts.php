@@ -20,12 +20,4 @@ final class Consts
      * 1st parameter: Form key
      */
     public const NONCE_FORMAT = '_tofu_%s_nonce';
-
-    /**
-     * Transient key format for storing session values.
-     *
-     * 1st parameter: Form key
-     * 2nd parameter: Unique identifier for the session
-     */
-    public const TRANSIENT_FORMAT = 'tofu_field_%s_%s';
 }

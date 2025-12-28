@@ -4,19 +4,19 @@ namespace TofuPlugin\Models;
 
 use TofuPlugin\Base\DatabaseModels as AbstractModels;
 use TofuPlugin\Logger;
+use TofuPlugin\Structure\DatabaseModelColumn;
 
 class Record extends AbstractModels {
     const TABLE_SUFFIX = 'tofu_records';
 
-    public static function dropTable()
+    protected static function columns(): array
     {
-        /** @var \wpdb */
-        global $wpdb;
-        $tableName = static::getTableName();
-
-        $sql = "DROP TABLE IF EXISTS `{$tableName}`;";
-
-        Logger::info('Drop table', ['sql' => $sql]);
-        $wpdb->query($sql);
+        return [
+            new DatabaseModelColumn(
+                name: 'form_id',
+                type: DatabaseModelColumn::COLUMN_STRING,
+                required: true,
+            ),
+        ];
     }
 }

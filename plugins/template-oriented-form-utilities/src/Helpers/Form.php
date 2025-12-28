@@ -124,21 +124,4 @@ class Form
 
         return wp_verify_nonce($nonce, $action);
     }
-
-    /**
-     * Get unique cookie name for identifying the session
-     *
-     * @return string
-     */
-    public static function getSessionCookieValue(): string
-    {
-        $cookieValue = $_COOKIE[Consts::SESSION_COOKIE_KEY] ?? null;
-
-        if (!isset($cookieValue)) {
-            $cookieValue = Uuid::uuid4()->toString();
-            setcookie(Consts::SESSION_COOKIE_KEY, $cookieValue, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
-        }
-
-        return $cookieValue;
-    }
 }

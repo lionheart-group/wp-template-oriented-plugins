@@ -61,5 +61,10 @@ add_action('upgrade_process_complete', function ($upgrader_object, $options) {
     }
 }, 10, 2);
 
+// Register hooks that are fired when the sendmail is failed
+add_action('wp_mail_failed', function ($wp_error) {
+    Logger::error('Mail sending failed: ' . $wp_error->get_error_message());
+}, 10, 1);
+
 // Initialize endpoint
 Endpoint::init();
