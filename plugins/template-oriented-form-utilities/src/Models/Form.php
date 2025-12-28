@@ -5,7 +5,10 @@ namespace TofuPlugin\Models;
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Form as FormHelper;
 use TofuPlugin\Helpers\Session;
+use TofuPlugin\Helpers\Template;
+use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
+use TofuPlugin\Structure\MailAddress;
 
 class Form
 {
@@ -164,11 +167,77 @@ class Form
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
-        /** @todo Send email function */
+
+        // Send email function
+        foreach ( $this->config->mail->recipients->recipients as $recipient) {
+            $mail = new Mail();
+
+            // Set mail from
+            $mail->setFrom(new MailAddress(
+                email: $this->config->mail->fromEmail,
+                name: $this->config->mail->fromName,
+            ));
+
+            // Set mail to
+            $mail->addTo(
+                Template::replaceBracesValues(
+                    $recipient->recipientEmail,
+                    $this->values
+                )
+            );
+
+            // Set subject
+            if ($recipient->subject !== null) {
+                $mail->setSubject(
+                    Template::replaceBracesValues(
+                        $recipient->subject,
+                        $this->values
+                    )
+                );
+            } else {
+                $mail->setSubjectFromTemplate($recipient->subjectPath);
+            }
+
+            // Set body
+            if ($recipient->mailBody !== null) {
+                $mail->setBody(
+                    Template::replaceBracesValues(
+                        $recipient->mailBody,
+                        $this->values
+                    )
+                );
+            } else {
+                $mail->setBodyFromTemplate($recipient->mailBodyPath);
+            }
+
+            // Set CC
+            if ($recipient->recipientCcEmail !== null) {
+                $mail->addCc(
+                    Template::replaceBracesValues(
+                        $recipient->recipientCcEmail,
+                        $this->values
+                    )
+                );
+            }
+
+            // Set BCC
+            if ($recipient->recipientBccEmail !== null) {
+                $mail->addBcc(
+                    Template::replaceBracesValues(
+                        $recipient->recipientBccEmail,
+                        $this->values
+                    )
+                );
+            }
+
+            if (!$mail->send()) {
+                Logger::error('Failed to send email', $mail->toArray());
+                wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
+            }
+        }
 
         // Redirect to the result page
         $url = $this->config->template->resultPath;
-
         wp_redirect($url);
         exit;
     }
