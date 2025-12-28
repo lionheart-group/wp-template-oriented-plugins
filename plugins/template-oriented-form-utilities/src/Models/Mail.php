@@ -26,7 +26,7 @@ class Mail
     /**
      * Add a recipient.
      *
-     * @param MailAddress $to
+     * @param string|MailAddress $to
      * @return Mail
      */
     public function addTo(string|MailAddress $to): Mail
@@ -45,7 +45,7 @@ class Mail
     /**
      * Add a CC recipient.
      *
-     * @param MailAddress $cc
+     * @param string|MailAddress $cc
      * @return Mail
      */
     public function addCc(string|MailAddress $cc): Mail
@@ -64,7 +64,7 @@ class Mail
     /**
      * Add a BCC recipient.
      *
-     * @param MailAddress $bcc
+     * @param string|MailAddress $bcc
      * @return Mail
      */
     public function addBcc(string|MailAddress $bcc): Mail

@@ -75,29 +75,6 @@ class MailRecipientsConfig
          */
         public readonly string | null $mailBodyPath = null,
     ) {
-        // Validate email address.
-        // If you set `{field}`, it will be replaced with the value of the field, so ensure it's a valid email format.
-        if (!preg_match('/^\{[a-zA-Z0-9_]+\}$/', $recipientEmail)) {
-            if (!Validate::isValidEmail($recipientEmail)) {
-                throw new \InvalidArgumentException('Invalid recipient email address.');
-            }
-        }
-
-        if ($recipientCcEmail) {
-            if (!preg_match('/^\{[a-zA-Z0-9_]+\}$/', $recipientCcEmail)) {
-                if (!Validate::isValidEmail($recipientCcEmail)) {
-                    throw new \InvalidArgumentException('Invalid recipient cc email address.');
-                }
-            }
-        }
-        if ($recipientBccEmail) {
-            if (!preg_match('/^\{[a-zA-Z0-9_]+\}$/', $recipientBccEmail)) {
-                if (!Validate::isValidEmail($recipientBccEmail)) {
-                    throw new \InvalidArgumentException('Invalid recipient bcc email address.');
-                }
-            }
-        }
-
         /**
          * Ensure that either subject or subjectPath is set.
          */

@@ -12,7 +12,7 @@ class MailAddress
     )
     {
         if (Validate::isValidEmail($this->email) === false) {
-            throw new \InvalidArgumentException("Invalid email address: " . $this->email);
+            throw new \InvalidArgumentException("Invalid email address.");
         }
     }
 

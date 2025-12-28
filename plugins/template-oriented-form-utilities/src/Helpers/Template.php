@@ -28,10 +28,10 @@ class Template
      * Replace brace placeholders in the template content.
      *
      * @param string $templateContent The template content with placeholders.
-     * @param array  $placeholders    An associative array of placeholders and their replacements.
+     * @param array  $values          An associative array of placeholders and their replacements.
      * @return string The template content with placeholders replaced.
      */
-    public static function replaceBracesValues(string $templateContent, array $values)
+    public static function replaceBracesValues(string $templateContent, array $values): string
     {
         foreach ($values as $key => $value) {
             $templateContent = preg_replace('/\{\s*?' . preg_quote($key, '/') . '\s*?\}/', $value, $templateContent);
