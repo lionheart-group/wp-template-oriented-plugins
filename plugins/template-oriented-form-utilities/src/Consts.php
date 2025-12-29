@@ -5,6 +5,11 @@ namespace TofuPlugin;
 final class Consts
 {
     /**
+     * Text domain for translations.
+     */
+    public const TEXT_DOMAIN = 'template-oriented-form-utilities';
+
+    /**
      * Query variable key for the endpoint.
      */
     public const QUERY_KEY = '_tofu_key';

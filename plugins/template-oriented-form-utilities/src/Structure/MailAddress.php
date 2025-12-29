@@ -2,7 +2,7 @@
 
 namespace TofuPlugin\Structure;
 
-use TofuPlugin\Helpers\Validate;
+use GUMP;
 
 class MailAddress
 {
@@ -11,8 +11,16 @@ class MailAddress
         public readonly string $name = '',
     )
     {
-        if (Validate::isValidEmail($this->email) === false) {
-            throw new \InvalidArgumentException("Invalid email address.");
+        $gump = new GUMP();
+
+        // Validate the email addresses.
+        if (
+            $gump->is_valid(
+                ['email' => $email],
+                ['email' => 'required|valid_email']
+            ) !== true
+        ) {
+            throw new \InvalidArgumentException('Invalid email address.');
         }
     }
 

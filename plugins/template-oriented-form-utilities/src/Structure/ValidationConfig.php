@@ -8,12 +8,17 @@ namespace TofuPlugin\Structure;
  * ```php
  * new ValidationConfig(
  *     rules: [
+ *         'name' => 'required|max_len:200',
+ *         'email' => 'required|valid_email',
+ *     ],
+ *     messages: [
  *         'name' => [
- *             'required' => true,
+ *             'required' => 'The name field is required.',
+ *             'max_len' => 'The name must be maximum 200 characters.',
  *         ],
  *         'email' => [
- *             'required' => true,
- *             'email' => true,
+ *             'required' => 'The email field is required.',
+ *             'valid_email' => 'The email must be a valid email address.',
  *         ],
  *     ],
  *     after: function ($form, $errors) {
@@ -40,11 +45,11 @@ class ValidationConfig
          * ```php
          * rules: [
          *     'name' => [
-         *         'required' => true,
+         *         'required' => [],
          *     ],
          *     'email' => [
-         *         'required' => true,
-         *         'email' => true,
+         *         'required' => [],
+         *         'email' => [],
          *     ],
          * ],
          * ```
@@ -52,6 +57,26 @@ class ValidationConfig
          * @var array
          */
         public readonly array $rules = [],
+
+        /**
+         * Validation messages.
+         *
+         * ```php
+         * messages: [
+         *     'name' => [
+         *         'required' => 'The name field is required.',
+         *         'length' => 'The name must be between {min} and {max} characters.',
+         *     ],
+         *     'email' => [
+         *         'required' => 'The email field is required.',
+         *         'email' => 'The email must be a valid email address.',
+         *     ],
+         * ],
+         * ```
+         *
+         * @var array
+         */
+        public readonly array $messages = [],
 
         /**
          * Custom after hook
