@@ -7,7 +7,7 @@ use TofuPlugin\Structure\FieldValue;
 class FieldValueCollection
 {
     /**
-     * Error messages collection
+     * Field values collection
      *
      * @var FieldValue[]
      */
@@ -18,7 +18,7 @@ class FieldValueCollection
     }
 
     /**
-     * Get all validation values
+     * Get all field values
      *
      * @return FieldValue[]
      */
@@ -37,7 +37,7 @@ class FieldValueCollection
     public function addValue(string $field, mixed $value): void
     {
         // Field value isn't duplicated
-        $currentValue = $this->getFieldValue($field);
+        $currentValue = $this->getValue($field);
         if ($currentValue !== null) {
             $currentValue->updateValue($value);
             return;
@@ -52,10 +52,10 @@ class FieldValueCollection
      * @param string $field
      * @return boolean
      */
-    public function hasFieldValue(string $field): bool
+    public function hasValue(string $field): bool
     {
-        foreach ($this->values as $error) {
-            if ($error->field === $field) {
+        foreach ($this->values as $value) {
+            if ($value->field === $field) {
                 return true;
             }
         }
@@ -63,12 +63,12 @@ class FieldValueCollection
     }
 
     /**
-     * Get error messages for a specific field
+     * Get field value for a specific field
      *
      * @param string $field
      * @return FieldValue|null
      */
-    public function getFieldValue(string $field): FieldValue | null
+    public function getValue(string $field): FieldValue | null
     {
         foreach ($this->values as $value) {
             if ($value->field === $field) {

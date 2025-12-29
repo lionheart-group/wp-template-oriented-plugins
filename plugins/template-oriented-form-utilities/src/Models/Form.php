@@ -47,13 +47,13 @@ class Form
 
         // Populate values and errors from session
         if ($sessionValues) {
-            if ($sessionValues['values']) {
+            if (isset($sessionValues['values']) && $sessionValues['values']) {
                 foreach ($sessionValues['values'] as $field => $value) {
                     $this->values->addValue($field, $value);
                 }
             }
 
-            if ($sessionValues['errors']) {
+            if (isset($sessionValues['errors']) && $sessionValues['errors']) {
                 foreach ($sessionValues['errors'] as $field => $messages) {
                     foreach ($messages as $message) {
                         $this->errors->addError($field, $message);
@@ -189,7 +189,7 @@ class Form
         $this->storeSession();
 
         // Redirect back for errors
-        if($this->errors->hasErrors()) {
+        if ($this->errors->hasErrors()) {
             $redirect = $this->config->template->inputPath;
             wp_redirect($redirect);
             exit;

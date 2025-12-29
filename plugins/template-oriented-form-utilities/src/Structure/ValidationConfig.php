@@ -26,10 +26,10 @@ namespace TofuPlugin\Structure;
  *         $value = $form->getValue('name');
  *
  *         // Set the value of the 'foo' field
- *         $form->setValue('foo', 'value');
+ *         $form->addValue('foo', 'value');
  *
  *         // Add a custom error message
- *         $errors->add('name', 'This is a custom error message.');
+ *         $errors->addError('name', 'This is a custom error message.');
  *     }
  * );
  * ```

@@ -84,7 +84,7 @@ class Form
     public static function value(string $key, string $field, bool $raw = false): mixed
     {
         $form = self::get($key);
-        $value = $form->getValues()->getFieldValue($field);
+        $value = $form->getValues()->getValue($field);
 
         if ($value === null) {
             return null;

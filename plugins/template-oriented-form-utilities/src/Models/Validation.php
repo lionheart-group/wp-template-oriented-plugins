@@ -22,23 +22,29 @@ class Validation
         $sanitizedData = $gump->run($targetValues);
 
         if ($gump->errors()) {
+            // Collect errors
             $gumpErrors = $gump->get_errors_array();
             foreach ($gumpErrors as $field => $message) {
                 $errors->addError($field, $message);
             }
+
+            // If validation fails, sanitize directly from $targetValues
+            $sanitizedData = $gump->sanitize($targetValues);
         }
 
+        if (!is_array($sanitizedData)) {
+            throw new \RuntimeException('Validation failed: sanitized data is not an array.');
+        }
+
+        // Collect sanitized values
+        foreach ($sanitizedData as $key => $value) {
+            $values->addValue($key, $value);
+        }
+
+        // After validation hook
         if (!empty($form->config->validation->after)) {
             $after = $form->config->validation->after;
             $after($form->getValues(), $errors);
-        }
-
-        if ($errors->hasErrors()) {
-            $sanitizedData = $gump->sanitize($_POST);
-        }
-
-        foreach ($sanitizedData as $key => $value) {
-            $values->addValue($key, $value);
         }
     }
 }
