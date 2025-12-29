@@ -8,6 +8,7 @@ use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Template;
 use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
+use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
 
 class Form
@@ -15,9 +16,16 @@ class Form
     /**
      * Input values.
      *
-     * @var array
+     * @var FieldValueCollection
      */
-    protected $values = [];
+    protected $values;
+
+    /**
+     * Error values.
+     *
+     * @var ValidationErrorCollection
+     */
+    protected $errors;
 
     /**
      * Form constructor.
@@ -28,14 +36,39 @@ class Form
          *
          * @var FormConfig
          */
-        protected readonly FormConfig $config,
+        public readonly FormConfig $config,
     )
     {
+        $this->values = new FieldValueCollection();
+        $this->errors = new ValidationErrorCollection();
+
         // Load the session values from Session Table
         $sessionValues = Session::get($this->config->key);
+
+        // Populate values and errors from session
         if ($sessionValues) {
-            $this->values = $sessionValues;
+            if (isset($sessionValues['values']) && $sessionValues['values']) {
+                foreach ($sessionValues['values'] as $field => $value) {
+                    $this->values->addValue($field, $value);
+                }
+            }
+
+            if (isset($sessionValues['errors']) && $sessionValues['errors']) {
+                foreach ($sessionValues['errors'] as $field => $messages) {
+                    foreach ($messages as $message) {
+                        $this->errors->addError($field, $message);
+                    }
+                }
+            }
         }
+
+        Logger::info('Form initialized', [
+            'key' => $this->config->key,
+            'name' => $this->config->name,
+            'session' => $sessionValues,
+            'values' => $this->values->toArray(),
+            'errors' => $this->errors->toArray(),
+        ]);
     }
 
     /**
@@ -61,30 +94,32 @@ class Form
     /**
      * Get the values.
      *
-     * @return array
+     * @return FieldValueCollection
      */
-    public function getValues(): array
+    public function getValues(): FieldValueCollection
     {
         return $this->values;
     }
 
     /**
-     * Get the specific value.
+     * Get the errors.
      *
-     * @param string $key The key of the value to get.
-     * @return mixed The value associated with the key, or null if not found.
+     * @return ValidationErrorCollection
      */
-    public function getValue(string $key): mixed
+    public function getErrors(): ValidationErrorCollection
     {
-        return $this->values[$key] ?? null;
+        return $this->errors;
     }
 
     /**
      * Store the values in the Session table.
      */
-    public function storeValues(): void
+    protected function storeSession(): void
     {
-        Session::save($this->config->key, $this->values);
+        Session::save($this->config->key, [
+            'values' => $this->values->toArray(),
+            'errors' => $this->errors->toArray(),
+        ]);
     }
 
     /**
@@ -142,12 +177,23 @@ class Form
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
-        /** @todo Validate input field */
-        $validated = $_POST;
+        // Initialize values and errors
+        $this->values = new FieldValueCollection();
+        $this->errors = new ValidationErrorCollection();
+
+        // Validate input field
+        $validation = new Validation();
+        $validation->validate($this, $_POST);
 
         // Store the input values in the Session table
-        $this->values = $validated;
-        $this->storeValues();
+        $this->storeSession();
+
+        // Redirect back for errors
+        if ($this->errors->hasErrors()) {
+            $redirect = $this->config->template->inputPath;
+            wp_redirect($redirect);
+            exit;
+        }
 
         // Redirect to the confirmation page
         $url = $this->config->template->confirmPath;
@@ -167,6 +213,7 @@ class Form
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
+        $values = $this->values->toArray();
 
         // Send email function
         foreach ( $this->config->mail->recipients->recipients as $recipient) {
@@ -182,7 +229,7 @@ class Form
             $mail->addTo(
                 Template::replaceBracesValues(
                     $recipient->recipientEmail,
-                    $this->values
+                    $values
                 )
             );
 
@@ -191,7 +238,7 @@ class Form
                 $mail->setSubject(
                     Template::replaceBracesValues(
                         $recipient->subject,
-                        $this->values
+                        $values
                     )
                 );
             } else {
@@ -203,7 +250,7 @@ class Form
                 $mail->setBody(
                     Template::replaceBracesValues(
                         $recipient->mailBody,
-                        $this->values
+                        $values
                     )
                 );
             } else {
@@ -215,7 +262,7 @@ class Form
                 $mail->addCc(
                     Template::replaceBracesValues(
                         $recipient->recipientCcEmail,
-                        $this->values
+                        $values
                     )
                 );
             }
@@ -225,7 +272,7 @@ class Form
                 $mail->addBcc(
                     Template::replaceBracesValues(
                         $recipient->recipientBccEmail,
-                        $this->values
+                        $values
                     )
                 );
             }

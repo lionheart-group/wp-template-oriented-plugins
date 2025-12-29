@@ -18,19 +18,19 @@ class TemplateConfig
         public readonly string $inputPath,
 
         /**
+         * Result page path.
+         *
+         * @var string
+         */
+        public readonly string $resultPath,
+
+        /**
          * Confirm page path.
          * If you want to skip the confirmation page, set this to null.
          *
          * @var string|null
          */
         public readonly string | null $confirmPath = null,
-
-        /**
-         * Result page path.
-         *
-         * @var string
-         */
-        public readonly string $resultPath,
 
         /**
          * Error page path.

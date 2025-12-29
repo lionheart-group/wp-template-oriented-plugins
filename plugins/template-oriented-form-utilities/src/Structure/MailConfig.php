@@ -2,8 +2,6 @@
 
 namespace TofuPlugin\Structure;
 
-use TofuPlugin\Helpers\Validate;
-
 /**
  * Mail configuration class.
  *
@@ -14,20 +12,18 @@ class MailConfig
     public function __construct(
         /**
          * From email address.
-         * If you set null, the default email address will be used.
          * This is usually the same as the site URL.
          *
-         * @var string|null
+         * @var string
          */
-        public readonly string | null $fromEmail = null,
+        public readonly string $fromEmail,
 
         /**
          * From name.
-         * If you set null, from name won't be set.
          *
-         * @var string|null
+         * @var string
          */
-        public readonly string | null $fromName = null,
+        public readonly string $fromName,
 
         /**
          * Email recipient collection.
@@ -36,9 +32,5 @@ class MailConfig
          */
         public readonly MailRecipientsCollection $recipients,
     ) {
-        // Validate the email addresses.
-        if (!Validate::isValidEmail($fromEmail)) {
-            throw new \InvalidArgumentException('Invalid from email address.');
-        }
     }
 }

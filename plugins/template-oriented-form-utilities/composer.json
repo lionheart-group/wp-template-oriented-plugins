@@ -20,8 +20,7 @@
         }
     },
     "require": {
-        "ramsey/uuid": "^4.2",
         "monolog/monolog": "^2.9",
-        "respect/validation": "^2.2"
+        "wixel/gump": "^2.3"
     }
 }

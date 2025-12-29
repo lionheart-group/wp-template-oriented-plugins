@@ -2,29 +2,41 @@
 
 namespace TofuPlugin\Structure;
 
+use TofuPlugin\Models\FieldValueCollection;
+use TofuPlugin\Models\ValidationErrorCollection;
+
 /**
  * Template configuration class.
  *
  * ```php
  * new ValidationConfig(
  *     rules: [
+ *         'name' => 'required|max_len:200',
+ *         'email' => 'required|valid_email',
+ *     ],
+ *     filters: [
+ *         'name' => 'trim|sanitize_string',
+ *         'email' => 'trim|sanitize_email',
+ *     ],
+ *     messages: [
  *         'name' => [
- *             'required' => true,
+ *             'required' => 'The name field is required.',
+ *             'max_len' => 'The name must be maximum 200 characters.',
  *         ],
  *         'email' => [
- *             'required' => true,
- *             'email' => true,
+ *             'required' => 'The email field is required.',
+ *             'valid_email' => 'The email must be a valid email address.',
  *         ],
  *     ],
- *     after: function ($form, $errors) {
+ *     after: function ($values, $errors) {
  *         // Get the value of the 'name' field
- *         $value = $form->getValue('name');
+ *         $value = $values->getValue('name');
  *
  *         // Set the value of the 'foo' field
- *         $form->setValue('foo', 'value');
+ *         $values->addValue('foo', 'value');
  *
  *         // Add a custom error message
- *         $errors->add('name', 'This is a custom error message.');
+ *         $errors->addError('name', 'This is a custom error message.');
  *     }
  * );
  * ```
@@ -39,22 +51,55 @@ class ValidationConfig
          *
          * ```php
          * rules: [
+         *     'name' => 'required|max_len:200',
+         *     'email' => 'required|valid_email',
+         * ],
+         * ```
+         *
+         * @var array
+         * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-validators
+         */
+        public readonly array $rules = [],
+
+        /**
+         * Filtering rules.
+         *
+         * ```php
+         * filters: [
+         *     'name' => 'trim|sanitize_string',
+         *     'email' => 'trim|sanitize_email',
+         * ],
+         * ```
+         *
+         * @var array
+         * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-filters
+         */
+        public readonly array $filters = [],
+
+        /**
+         * Validation messages.
+         *
+         * ```php
+         * messages: [
          *     'name' => [
-         *         'required' => true,
+         *         'required' => 'The name field is required.',
+         *         'max_len' => 'The name must be maximum 200 characters.',
          *     ],
          *     'email' => [
-         *         'required' => true,
-         *         'email' => true,
+         *         'required' => 'The email field is required.',
+         *         'valid_email' => 'The email must be a valid email address.',
          *     ],
          * ],
          * ```
          *
          * @var array
          */
-        public readonly array $rules = [],
+        public readonly array $messages = [],
 
         /**
          * Custom after hook
+         *
+         * @var \Closure(FieldValueCollection $values, ValidationErrorCollection $errors): void|null
          */
         public readonly \Closure | null $after = null,
     ) {}

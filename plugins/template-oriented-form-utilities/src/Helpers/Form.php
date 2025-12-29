@@ -2,7 +2,6 @@
 
 namespace TofuPlugin\Helpers;
 
-use Ramsey\Uuid\Uuid;
 use TofuPlugin\Consts;
 use \TofuPlugin\Models\Form as FormModel;
 use TofuPlugin\Structure\FormConfig;
@@ -85,16 +84,46 @@ class Form
     public static function value(string $key, string $field, bool $raw = false): mixed
     {
         $form = self::get($key);
-        $value = $form->getValue($field);
+        $value = $form->getValues()->getValue($field);
+
+        if ($value === null) {
+            return null;
+        }
 
         if ($raw) {
-            return $value;
+            return $value->value;
         }
 
-        if (is_string($value)) {
-            return esc_html($value);
+        if (is_string($value->value)) {
+            return esc_html($value->value);
         }
-        return $value;
+        return $value->value;
+    }
+
+    /**
+     * Check if the form has error for the specified field
+     *
+     * @param string $key
+     * @param string $field
+     * @return boolean
+     */
+    public static function hasError(string $key, string $field): bool
+    {
+        $form = self::get($key);
+        return $form->getErrors()->hasFieldErrors($field);
+    }
+
+    /**
+     * Get form error messages of the specified field
+     *
+     * @param string $key
+     * @param string $field
+     * @return string[]
+     */
+    public static function errors(string $key, string $field): array
+    {
+        $form = self::get($key);
+        return $form->getErrors()->getFieldErrorMessages($field);
     }
 
     /**

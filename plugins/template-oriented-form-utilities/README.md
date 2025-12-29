@@ -56,15 +56,28 @@ add_action('init', function () {
     // Specify validation settings
     $validation = new \TofuPlugin\Structure\ValidationConfig(
         rules: [
+            'name' => 'required|max_len:200',
+            'email' => 'required|valid_email',
+        ],
+        messages: [
             'name' => [
-                'required' => true,
+                'required' => 'Please enter your name.',
+                'max_len' => 'Your name must be within 200 characters.',
             ],
             'email' => [
-                'required' => true,
-                'email' => true,
+                'required' => 'Please enter your email address.',
+                'valid_email' => 'Please enter a valid email address.',
             ],
         ],
-        after: function () {
+        // $values: \TofuPlugin\Models\FieldValueCollection
+        // $errors: \TofuPlugin\Models\ValidationErrorCollection
+        after: function ($values, $errors) {
+            // Custom validation logic can be added here
+            $nameValue = $values->getValue('name');
+
+            if ($nameValue !== null && $nameValue->value === 'Test') {
+                $errors->addError('name', 'The name "Test" is not allowed.');
+            }
         }
     );
 
@@ -95,11 +108,23 @@ $formAction = 'input';
     <div>
         <label for="name">Name</label>
         <input type="text" id="name" name="name" value="<?php echo Form::value($formKey, 'name'); ?>" required>
+
+        <?php if (Form::hasError($formKey, 'name')): ?>
+            <?php foreach (Form::errors($formKey, 'name') as $errorMessage): ?>
+                <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
     <div>
         <label for="email">Email</label>
         <input type="email" id="email" name="email" value="<?php echo Form::value($formKey, 'email'); ?>" required>
+
+        <?php if (Form::hasError($formKey, 'email')): ?>
+            <?php foreach (Form::errors($formKey, 'email') as $errorMessage): ?>
+                <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
     <div>
