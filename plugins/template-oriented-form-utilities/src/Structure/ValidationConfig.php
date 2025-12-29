@@ -87,7 +87,7 @@ class ValidationConfig
          *     ],
          *     'email' => [
          *         'required' => 'The email field is required.',
-         *         'email' => 'The email must be a valid email address.',
+         *         'valid_email' => 'The email must be a valid email address.',
          *     ],
          * ],
          * ```

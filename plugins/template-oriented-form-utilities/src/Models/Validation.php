@@ -17,20 +17,18 @@ class Validation
 
         // Validate input values
         $gump = new GUMP($locale);
-        $gump->validation_rules($form->config->validation->rules);
-        $gump->filter_rules($form->config->validation->filters);
         $gump->set_fields_error_messages($form->config->validation->messages);
-        $sanitizedData = $gump->run($targetValues);
 
-        if ($gump->errors()) {
+        // Sanitize and validate
+        $sanitizedData = $gump->filter($targetValues, $form->config->validation->filters);
+        $isValid = $gump->validate($targetValues, $form->config->validation->rules);
+
+        if ($isValid !== true) {
             // Collect errors
             $gumpErrors = $gump->get_errors_array();
             foreach ($gumpErrors as $field => $message) {
                 $errors->addError($field, $message);
             }
-
-            // If validation fails, sanitize directly from $targetValues
-            $sanitizedData = $gump->sanitize($targetValues);
         }
 
         if (!is_array($sanitizedData)) {
