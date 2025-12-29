@@ -11,11 +11,9 @@ class MailAddress
         public readonly string $name = '',
     )
     {
-        $gump = GUMP::get_instance();
-
         // Validate the email addresses.
         if (
-            $gump->is_valid(
+            GUMP::is_valid(
                 ['email' => $email],
                 ['email' => 'required|valid_email']
             ) !== true

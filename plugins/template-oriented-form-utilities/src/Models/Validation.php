@@ -13,7 +13,7 @@ class Validation
 
         // Get locale
         $full_locale = get_locale();
-        $locale = substr($full_locale, 0, 2);
+        $locale = explode('_', $full_locale)[0];
 
         // Validate input values
         $gump = new GUMP($locale);

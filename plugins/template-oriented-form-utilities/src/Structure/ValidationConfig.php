@@ -83,7 +83,7 @@ class ValidationConfig
          * messages: [
          *     'name' => [
          *         'required' => 'The name field is required.',
-         *         'length' => 'The name must be between {min} and {max} characters.',
+         *         'max_len' => 'The name must be maximum 200 characters.',
          *     ],
          *     'email' => [
          *         'required' => 'The email field is required.',
