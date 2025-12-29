@@ -20,10 +20,7 @@ class Validation
         $gump->validation_rules($form->config->validation->rules);
         $gump->filter_rules($form->config->validation->filters);
         $gump->set_fields_error_messages($form->config->validation->messages);
-        $gump->run($targetValues);
-
-        // If validation fails, sanitize directly from $targetValues
-        $sanitizedData = $gump->sanitize($targetValues);
+        $sanitizedData = $gump->run($targetValues);
 
         if ($gump->errors()) {
             // Collect errors
@@ -32,6 +29,8 @@ class Validation
                 $errors->addError($field, $message);
             }
 
+            // If validation fails, sanitize directly from $targetValues
+            $sanitizedData = $gump->sanitize($targetValues);
         }
 
         if (!is_array($sanitizedData)) {

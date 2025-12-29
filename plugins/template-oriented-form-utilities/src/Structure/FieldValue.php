@@ -25,8 +25,8 @@ class FieldValue
         return $this->data[$name];
     }
 
-    public function __isset($name)
+    public function __isset($name): bool
     {
-        return $name === 'field' || $name === 'value';
+        return isset($this->data[$name]);
     }
 }

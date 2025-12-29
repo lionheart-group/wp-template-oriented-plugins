@@ -28,12 +28,12 @@ use TofuPlugin\Models\ValidationErrorCollection;
  *             'valid_email' => 'The email must be a valid email address.',
  *         ],
  *     ],
- *     after: function ($form, $errors) {
+ *     after: function ($values, $errors) {
  *         // Get the value of the 'name' field
- *         $value = $form->getValue('name');
+ *         $value = $values->getValue('name');
  *
  *         // Set the value of the 'foo' field
- *         $form->addValue('foo', 'value');
+ *         $values->addValue('foo', 'value');
  *
  *         // Add a custom error message
  *         $errors->addError('name', 'This is a custom error message.');
