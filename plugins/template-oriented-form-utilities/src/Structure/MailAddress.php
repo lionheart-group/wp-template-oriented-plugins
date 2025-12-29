@@ -11,7 +11,7 @@ class MailAddress
         public readonly string $name = '',
     )
     {
-        $gump = new GUMP();
+        $gump = GUMP::get_instance();
 
         // Validate the email addresses.
         if (

@@ -4,27 +4,29 @@ namespace TofuPlugin\Structure;
 
 class FieldValue
 {
+    protected array $data = [];
+
     public function __construct(
-        protected string $_field,
-        protected mixed $_value,
+        string $field,
+        mixed $value,
     )
     {
+        $this->data['field'] = $field;
+        $this->data['value'] = $value;
     }
 
     public function updateValue(mixed $newValue): void
     {
-        $this->_value = $newValue;
+        $this->data['value'] = $newValue;
     }
 
     public function __get(string $name): mixed
     {
-        switch ($name) {
-            case 'field':
-                return $this->_field;
-            case 'value':
-                return $this->_value;
-            default:
-                throw new \InvalidArgumentException("Undefined property: " . $name);
-        }
+        return $this->data[$name];
+    }
+
+    public function __isset($name)
+    {
+        return $name === 'field' || $name === 'value';
     }
 }

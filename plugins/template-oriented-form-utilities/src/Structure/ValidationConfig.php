@@ -2,6 +2,9 @@
 
 namespace TofuPlugin\Structure;
 
+use TofuPlugin\Models\FieldValueCollection;
+use TofuPlugin\Models\ValidationErrorCollection;
+
 /**
  * Template configuration class.
  *
@@ -10,6 +13,10 @@ namespace TofuPlugin\Structure;
  *     rules: [
  *         'name' => 'required|max_len:200',
  *         'email' => 'required|valid_email',
+ *     ],
+ *     filters: [
+ *         'name' => 'trim|sanitize_string',
+ *         'email' => 'trim|sanitize_email',
  *     ],
  *     messages: [
  *         'name' => [
@@ -44,19 +51,30 @@ class ValidationConfig
          *
          * ```php
          * rules: [
-         *     'name' => [
-         *         'required' => [],
-         *     ],
-         *     'email' => [
-         *         'required' => [],
-         *         'email' => [],
-         *     ],
+         *     'name' => 'required|max_len:200',
+         *     'email' => 'required|valid_email',
          * ],
          * ```
          *
          * @var array
+         * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-validators
          */
         public readonly array $rules = [],
+
+        /**
+         * Filtering rules.
+         *
+         * ```php
+         * filters: [
+         *     'name' => 'trim|sanitize_string',
+         *     'email' => 'trim|sanitize_email',
+         * ],
+         * ```
+         *
+         * @var array
+         * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-filters
+         */
+        public readonly array $filters = [],
 
         /**
          * Validation messages.
@@ -80,6 +98,8 @@ class ValidationConfig
 
         /**
          * Custom after hook
+         *
+         * @var \Closure(FieldValueCollection $values, ValidationErrorCollection $errors): void|null
          */
         public readonly \Closure | null $after = null,
     ) {}

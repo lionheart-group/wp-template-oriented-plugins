@@ -43,7 +43,10 @@ class FieldValueCollection
             return;
         }
 
-        $this->values[] = new FieldValue($field, $value);
+        $this->values[] = new FieldValue(
+            field: $field,
+            value: $value,
+        );
     }
 
     /**

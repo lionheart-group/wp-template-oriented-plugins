@@ -70,7 +70,7 @@ add_action('init', function () {
             ],
         ],
         // $values: \TofuPlugin\Models\FieldValueCollection
-        // $errors: \TofuPlugin\Models\FieldErrorCollection
+        // $errors: \TofuPlugin\Models\ValidationErrorCollection
         after: function ($values, $errors) {
             // Custom validation logic can be added here
             $nameValue = $values->getValue('name');

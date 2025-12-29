@@ -118,6 +118,7 @@ class Form
      *
      * @param string $key
      * @param string $field
+     * @return string[]
      */
     public static function errors(string $key, string $field): array
     {

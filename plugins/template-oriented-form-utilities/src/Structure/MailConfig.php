@@ -12,18 +12,16 @@ class MailConfig
     public function __construct(
         /**
          * From email address.
-         * If you set null, the default email address will be used.
          * This is usually the same as the site URL.
          *
-         * @var string|null
+         * @var string
          */
         public readonly string $fromEmail,
 
         /**
          * From name.
-         * If you set null, from name won't be set.
          *
-         * @var string|null
+         * @var string
          */
         public readonly string $fromName,
 
