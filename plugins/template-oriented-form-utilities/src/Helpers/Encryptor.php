@@ -56,7 +56,7 @@ class Encryptor
      * @param string $encryptedData
      * @return mixed|false
      */
-    public static function decrypt(string $encryptedData): mixed
+    public static function decrypt(string $encryptedData)
     {
         // Generate a key for decryption
         $key_for_openssl = self::getKey();
