@@ -36,7 +36,11 @@ class Template
         foreach ($values as $key => $value) {
             $replaceValue = '';
             if (is_array($value) || is_object($value)) {
-                $replaceValue = print_r($value, true);
+                $replaceValue = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if ($replaceValue === false) {
+                    Logger::warning("Failed to encode value for template placeholder", ["key" => $key, "error" => json_last_error_msg()]);
+                    $replaceValue = '';
+                }
             } else {
                 $replaceValue = (string)$value;
             }
