@@ -56,7 +56,17 @@ class Uploader
             wp_mkdir_p($tempDir);
 
             file_put_contents($tempDir . DIRECTORY_SEPARATOR . 'index.php', '<?php // Silence is golden.');
-            file_put_contents($tempDir . DIRECTORY_SEPARATOR . '.htaccess', "Order Deny,Allow\nDeny from all");
+
+            // Create .htaccess to prevent direct access
+            // Apache 2.4 or later: "Require all denied", Apache 2.2 or earlier: "Order Deny,Allow\nDeny from all"
+            $htaccessContent  = '<IfModule mod_authz_core.c>' . PHP_EOL;
+            $htaccessContent .= '   Require all denied' . PHP_EOL;
+            $htaccessContent .= '</IfModule>' . PHP_EOL;
+            $htaccessContent .= '<IfModule !mod_authz_core.c>' . PHP_EOL;
+            $htaccessContent .= '    Order Deny,Allow' . PHP_EOL;
+            $htaccessContent .= '    Deny from all' . PHP_EOL;
+            $htaccessContent .= '</IfModule>' . PHP_EOL;
+            file_put_contents($tempDir . DIRECTORY_SEPARATOR . '.htaccess', $htaccessContent);
         }
 
         return $tempDir;
