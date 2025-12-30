@@ -36,7 +36,10 @@ class Template
         foreach ($values as $key => $value) {
             $replaceValue = '';
             if (is_array($value) || is_object($value)) {
-                $replaceValue = print_r($value, true);
+                $replaceValue = json_encode($value);
+                if ($replaceValue === false) {
+                    $replaceValue = '';
+                }
             } else {
                 $replaceValue = (string)$value;
             }
