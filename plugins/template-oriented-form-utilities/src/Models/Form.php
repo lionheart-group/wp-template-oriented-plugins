@@ -40,9 +40,9 @@ class Form
     /**
      * Flush session value.
      *
-     * @var string|null
+     * @var ?string
      */
-    protected string|null $flushValue = null;
+    protected ?string $flushValue = null;
 
     /**
      * Form constructor.
@@ -160,7 +160,7 @@ class Form
     /**
      * Store the values in the Session table.
      */
-    protected function storeSession(string|null $flushValue = null): void
+    protected function storeSession(?string $flushValue = null): void
     {
         Session::save($this->config->key, [
             'values' => $this->values->toArray(),

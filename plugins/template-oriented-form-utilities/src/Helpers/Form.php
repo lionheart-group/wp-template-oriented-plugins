@@ -44,7 +44,7 @@ class Form
      *
      * @return FormModel|false
      */
-    public static function get(string $key, bool $isStrict = true): FormModel | false
+    public static function get(string $key, bool $isStrict = true): mixed
     {
         foreach (self::$forms as $form) {
             if ($form->getKey() === $key) {
@@ -149,9 +149,9 @@ class Form
      *
      * @param string $key
      * @param string $field
-     * @return UploadedFile|null
+     * @return ?UploadedFile
      */
-    public static function file(string $key, string $field): UploadedFile|null
+    public static function file(string $key, string $field): ?UploadedFile
     {
         $form = self::get($key);
         return $form->getFiles()->getFile($field);

@@ -62,7 +62,7 @@ class Validation
 
         // Upload files
         foreach ($targetValues as $name => $_) {
-            if (isset($_FILES[$name]) && isset($_FILES[$name]) && $_FILES[$name]['error'] === UPLOAD_ERR_OK) {
+            if (isset($_FILES[$name]) && isset($_FILES[$name]['error']) && $_FILES[$name]['error'] === UPLOAD_ERR_OK) {
                 $uploadedFile = Uploader::upload($name);
                 if ($uploadedFile) {
                     $files->addFile($uploadedFile);

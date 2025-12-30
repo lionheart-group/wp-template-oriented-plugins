@@ -8,7 +8,7 @@ use TofuPlugin\Structure\UploadedFile;
 
 class Uploader
 {
-    public static function upload($name): UploadedFile|null
+    public static function upload($name): ?UploadedFile
     {
         if (!isset($_FILES[$name]) || empty($_FILES[$name]['tmp_name'])) {
             return null;
@@ -81,6 +81,11 @@ class Uploader
         }
 
         $files = scandir($tempDir);
+        if ($files === false) {
+            Logger::error(sprintf('Failed to scan temporary upload directory for clearing expired files: %s', $tempDir));
+            return;
+        }
+
         $now = time();
         foreach ($files as $file) {
             if ($file === '.' || $file === '..' || in_array($file, ['index.php', '.htaccess'], true)) {

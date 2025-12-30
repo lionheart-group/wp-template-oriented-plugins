@@ -69,9 +69,9 @@ class FieldValueCollection
      * Get field value for a specific field
      *
      * @param string $field
-     * @return FieldValue|null
+     * @return ?FieldValue
      */
-    public function getValue(string $field): FieldValue | null
+    public function getValue(string $field): ?FieldValue
     {
         foreach ($this->values as $value) {
             if ($value->field === $field) {

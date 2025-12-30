@@ -29,9 +29,9 @@ class MailRecipientsConfig
          * If you set `{field}`, it will be replaced with the value of the field.
          * For example, if you set `{cc}`, it will be replaced with the value of the `cc` field.
          *
-         * @var string|null
+         * @var ?string
          */
-        public readonly string | null $recipientCcEmail = null,
+        public readonly ?string $recipientCcEmail = null,
 
         /**
          * Recipient bcc email address.
@@ -40,40 +40,40 @@ class MailRecipientsConfig
          * If you set `{field}`, it will be replaced with the value of the field.
          * For example, if you set `{bcc}`, it will be replaced with the value of the `bcc` field.
          *
-         * @var string|null
+         * @var ?string
          */
-        public readonly string | null $recipientBccEmail = null,
+        public readonly ?string $recipientBccEmail = null,
 
         /**
          * Recipient email subject.
          * You can choose to set a static subject here or use a template path.
          *
-         * @var string|null
+         * @var ?string
          */
-        public readonly string | null $subject = null,
+        public readonly ?string $subject = null,
 
         /**
          * Recipient email subject template.
          * You can choose to set a template path here or use a static subject.
          *
-         * @var string|null
+         * @var ?string
          */
-        public readonly string | null $subjectPath = null,
+        public readonly ?string $subjectPath = null,
 
         /**
          * Recipient email body.
          * You can choose to set a static mail body here or use a template path.
-         * @var string|null
+         * @var ?string
          */
-        public readonly string | null $mailBody = null,
+        public readonly ?string $mailBody = null,
 
         /**
          * Recipient email body template.
          * You can choose to set a template path here or use a static mail body.
          *
-         * @var string|null
+         * @var ?string
          */
-        public readonly string | null $mailBodyPath = null,
+        public readonly ?string $mailBodyPath = null,
     ) {
         /**
          * Ensure that either subject or subjectPath is set.

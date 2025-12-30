@@ -9,13 +9,13 @@ class Template
     /**
      * Get the template content as a string by rendering a template part.
      *
-     * @param string      $slug The slug name for the generic template.
-     * @param string|null $name Optional. The name of the specialized template. Default null.
-     * @param array       $args Optional. Additional arguments passed to the template.
-     *                          Default empty array.
+     * @param string  $slug The slug name for the generic template.
+     * @param ?string $name Optional. The name of the specialized template. Default null.
+     * @param array   $args Optional. Additional arguments passed to the template.
+     *                      Default empty array.
      * @return string
      */
-    public static function getTemplateContent(string $slug, string|null $name = null, array $args = array()): string
+    public static function getTemplateContent(string $slug, ?string $name = null, array $args = array()): string
     {
         ob_start();
         get_template_part($slug, $name, $args);

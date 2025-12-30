@@ -72,9 +72,9 @@ class Session
      * Get session data
      *
      * @param string $form_id
-     * @return mixed|null
+     * @return ?mixed
      */
-    public static function get($form_id)
+    public static function get($form_id): mixed
     {
         // Session ID
         $key = self::getSessionId();

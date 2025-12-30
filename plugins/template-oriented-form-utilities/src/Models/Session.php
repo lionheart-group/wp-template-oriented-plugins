@@ -40,7 +40,7 @@ class Session extends AbstractModels {
      *
      * @param string $form_id
      * @param string $session_key
-     * @return string|null
+     * @return ?string
      */
     public static function get(string $form_id, string $session_key): ?string
     {

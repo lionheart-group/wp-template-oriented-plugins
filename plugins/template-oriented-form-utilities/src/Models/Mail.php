@@ -10,7 +10,7 @@ class Mail
     protected array $to = [];
     protected array $cc = [];
     protected array $bcc = [];
-    protected string|MailAddress $from;
+    protected mixed $from;
     protected string $subject = '';
     protected string $body = '';
     protected array $headers = [];
@@ -29,7 +29,7 @@ class Mail
      * @param string|MailAddress $to
      * @return Mail
      */
-    public function addTo(string|MailAddress $to): Mail
+    public function addTo(mixed $to): Mail
     {
         if (is_string($to)) {
             foreach (explode(',', $to) as $email) {
@@ -48,7 +48,7 @@ class Mail
      * @param string|MailAddress $cc
      * @return Mail
      */
-    public function addCc(string|MailAddress $cc): Mail
+    public function addCc(mixed $cc): Mail
     {
         if (is_string($cc)) {
             foreach (explode(',', $cc) as $email) {
@@ -67,7 +67,7 @@ class Mail
      * @param string|MailAddress $bcc
      * @return Mail
      */
-    public function addBcc(string|MailAddress $bcc): Mail
+    public function addBcc(mixed $bcc): Mail
     {
         if (is_string($bcc)) {
             foreach (explode(',', $bcc) as $email) {
@@ -86,7 +86,7 @@ class Mail
      * @param string|MailAddress $from
      * @return Mail
      */
-    public function setFrom(string|MailAddress $from): Mail
+    public function setFrom(mixed $from): Mail
     {
         if (is_string($from)) {
             $from = new MailAddress(trim($from));

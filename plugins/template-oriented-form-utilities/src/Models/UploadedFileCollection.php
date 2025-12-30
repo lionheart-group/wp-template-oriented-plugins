@@ -52,9 +52,9 @@ class UploadedFileCollection
      * Get files by field name
      *
      * @param string $name
-     * @return UploadedFile|null
+     * @return ?UploadedFile
      */
-    public function getFile(string $name): UploadedFile|null
+    public function getFile(string $name): ?UploadedFile
     {
         return $this->files[$name] ?? null;
     }
