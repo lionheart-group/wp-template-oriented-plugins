@@ -28,7 +28,7 @@ class Uploader
 
         // Rename and move the uploaded file to a temporary directory
         $fileName = $filePost['name'];
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+        $extension = strtolower((string) pathinfo($fileName, PATHINFO_EXTENSION));
         $tempName = wp_generate_password(32, false) . '.' . $extension;
         $tempPath = self::getTempFilePath($tempName);
 

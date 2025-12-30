@@ -37,7 +37,7 @@ final class Consts
     public const UPLOAD_SUBFOLDER = 'tofu_uploads';
 
     /**
-     * Uploaded files temporary input fild name.
+     * Uploaded files temporary input field name.
      */
     public const UPLOADED_FILES_INPUT_NAME = '__tofu_uploaded_files';
 

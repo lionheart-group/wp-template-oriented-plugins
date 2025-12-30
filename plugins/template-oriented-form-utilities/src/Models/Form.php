@@ -82,11 +82,11 @@ class Form
             if (isset($sessionValues['files']) && $sessionValues['files']) {
                 foreach ($sessionValues['files'] as $fileData) {
                     $this->files->addFile(new UploadedFile(
-                        name: isset($fileData['name']) ? $fileData['name'] : '',
-                        fileName: isset($fileData['fileName']) ? $fileData['fileName'] : '',
-                        mimeType: isset($fileData['mimeType']) ? $fileData['mimeType'] : '',
-                        tempName: isset($fileData['tempName']) ? $fileData['tempName'] : '',
-                        size: isset($fileData['size']) ? $fileData['size'] : 0,
+                        name: $fileData['name'] ?? '',
+                        fileName: $fileData['fileName'] ?? '',
+                        mimeType: $fileData['mimeType'] ?? '',
+                        tempName: $fileData['tempName'] ?? '',
+                        size: $fileData['size'] ?? 0,
                     ));
                 }
             }
