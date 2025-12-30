@@ -34,7 +34,7 @@ class FieldValueCollection
      * @param mixed $value
      * @return void
      */
-    public function addValue(string $field, mixed $value): void
+    public function addValue(string $field, $value): void
     {
         // Field value isn't duplicated
         $currentValue = $this->getValue($field);
@@ -69,9 +69,9 @@ class FieldValueCollection
      * Get field value for a specific field
      *
      * @param string $field
-     * @return FieldValue|null
+     * @return ?FieldValue
      */
-    public function getValue(string $field): FieldValue | null
+    public function getValue(string $field): ?FieldValue
     {
         foreach ($this->values as $value) {
             if ($value->field === $field) {
@@ -79,6 +79,24 @@ class FieldValueCollection
             }
         }
         return null;
+    }
+
+    /**
+     * Unset field value for a specific field
+     *
+     * @param string $field
+     * @return void
+     */
+    public function unsetValue(string $field): void
+    {
+        foreach ($this->values as $index => $value) {
+            if ($value->field === $field) {
+                unset($this->values[$index]);
+                // Reindex array
+                $this->values = array_values($this->values);
+                return;
+            }
+        }
     }
 
     /**

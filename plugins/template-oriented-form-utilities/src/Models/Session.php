@@ -40,7 +40,7 @@ class Session extends AbstractModels {
      *
      * @param string $form_id
      * @param string $session_key
-     * @return string|null
+     * @return ?string
      */
     public static function get(string $form_id, string $session_key): ?string
     {
@@ -78,5 +78,23 @@ class Session extends AbstractModels {
         $count = $wpdb->get_var($query);
 
         return $count > 0;
+    }
+
+    /**
+     * Clear expired sessions
+     *
+     * @return void
+     */
+    public static function clearExpired(): void
+    {
+        global $wpdb;
+        $table = static::getTableName();
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$table} WHERE expiration <= %s",
+                \current_time('mysql')
+            )
+        );
     }
 }

@@ -14,7 +14,7 @@
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
  * Domain Path: /languages
- * Requires PHP: 8.0
+ * Requires PHP: 7.4
  */
 
 // If this file is called directly, abort.
@@ -33,6 +33,9 @@ define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
 // Load autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
+use TofuPlugin\Consts;
+use TofuPlugin\Helpers\Session;
+use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
 use TofuPlugin\Init\Migrate;
@@ -65,6 +68,16 @@ add_action('upgrade_process_complete', function ($upgrader_object, $options) {
 add_action('wp_mail_failed', function ($wp_error) {
     Logger::error('Mail sending failed: ' . $wp_error->get_error_message());
 }, 10, 1);
+
+// Garbage collection for expired sessions
+add_action('init', function () {
+    $rand = mt_rand(1, 100);
+
+    if ($rand <= Consts::GARBAGE_COLLECTION_PERCENTAGE) {
+        Session::clearExpired();
+        Uploader::clearExpired();
+    }
+});
 
 // Initialize endpoint
 Endpoint::init();

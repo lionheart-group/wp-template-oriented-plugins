@@ -7,8 +7,6 @@ use TofuPlugin\Models\Session as SessionModel;
 
 class Session
 {
-    const EXPIRY = 3600; // 1 hour
-
     /**
      * Get unique cookie name for identifying the session
      *
@@ -40,7 +38,7 @@ class Session
 
         // Expiration time
         $expiration = new \DateTime('now', \wp_timezone());
-        $expiration->modify('+' . self::EXPIRY . ' seconds');
+        $expiration->modify('+' . Consts::SESSION_EXPIRY . ' seconds');
 
         // Encrypt session value
         $encryptedValue = Encryptor::encrypt($data);
@@ -74,7 +72,7 @@ class Session
      * Get session data
      *
      * @param string $form_id
-     * @return mixed|null
+     * @return ?mixed
      */
     public static function get($form_id)
     {
@@ -102,10 +100,21 @@ class Session
     {
         // Session ID
         $key = self::getSessionId();
+
         // Delete session record from the database
         SessionModel::delete([
             'form_id' => $form_id,
             'session_key' => $key,
         ]);
+    }
+
+    /**
+     * Clear expired sessions
+     *
+     * @return void
+     */
+    public static function clearExpired()
+    {
+        SessionModel::clearExpired();
     }
 }

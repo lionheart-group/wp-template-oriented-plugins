@@ -11,7 +11,7 @@ class Encryptor
      *
      * @return string
      */
-    protected static function getKey()
+    protected static function getKey(): string
     {
         if (!defined('AUTH_KEY') || !defined('SECURE_AUTH_KEY')) {
             \wp_die(
@@ -31,7 +31,7 @@ class Encryptor
      * @param mixed $data
      * @return string
      */
-    public static function encrypt($data)
+    public static function encrypt($data): string
     {
         // Generate a key for encryption
         $key_for_openssl = self::getKey();

@@ -99,8 +99,8 @@ class ValidationConfig
         /**
          * Custom after hook
          *
-         * @var \Closure(FieldValueCollection $values, ValidationErrorCollection $errors): void|null
+         * @var ?\Closure(FieldValueCollection $values, ValidationErrorCollection $errors):void
          */
-        public readonly \Closure | null $after = null,
+        public readonly ?\Closure $after = null,
     ) {}
 }

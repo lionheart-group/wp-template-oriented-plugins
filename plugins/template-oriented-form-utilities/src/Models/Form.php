@@ -3,13 +3,16 @@
 namespace TofuPlugin\Models;
 
 use TofuPlugin\Consts;
+use TofuPlugin\Helpers\Encryptor;
 use TofuPlugin\Helpers\Form as FormHelper;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Template;
+use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
+use TofuPlugin\Structure\UploadedFile;
 
 class Form
 {
@@ -18,14 +21,28 @@ class Form
      *
      * @var FieldValueCollection
      */
-    protected $values;
+    protected FieldValueCollection $values;
 
     /**
      * Error values.
      *
      * @var ValidationErrorCollection
      */
-    protected $errors;
+    protected ValidationErrorCollection $errors;
+
+    /**
+     * Uploaded files.
+     *
+     * @var UploadedFileCollection
+     */
+    protected UploadedFileCollection $files;
+
+    /**
+     * Flush session value.
+     *
+     * @var ?string
+     */
+    protected ?string $flushValue = null;
 
     /**
      * Form constructor.
@@ -41,6 +58,7 @@ class Form
     {
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
+        $this->files = new UploadedFileCollection();
 
         // Load the session values from Session Table
         $sessionValues = Session::get($this->config->key);
@@ -60,6 +78,22 @@ class Form
                     }
                 }
             }
+
+            if (isset($sessionValues['files']) && $sessionValues['files']) {
+                foreach ($sessionValues['files'] as $fileData) {
+                    $this->files->addFile(new UploadedFile(
+                        name: $fileData['name'] ?? '',
+                        fileName: $fileData['fileName'] ?? '',
+                        mimeType: $fileData['mimeType'] ?? '',
+                        tempName: $fileData['tempName'] ?? '',
+                        size: $fileData['size'] ?? 0,
+                    ));
+                }
+            }
+
+            if (isset($sessionValues['flushValue'])) {
+                $this->flushValue = $sessionValues['flushValue'];
+            }
         }
 
         Logger::info('Form initialized', [
@@ -68,6 +102,8 @@ class Form
             'session' => $sessionValues,
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
+            'files' => $this->files->toArray(),
+            'flushValue' => $this->flushValue,
         ]);
     }
 
@@ -102,6 +138,16 @@ class Form
     }
 
     /**
+     * Get the uploaded files.
+     *
+     * @return UploadedFileCollection
+     */
+    public function getFiles(): UploadedFileCollection
+    {
+        return $this->files;
+    }
+
+    /**
      * Get the errors.
      *
      * @return ValidationErrorCollection
@@ -114,11 +160,13 @@ class Form
     /**
      * Store the values in the Session table.
      */
-    protected function storeSession(): void
+    protected function storeSession(?string $flushValue = null): void
     {
         Session::save($this->config->key, [
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
+            'files' => $this->files->toArray(),
+            'flushValue' => $flushValue,
         ]);
     }
 
@@ -180,10 +228,11 @@ class Form
         // Initialize values and errors
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
+        $this->files = new UploadedFileCollection();
 
         // Validate input field
         $validation = new Validation();
-        $validation->validate($this, $_POST);
+        $validation->validate($this, array_merge($_POST, $_FILES));
 
         // Store the input values in the Session table
         $this->storeSession();
@@ -207,10 +256,32 @@ class Form
         exit;
     }
 
+    public function verifySession(): bool
+    {
+        // Validate input field
+        $validation = new Validation();
+        $validation->validate($this, $this->values->toArray());
+
+        return !$this->errors->hasErrors();
+    }
+
     public function actionConfirm(bool $skipVerify = false)
     {
-        if ($skipVerify || FormHelper::verifyNonceField($this->getKey(), 'confirm') === false) {
-            wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
+        if ($skipVerify === false) {
+            if (FormHelper::verifyNonceField($this->getKey(), 'confirm') === false) {
+                wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
+            }
+
+            // Verify session data
+            if (!$this->verifySession()) {
+                // Store the input values in the Session table
+                $this->storeSession();
+
+                // Redirect back for errors
+                $redirect = $this->config->template->inputPath;
+                wp_redirect($redirect);
+                exit;
+            }
         }
 
         $values = $this->values->toArray();
@@ -277,15 +348,64 @@ class Form
                 );
             }
 
+            // Attach uploaded files
+            foreach ($this->files->getAllFiles() as $uploadedFile) {
+                $mail->addAttachment($uploadedFile->fileName, Uploader::getTempFilePath($uploadedFile->tempName));
+            }
+
             if (!$mail->send()) {
                 Logger::error('Failed to send email', $mail->toArray());
                 wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
             }
         }
 
+        // Delete uploaded files
+        foreach ($this->files->getAllFiles() as $uploadedFile) {
+            $tempPath = Uploader::getTempFilePath($uploadedFile->tempName);
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+        }
+
+        // Clear the session data
+        Session::clear($this->config->key);
+        $this->values = new FieldValueCollection();
+        $this->errors = new ValidationErrorCollection();
+        $this->files = new UploadedFileCollection();
+
+        // Save flush value for verification in result page
+        $this->storeSession(Encryptor::encrypt([
+            'form_key' => $this->config->key,
+            'timestamp' => time(),
+        ]));
+
         // Redirect to the result page
         $url = $this->config->template->resultPath;
         wp_redirect($url);
         exit;
+    }
+
+    public function verifySubmit(): bool
+    {
+        if ($this->flushValue === null) {
+            return false;
+        }
+        Session::clear($this->config->key);
+
+        $sessionData = Encryptor::decrypt($this->flushValue);
+        if ($sessionData === false || !is_array($sessionData)) {
+            return false;
+        }
+
+        if (!isset($sessionData['form_key']) || $sessionData['form_key'] !== $this->config->key) {
+            return false;
+        }
+
+        $timestamp = isset($sessionData['timestamp']) ? (int)$sessionData['timestamp'] : 0;
+        if (time() - $timestamp > 3600) { // 1 hour expiry
+            return false;
+        }
+
+        return true;
     }
 }
