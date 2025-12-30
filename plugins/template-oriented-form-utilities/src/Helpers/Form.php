@@ -90,7 +90,7 @@ class Form
 
         $attrString = '';
         foreach ($attributes as $attrKey => $attrValue) {
-            $attrString .= sprintf(' %s="%s"', esc_html($attrKey), esc_attr($attrValue));
+            $attrString .= sprintf(' %s="%s"', $attrKey, esc_attr($attrValue));
         }
 
         return sprintf('<form action="%s" method="post" enctype="multipart/form-data"%s>', esc_url($actionUrl), $attrString);
