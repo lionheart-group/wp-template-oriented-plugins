@@ -49,11 +49,11 @@ class Validation
         if (isset($targetValues[Consts::UPLOADED_FILES_INPUT_NAME]) && is_array($targetValues[Consts::UPLOADED_FILES_INPUT_NAME])) {
             foreach ($targetValues[Consts::UPLOADED_FILES_INPUT_NAME] as $fileData) {
                 $uploadedFile = new UploadedFile(
-                    name: $fileData['name'],
-                    fileName: $fileData['fileName'],
-                    mimeType: $fileData['mimeType'],
-                    tempPath: $fileData['tempPath'],
-                    size: (int)$fileData['size'],
+                    name: $fileData['name'] ?? '',
+                    fileName: $fileData['fileName'] ?? '',
+                    mimeType: $fileData['mimeType'] ?? '',
+                    tempName: $fileData['tempName'] ?? '',
+                    size: (int)($fileData['size'] ?? 0),
                 );
                 $files->addFile($uploadedFile);
             }

@@ -79,4 +79,22 @@ class Session extends AbstractModels {
 
         return $count > 0;
     }
+
+    /**
+     * Clear expired sessions
+     *
+     * @return void
+     */
+    public static function clearExpired(): void
+    {
+        global $wpdb;
+        $table = static::getTableName();
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$table} WHERE expiration <= %s",
+                \current_time('mysql')
+            )
+        );
+    }
 }

@@ -30,8 +30,7 @@ class Uploader
         $fileName = $filePost['name'];
         $extension = pathinfo($fileName, PATHINFO_EXTENSION);
         $tempName = wp_generate_password(32, false) . '.' . $extension;
-        $tempDir = self::getTempDir();
-        $tempPath = $tempDir . DIRECTORY_SEPARATOR . $tempName;
+        $tempPath = self::getTempFilePath($tempName);
 
         // Move the uploaded file
         if (!move_uploaded_file($filePost['tmp_name'], $tempPath)) {
@@ -43,7 +42,7 @@ class Uploader
             name: $name,
             fileName: $fileName,
             mimeType: $mimeType,
-            tempPath: $tempPath,
+            tempName: $tempName,
             size: $size,
         );
     }
@@ -61,5 +60,40 @@ class Uploader
         }
 
         return $tempDir;
+    }
+
+    public static function getTempFilePath(string $tempName): string
+    {
+        $tempDir = self::getTempDir();
+        return $tempDir . DIRECTORY_SEPARATOR . $tempName;
+    }
+
+    /**
+     * Clear expired uploaded files
+     *
+     * @return void
+     */
+    public static function clearExpired()
+    {
+        $tempDir = self::getTempDir();
+        if (!is_dir($tempDir)) {
+            return;
+        }
+
+        $files = scandir($tempDir);
+        $now = time();
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..' || in_array($file, ['index.php', '.htaccess'], true)) {
+                continue;
+            }
+
+            $filePath = $tempDir . DIRECTORY_SEPARATOR . $file;
+            if (is_file($filePath)) {
+                $fileModTime = filemtime($filePath);
+                if ($fileModTime !== false && ($now - $fileModTime) > Consts::SESSION_EXPIRY) {
+                    unlink($filePath);
+                }
+            }
+        }
     }
 }

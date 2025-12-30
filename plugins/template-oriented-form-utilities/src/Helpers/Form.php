@@ -194,10 +194,10 @@ class Form
             esc_attr($file->mimeType)
         );
         $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][tempPath]" value="%s">',
+            '<input type="hidden" name="%s[%s][tempName]" value="%s">',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->tempPath)
+            esc_attr($file->tempName)
         );
         $outputs[] = sprintf(
             '<input type="hidden" name="%s[%s][size]" value="%d">',

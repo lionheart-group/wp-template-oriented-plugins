@@ -20,6 +20,11 @@ final class Consts
     public const SESSION_COOKIE_KEY = '_tofu_session_key';
 
     /**
+     * Session expuiry time in seconds. (24 hours)
+     */
+    public const SESSION_EXPIRY = 86400;
+
+    /**
      * Nonce key format for form submission.
      *
      * 1st parameter: Form key
@@ -35,4 +40,9 @@ final class Consts
      * Uploaded files temporary input fild name.
      */
     public const UPLOADED_FILES_INPUT_NAME = '__tofu_uploaded_files';
+
+    /**
+     * Percentage for garbage collection.
+     */
+    public const GARBAGE_COLLECTION_PERCENTAGE = 10;
 }

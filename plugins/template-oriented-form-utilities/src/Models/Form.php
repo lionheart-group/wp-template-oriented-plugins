@@ -6,6 +6,7 @@ use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Form as FormHelper;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Template;
+use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
@@ -77,7 +78,7 @@ class Form
                         name: isset($fileData['name']) ? $fileData['name'] : '',
                         fileName: isset($fileData['fileName']) ? $fileData['fileName'] : '',
                         mimeType: isset($fileData['mimeType']) ? $fileData['mimeType'] : '',
-                        tempPath: isset($fileData['tempPath']) ? $fileData['tempPath'] : '',
+                        tempName: isset($fileData['tempName']) ? $fileData['tempName'] : '',
                         size: isset($fileData['size']) ? $fileData['size'] : 0,
                     ));
                 }
@@ -314,7 +315,7 @@ class Form
 
             // Attach uploaded files
             foreach ($this->files->getAllFiles() as $uploadedFile) {
-                $mail->addAttachment($uploadedFile->fileName, $uploadedFile->tempPath);
+                $mail->addAttachment($uploadedFile->fileName, Uploader::getTempFilePath($uploadedFile->tempName));
             }
 
             if (!$mail->send()) {
@@ -325,8 +326,9 @@ class Form
 
         // Delete uploaded files
         foreach ($this->files->getAllFiles() as $uploadedFile) {
-            if (file_exists($uploadedFile->tempPath)) {
-                unlink($uploadedFile->tempPath);
+            $tempPath = Uploader::getTempFilePath($uploadedFile->tempName);
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
             }
         }
 
