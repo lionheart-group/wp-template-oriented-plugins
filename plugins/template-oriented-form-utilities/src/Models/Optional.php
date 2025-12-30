@@ -9,13 +9,13 @@ use ArrayAccess;
 
 class Optional
 {
-    public static function of(mixed $value): Optional
+    public static function of($value): Optional
     {
         return new Optional($value);
     }
 
     public function __construct(
-        protected mixed $value
+        protected $value
     )
     {
     }

@@ -39,8 +39,9 @@ class UploadedFileCollection
     }
 
     /**
-     * Check if there are any uploaded files
+     * Check if a specific uploaded file exists by name.
      *
+     * @param string $name
      * @return boolean
      */
     public function hasFile(string $name): bool

@@ -7,13 +7,60 @@ use TofuPlugin\Structure\MailAddress;
 
 class Mail
 {
+    /**
+     * Recipients
+     *
+     * @var MailAddress[]
+     */
     protected array $to = [];
+
+    /**
+     * CC Recipients
+     *
+     * @var MailAddress[]
+     */
     protected array $cc = [];
+
+    /**
+     * BCC Recipients
+     *
+     * @var MailAddress[]
+     */
     protected array $bcc = [];
-    protected mixed $from;
+
+    /**
+     * Sender
+     *
+     * @var MailAddress
+     */
+    protected MailAddress $from;
+
+    /**
+     * Subject
+     *
+     * @var string
+     */
     protected string $subject = '';
+
+    /**
+     * Body
+     *
+     * @var string
+     */
     protected string $body = '';
+
+    /**
+     * Headers
+     *
+     * @var string[]
+     */
     protected array $headers = [];
+
+    /**
+     * Attachments
+     *
+     * @var array<string, string>
+     */
     protected array $attachments = [];
 
     /**
@@ -29,7 +76,7 @@ class Mail
      * @param string|MailAddress $to
      * @return Mail
      */
-    public function addTo(mixed $to): Mail
+    public function addTo($to): Mail
     {
         if (is_string($to)) {
             foreach (explode(',', $to) as $email) {
@@ -48,7 +95,7 @@ class Mail
      * @param string|MailAddress $cc
      * @return Mail
      */
-    public function addCc(mixed $cc): Mail
+    public function addCc($cc): Mail
     {
         if (is_string($cc)) {
             foreach (explode(',', $cc) as $email) {
@@ -67,7 +114,7 @@ class Mail
      * @param string|MailAddress $bcc
      * @return Mail
      */
-    public function addBcc(mixed $bcc): Mail
+    public function addBcc($bcc): Mail
     {
         if (is_string($bcc)) {
             foreach (explode(',', $bcc) as $email) {
@@ -86,7 +133,7 @@ class Mail
      * @param string|MailAddress $from
      * @return Mail
      */
-    public function setFrom(mixed $from): Mail
+    public function setFrom($from): Mail
     {
         if (is_string($from)) {
             $from = new MailAddress(trim($from));

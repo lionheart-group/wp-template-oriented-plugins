@@ -34,7 +34,7 @@ class FieldValueCollection
      * @param mixed $value
      * @return void
      */
-    public function addValue(string $field, mixed $value): void
+    public function addValue(string $field, $value): void
     {
         // Field value isn't duplicated
         $currentValue = $this->getValue($field);
