@@ -74,7 +74,7 @@ class Session
      * @param string $form_id
      * @return ?mixed
      */
-    public static function get($form_id): mixed
+    public static function get($form_id)
     {
         // Session ID
         $key = self::getSessionId();
