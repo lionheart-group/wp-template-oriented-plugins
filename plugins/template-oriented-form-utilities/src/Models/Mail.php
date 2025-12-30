@@ -166,12 +166,13 @@ class Mail
     /**
      * Add an attachment.
      *
-     * @param string $attachment
+     * @param string $fileName
+     * @param string $filePath
      * @return Mail
      */
-    public function addAttachment(string $attachment): Mail
+    public function addAttachment(string $fileName, string $filePath): Mail
     {
-        $this->attachments[] = $attachment;
+        $this->attachments[$fileName] = $filePath;
         return $this;
     }
 

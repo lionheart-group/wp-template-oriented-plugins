@@ -102,6 +102,7 @@ class Session
     {
         // Session ID
         $key = self::getSessionId();
+
         // Delete session record from the database
         SessionModel::delete([
             'form_id' => $form_id,

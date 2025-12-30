@@ -10,6 +10,7 @@ use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
+use TofuPlugin\Structure\UploadedFile;
 
 class Form
 {
@@ -18,14 +19,22 @@ class Form
      *
      * @var FieldValueCollection
      */
-    protected $values;
+    protected FieldValueCollection $values;
 
     /**
      * Error values.
      *
      * @var ValidationErrorCollection
      */
-    protected $errors;
+    protected ValidationErrorCollection $errors;
+
+    /**
+     * Uploaded files.
+     *
+     * @var UploadedFileCollection
+     */
+    protected UploadedFileCollection $files;
+
 
     /**
      * Form constructor.
@@ -41,6 +50,7 @@ class Form
     {
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
+        $this->files = new UploadedFileCollection();
 
         // Load the session values from Session Table
         $sessionValues = Session::get($this->config->key);
@@ -60,6 +70,18 @@ class Form
                     }
                 }
             }
+
+            if (isset($sessionValues['files']) && $sessionValues['files']) {
+                foreach ($sessionValues['files'] as $fileData) {
+                    $this->files->addFile(new UploadedFile(
+                        name: isset($fileData['name']) ? $fileData['name'] : '',
+                        fileName: isset($fileData['fileName']) ? $fileData['fileName'] : '',
+                        mimeType: isset($fileData['mimeType']) ? $fileData['mimeType'] : '',
+                        tempPath: isset($fileData['tempPath']) ? $fileData['tempPath'] : '',
+                        size: isset($fileData['size']) ? $fileData['size'] : 0,
+                    ));
+                }
+            }
         }
 
         Logger::info('Form initialized', [
@@ -68,6 +90,7 @@ class Form
             'session' => $sessionValues,
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
+            'files' => $this->files->toArray(),
         ]);
     }
 
@@ -102,6 +125,16 @@ class Form
     }
 
     /**
+     * Get the uploaded files.
+     *
+     * @return UploadedFileCollection
+     */
+    public function getFiles(): UploadedFileCollection
+    {
+        return $this->files;
+    }
+
+    /**
      * Get the errors.
      *
      * @return ValidationErrorCollection
@@ -119,6 +152,7 @@ class Form
         Session::save($this->config->key, [
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
+            'files' => $this->files->toArray(),
         ]);
     }
 
@@ -180,10 +214,11 @@ class Form
         // Initialize values and errors
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
+        $this->files = new UploadedFileCollection();
 
         // Validate input field
         $validation = new Validation();
-        $validation->validate($this, $_POST);
+        $validation->validate($this, array_merge($_POST, $_FILES));
 
         // Store the input values in the Session table
         $this->storeSession();
@@ -277,11 +312,26 @@ class Form
                 );
             }
 
+            // Attach uploaded files
+            foreach ($this->files->getAllFiles() as $uploadedFile) {
+                $mail->addAttachment($uploadedFile->fileName, $uploadedFile->tempPath);
+            }
+
             if (!$mail->send()) {
                 Logger::error('Failed to send email', $mail->toArray());
                 wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
             }
         }
+
+        // Delete uploaded files
+        foreach ($this->files->getAllFiles() as $uploadedFile) {
+            if (file_exists($uploadedFile->tempPath)) {
+                unlink($uploadedFile->tempPath);
+            }
+        }
+
+        // Clear the session data
+        Session::clear($this->config->key);
 
         // Redirect to the result page
         $url = $this->config->template->resultPath;

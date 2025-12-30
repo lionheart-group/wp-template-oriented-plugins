@@ -34,7 +34,14 @@ class Template
     public static function replaceBracesValues(string $templateContent, array $values): string
     {
         foreach ($values as $key => $value) {
-            $templateContent = preg_replace('/\{\s*?' . preg_quote($key, '/') . '\s*?\}/', $value, $templateContent);
+            $replaceValue = '';
+            if (is_array($value) || is_object($value)) {
+                $replaceValue = print_r($value, true);
+            } else {
+                $replaceValue = (string)$value;
+            }
+
+            $templateContent = preg_replace('/\{\s*?' . preg_quote($key, '/') . '\s*?\}/', $replaceValue, $templateContent);
         }
         return $templateContent;
     }

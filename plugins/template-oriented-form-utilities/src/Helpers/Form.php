@@ -5,6 +5,7 @@ namespace TofuPlugin\Helpers;
 use TofuPlugin\Consts;
 use \TofuPlugin\Models\Form as FormModel;
 use TofuPlugin\Structure\FormConfig;
+use TofuPlugin\Structure\UploadedFile;
 
 class Form
 {
@@ -76,6 +77,36 @@ class Form
     }
 
     /**
+     * Generate form tag
+     *
+     * @param string $key
+     * @param string $action
+     * @return string
+     */
+    public static function formOpen(string $key, string $action, array $attributes = []): string
+    {
+        $form = self::get($key);
+        $actionUrl = $form->getActionUrl($action);
+
+        $attrString = '';
+        foreach ($attributes as $attrKey => $attrValue) {
+            $attrString .= sprintf(' %s="%s"', esc_html($attrKey), esc_attr($attrValue));
+        }
+
+        return sprintf('<form action="%s" method="post" enctype="multipart/form-data"%s>', esc_url($actionUrl), $attrString);
+    }
+
+    /**
+     * Generate form closing tag
+     *
+     * @return string
+     */
+    public static function formClose(): string
+    {
+        return '</form>';
+    }
+
+    /**
      * Get form value
      *
      * @param string $key
@@ -98,6 +129,84 @@ class Form
             return esc_html($value->value);
         }
         return $value->value;
+    }
+
+    /**
+     * Check if the uploaded file exists for the specified field
+     *
+     * @param string $key
+     * @param string $field
+     * @return boolean
+     */
+    public static function hasFile(string $key, string $field): bool
+    {
+        $form = self::get($key);
+        return $form->getFiles()->hasFile($field);
+    }
+
+    /**
+     * Get uploaded file for the specified field
+     *
+     * @param string $key
+     * @param string $field
+     * @return UploadedFile|null
+     */
+    public static function file(string $key, string $field): UploadedFile|null
+    {
+        $form = self::get($key);
+        return $form->getFiles()->getFile($field);
+    }
+
+    /**
+     * Generate hidden input field for the uploaded file
+     *
+     * @param string $key
+     * @param string $field
+     * @return string
+     */
+    public static function fileHidden(string $key, string $field): string
+    {
+        $form = self::get($key);
+        $file = $form->getFiles()->getFile($field);
+
+        if ($file === null) {
+            return '';
+        }
+
+        $outputs = [];
+
+        $outputs[] = sprintf(
+            '<input type="hidden" name="%s[%s][name]" value="%s">',
+            Consts::UPLOADED_FILES_INPUT_NAME,
+            esc_attr($file->name),
+            esc_attr($file->name)
+        );
+        $outputs[] = sprintf(
+            '<input type="hidden" name="%s[%s][fileName]" value="%s">',
+            Consts::UPLOADED_FILES_INPUT_NAME,
+            esc_attr($file->name),
+            esc_attr($file->fileName)
+        );
+        $outputs[] = sprintf(
+            '<input type="hidden" name="%s[%s][mimeType]" value="%s">',
+            Consts::UPLOADED_FILES_INPUT_NAME,
+            esc_attr($file->name),
+            esc_attr($file->mimeType)
+        );
+        $outputs[] = sprintf(
+            '<input type="hidden" name="%s[%s][tempPath]" value="%s">',
+            Consts::UPLOADED_FILES_INPUT_NAME,
+            esc_attr($file->name),
+            esc_attr($file->tempPath)
+        );
+        $outputs[] = sprintf(
+            '<input type="hidden" name="%s[%s][size]" value="%d">',
+            Consts::UPLOADED_FILES_INPUT_NAME,
+            esc_attr($file->name),
+            $file->size
+        );
+
+        return implode("", $outputs);
     }
 
     /**
