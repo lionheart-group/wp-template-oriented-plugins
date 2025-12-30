@@ -82,6 +82,24 @@ class FieldValueCollection
     }
 
     /**
+     * Unset field value for a specific field
+     *
+     * @param string $field
+     * @return void
+     */
+    public function unsetValue(string $field): void
+    {
+        foreach ($this->values as $index => $value) {
+            if ($value->field === $field) {
+                unset($this->values[$index]);
+                // Reindex array
+                $this->values = array_values($this->values);
+                return;
+            }
+        }
+    }
+
+    /**
      * Convert values to an array
      *
      * @return array

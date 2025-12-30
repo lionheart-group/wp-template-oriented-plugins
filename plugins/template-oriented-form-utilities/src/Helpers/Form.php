@@ -262,4 +262,26 @@ class Form
 
         return wp_verify_nonce($nonce, $action);
     }
+
+    /**
+     * Verify session value
+     *
+     * @return bool
+     */
+    public static function verifySession(string $key): bool
+    {
+        $form = self::get($key);
+        return $form->verifySession();
+    }
+
+    /**
+     * Verify submit step
+     *
+     * @return bool
+     */
+    public static function verifySubmit(string $key): bool
+    {
+        $form = self::get($key);
+        return $form->verifySubmit();
+    }
 }

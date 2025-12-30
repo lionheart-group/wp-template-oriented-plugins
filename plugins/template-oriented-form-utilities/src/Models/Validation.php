@@ -56,6 +56,7 @@ class Validation
                     size: (int)($fileData['size'] ?? 0),
                 );
                 $files->addFile($uploadedFile);
+                $values->unsetValue($uploadedFile->name);
             }
         }
 
@@ -65,6 +66,7 @@ class Validation
                 $uploadedFile = Uploader::upload($name);
                 if ($uploadedFile) {
                     $files->addFile($uploadedFile);
+                    $values->unsetValue($uploadedFile->name);
                 }
             }
         }

@@ -3,6 +3,7 @@
 namespace TofuPlugin\Models;
 
 use TofuPlugin\Consts;
+use TofuPlugin\Helpers\Encryptor;
 use TofuPlugin\Helpers\Form as FormHelper;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Template;
@@ -36,6 +37,12 @@ class Form
      */
     protected UploadedFileCollection $files;
 
+    /**
+     * Flush session value.
+     *
+     * @var string|null
+     */
+    protected string|null $flushValue = null;
 
     /**
      * Form constructor.
@@ -83,6 +90,10 @@ class Form
                     ));
                 }
             }
+
+            if (isset($sessionValues['flushValue'])) {
+                $this->flushValue = $sessionValues['flushValue'];
+            }
         }
 
         Logger::info('Form initialized', [
@@ -92,6 +103,7 @@ class Form
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
             'files' => $this->files->toArray(),
+            'flushValue' => $this->flushValue,
         ]);
     }
 
@@ -148,12 +160,13 @@ class Form
     /**
      * Store the values in the Session table.
      */
-    protected function storeSession(): void
+    protected function storeSession(string|null $flushValue = null): void
     {
         Session::save($this->config->key, [
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
             'files' => $this->files->toArray(),
+            'flushValue' => $flushValue,
         ]);
     }
 
@@ -243,10 +256,32 @@ class Form
         exit;
     }
 
+    public function verifySession(): bool
+    {
+        // Validate input field
+        $validation = new Validation();
+        $validation->validate($this, $this->values->toArray());
+
+        return !$this->errors->hasErrors();
+    }
+
     public function actionConfirm(bool $skipVerify = false)
     {
-        if ($skipVerify || FormHelper::verifyNonceField($this->getKey(), 'confirm') === false) {
-            wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
+        if ($skipVerify === false) {
+            if (FormHelper::verifyNonceField($this->getKey(), 'confirm') === false) {
+                wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
+            }
+
+            // Verify session data
+            if (!$this->verifySession()) {
+                // Store the input values in the Session table
+                $this->storeSession();
+
+                // Redirect back for errors
+                $redirect = $this->config->template->inputPath;
+                wp_redirect($redirect);
+                exit;
+            }
         }
 
         $values = $this->values->toArray();
@@ -334,10 +369,43 @@ class Form
 
         // Clear the session data
         Session::clear($this->config->key);
+        $this->values = new FieldValueCollection();
+        $this->errors = new ValidationErrorCollection();
+        $this->files = new UploadedFileCollection();
+
+        // Save flush value for verification in result page
+        $this->storeSession(Encryptor::encrypt([
+            'form_key' => $this->config->key,
+            'timestamp' => time(),
+        ]));
 
         // Redirect to the result page
         $url = $this->config->template->resultPath;
         wp_redirect($url);
         exit;
+    }
+
+    public function verifySubmit(): bool
+    {
+        if ($this->flushValue === null) {
+            return false;
+        }
+        Session::clear($this->config->key);
+
+        $sessionData = Encryptor::decrypt($this->flushValue);
+        if ($sessionData === false || !is_array($sessionData)) {
+            return false;
+        }
+
+        if (!isset($sessionData['form_key']) || $sessionData['form_key'] !== $this->config->key) {
+            return false;
+        }
+
+        $timestamp = isset($sessionData['timestamp']) ? (int)$sessionData['timestamp'] : 0;
+        if (time() - $timestamp > 3600) { // 1 hour expiry
+            return false;
+        }
+
+        return true;
     }
 }
