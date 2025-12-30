@@ -44,7 +44,7 @@ class Form
      *
      * @return FormModel|false
      */
-    public static function get(string $key, bool $isStrict = true): mixed
+    public static function get(string $key, bool $isStrict = true)
     {
         foreach (self::$forms as $form) {
             if ($form->getKey() === $key) {
