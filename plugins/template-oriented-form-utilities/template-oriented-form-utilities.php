@@ -69,7 +69,7 @@ add_action('wp_mail_failed', function ($wp_error) {
     Logger::error('Mail sending failed: ' . $wp_error->get_error_message());
 }, 10, 1);
 
-// Gobage collection for expired sessions
+// Garbage collection for expired sessions
 add_action('init', function () {
     $rand = mt_rand(1, 100);
 
