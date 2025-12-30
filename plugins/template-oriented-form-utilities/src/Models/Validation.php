@@ -86,7 +86,7 @@ GUMP::add_validator(
     'custom_required_file',
     function ($field, array $input, array $params) {
         // If uploaded file is exists, return true
-        if (isset($input[$field]) && is_array($input[$field]) && $input[$field]['error'] === 0) {
+        if (isset($input[$field]) && is_array($input[$field]) && $input[$field]['error'] === \UPLOAD_ERR_OK) {
             return true;
         }
 
