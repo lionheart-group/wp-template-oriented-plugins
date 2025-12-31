@@ -59,7 +59,7 @@ class ValidationConfig
          * @var array
          * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-validators
          */
-        public readonly array $rules = [],
+        public readonly array $rules,
 
         /**
          * Filtering rules.
@@ -74,7 +74,19 @@ class ValidationConfig
          * @var array
          * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-filters
          */
-        public readonly array $filters = [],
+        public readonly array $filters,
+
+        /**
+         * Field names for error messages.
+         *
+         * ```php
+         * names: [
+         *     'name' => 'Full Name',
+         *     'email' => 'Email Address',
+         * ]
+         * ```
+         */
+        public readonly array $names,
 
         /**
          * Validation messages.

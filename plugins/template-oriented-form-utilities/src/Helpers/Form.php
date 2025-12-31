@@ -243,7 +243,7 @@ class Form
             esc_attr($key),
             esc_attr($field),
             $attrString,
-            $label !== null ? esc_html($label) : esc_html__('Remove File', Consts::TEXT_DOMAIN)
+            $label !== null ? esc_html($label) : esc_html__('Remove File', 'template-oriented-form-utilities')
         );
     }
 

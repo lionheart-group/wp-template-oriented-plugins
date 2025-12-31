@@ -23,6 +23,7 @@ class Validation
         // Validate input values
         $gump = new GUMP($locale);
         $gump->set_fields_error_messages($form->config->validation->messages);
+        $gump->set_field_names($form->config->validation->names);
 
         // Sanitize and validate
         $sanitizedData = $gump->filter($targetValues, $form->config->validation->filters);
@@ -100,7 +101,7 @@ GUMP::add_validator(
 
         return false;
     },
-    __('The {field} field is required.', Consts::TEXT_DOMAIN)
+    __('The {field} field is required.', 'template-oriented-form-utilities')
 );
 
 // Validate file size in MB
@@ -121,7 +122,7 @@ GUMP::add_validator(
         $fileSizeInMb = $fileSizeInBytes / (1024 * 1024);
         return $fileSizeInMb <= $maxMb;
     },
-    __('The {field} field must be less than {param[0]} MB in size.', Consts::TEXT_DOMAIN)
+    __('The {field} field must be less than {param[0]} MB in size.', 'template-oriented-form-utilities')
 );
 
 // Validate file mime type
@@ -142,5 +143,5 @@ GUMP::add_validator(
 
         return in_array($fileMimeType, $params);
     },
-    __('The {field} field must be a file of type: {param}.', Consts::TEXT_DOMAIN)
+    __('The {field} field must be a file of type: {param}.', 'template-oriented-form-utilities')
 );

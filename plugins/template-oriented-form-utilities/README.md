@@ -59,6 +59,14 @@ add_action('init', function () {
             'name' => 'required|max_len:200',
             'email' => 'required|valid_email',
         ],
+        filters: [
+            'name' => 'trim|sanitize_string',
+            'email' => 'trim|sanitize_email',
+        ],
+        names: [
+            'name' => 'Full Name',
+            'email' => 'Email Address',
+        ],
         messages: [
             'name' => [
                 'required' => 'Please enter your name.',

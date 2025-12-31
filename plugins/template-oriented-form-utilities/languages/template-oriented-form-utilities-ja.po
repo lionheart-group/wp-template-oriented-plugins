@@ -3,97 +3,107 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: TOFU 0.0.1\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/template-oriented-form-utilities\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/template-oriented-"
+"form-utilities\n"
+"POT-Creation-Date: 2025-12-31T13:37:11+09:00\n"
+"PO-Revision-Date: 2025-12-31 12:43+0800\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-31T13:37:11+09:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.12.0\n"
+"X-Generator: Poedit 3.8\n"
 "X-Domain: template-oriented-form-utilities\n"
 
 #. Plugin Name of the plugin
 #: template-oriented-form-utilities.php
 msgid "TOFU"
-msgstr ""
+msgstr "TOFU"
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
 #: template-oriented-form-utilities.php
 msgid "https://www.lionheart.co.jp/"
-msgstr ""
+msgstr "https://www.lionheart.co.jp/"
 
 #. Description of the plugin
 #: template-oriented-form-utilities.php
 msgid "Template-Oriented Form Utilities"
-msgstr ""
+msgstr "Template-Oriented Form Utilities"
 
 #. Author of the plugin
 #: template-oriented-form-utilities.php
 msgid "LionHeart Group"
-msgstr ""
+msgstr "ライオンハートグループ"
 
 #: src/Helpers/Form.php:246
 msgid "Remove File"
-msgstr ""
+msgstr "ファイルの削除"
 
-#: src/Helpers/ReCAPTCHA.php:42
-#: src/Helpers/ReCAPTCHA.php:49
+#: src/Helpers/ReCAPTCHA.php:42 src/Helpers/ReCAPTCHA.php:49
 msgid "Failed to verify reCAPTCHA at this time. Please try again later."
-msgstr ""
+msgstr "reCAPTCHAの検証に失敗しました。後ほど再度お試しください。"
 
 #: src/Helpers/ReCAPTCHA.php:60
 msgid "Unexpected response from the reCAPTCHA service. Please try again later."
 msgstr ""
+"reCAPTCHAサービスの不明のエラーが発生しました。後ほど再度お試しください。"
 
 #: src/Helpers/ReCAPTCHA.php:68
 msgid "The secret parameter is missing."
-msgstr ""
+msgstr "シークレットパラメータがありません."
 
 #: src/Helpers/ReCAPTCHA.php:71
 msgid "The secret parameter is invalid or malformed."
-msgstr ""
+msgstr "シークレットパラメータが無効か、または形式が正しくありません."
 
 #: src/Helpers/ReCAPTCHA.php:74
 msgid "The response parameter is missing."
-msgstr ""
+msgstr "レスポンスのパラメーターがありません."
 
 #: src/Helpers/ReCAPTCHA.php:77
 msgid "The response parameter is invalid or malformed."
-msgstr ""
+msgstr "レスポンスのパラメータが正しくないか、形が正しくありません。"
 
 #: src/Helpers/ReCAPTCHA.php:80
 msgid "The request is invalid or malformed."
-msgstr ""
+msgstr "リクエストが正しくないか、形式が正しくありません。"
 
 #: src/Helpers/ReCAPTCHA.php:83
-msgid "The response is no longer valid: either is too old or has been used previously."
+msgid ""
+"The response is no longer valid: either is too old or has been used "
+"previously."
 msgstr ""
+"レスポンスが有効ではありません。有効期限が切れているか、すでに使われていま"
+"す。"
 
 #. translators: %s is the error code
 #: src/Helpers/ReCAPTCHA.php:88
 #, php-format
 msgid "An unknown reCAPTCHA error occurred (code: %s). Please try again later."
 msgstr ""
+"reCAPTCHAの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてく"
+"ださい。"
 
 #: src/Helpers/ReCAPTCHA.php:99
 msgid "Failed to verify reCAPTCHA score. Please try again later."
 msgstr ""
+"reCAPTCHAのスコアを確認することができませんでした。後でもう一度試してみてくだ"
+"さい。"
 
 #: src/Helpers/ReCAPTCHA.php:102
 msgid "Verification failed. Please try again later."
-msgstr ""
+msgstr "確認に失敗しました。後でもう一度試してみてください。"
 
 #: src/Models/Validation.php:103
 msgid "The {field} field is required."
-msgstr ""
+msgstr "{field} の項目は必ず入力してください。"
 
 #: src/Models/Validation.php:124
 msgid "The {field} field must be less than {param[0]} MB in size."
-msgstr ""
+msgstr "{field} の項目は{param[0]} MBより小さくなければなりません。"
 
 #: src/Models/Validation.php:145
 msgid "The {field} field must be a file of type: {param}."
-msgstr ""
+msgstr "{field} の項目は {param} の種類のファイルでなければなりません。"
