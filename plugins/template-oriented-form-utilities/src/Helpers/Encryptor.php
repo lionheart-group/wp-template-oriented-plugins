@@ -51,7 +51,7 @@ class Encryptor
         }
 
         // Encrypt the data
-        $encrypted = openssl_encrypt( $plaintext, 'AES-256-CBC', $key_for_openssl, 0, $iv );
+        $encrypted = openssl_encrypt( $plaintext, self::METHOD, $key_for_openssl, 0, $iv );
 
         // Return the encrypted data with the IV for decryption
         return base64_encode( $iv . $encrypted );
@@ -77,7 +77,7 @@ class Encryptor
         $encrypted = substr( $data, $iv_length );
 
         // Decrypt the data
-        $decrypted = openssl_decrypt( $encrypted, 'AES-256-CBC', $key_for_openssl, 0, $iv );
+        $decrypted = openssl_decrypt( $encrypted, self::METHOD, $key_for_openssl, 0, $iv );
 
         // Check if decryption was successful
         if ($decrypted === false) {
