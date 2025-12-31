@@ -73,11 +73,23 @@ return [
         ]),
     ],
 
+    // Disable global constant exposure
+    'expose-global-constants' => false,
+
+    // Disable global class/function constant exposure
+    'expose-global-classes' => false,
+
+    // Disable global function exposure
+    'expose-global-functions' => false,
+
     // List of symbols (classes, functions, constants) that should not be prefixed
     'exclude-namespaces' => [
         // WordPress core
         'WP',
         'WP_*',
+
+        // GUMP (validation library)
+        'GUMP',
 
         // Our own plugin namespace (already unique)
         'TofuPlugin',
@@ -156,6 +168,8 @@ return [
         'wp_safe_redirect',
         'wp_mail',
         'wp_upload_dir',
+        'wp_unslash',
+        'wp_timezone',
         'maybe_serialize',
         'maybe_unserialize',
         'set_transient',
@@ -187,6 +201,8 @@ return [
         'wp_localize_script',
         'wp_add_inline_script',
         'wp_add_inline_style',
+        'sanitize_text_field',
+        'is_ssl',
 
         // PHP built-in functions (some commonly used ones)
         'defined',
@@ -217,6 +233,8 @@ return [
         'UPLOAD_ERR_NO_TMP_DIR',
         'UPLOAD_ERR_CANT_WRITE',
         'UPLOAD_ERR_EXTENSION',
+        'AUTH_KEY',
+        'SECURE_AUTH_KEY',
 
         // Plugin constants
         'TOFU_VERSION',
@@ -237,6 +255,43 @@ return [
             if ($baseName === 'template-oriented-form-utilities.php' || $baseName === 'index.php') {
                 $contents = preg_replace(
                     '/^namespace\s+' . preg_quote($prefix, '/') . ';\s*\n/m',
+                    '',
+                    $contents
+                );
+            }
+
+            // Remove prefix from GUMP use statements
+            if (str_contains($filePath, 'vendor/wixel/gump/') && str_ends_with($baseName, '.php')) {
+                $contents = preg_replace(
+                    '/(use|namespace)\s+' . preg_quote($prefix, '/') . '\\\\GUMP/',
+                    '$1 GUMP',
+                    $contents
+                );
+                $contents = preg_replace(
+                    '/namespace\s+' . preg_quote($prefix, '/') . ';/',
+                    '',
+                    $contents
+                );
+            }
+
+            // Remove prefix from GUMP use statements in composer.json
+            if (str_contains($filePath, 'vendor/wixel/gump/') && str_ends_with($baseName, 'composer.json')) {
+                $contents = str_replace(
+                    $prefix . '\\\\GUMP',
+                    'GUMP',
+                    $contents
+                );
+                $contents = str_replace(
+                    $prefix . '\\\\Tests',
+                    'Tests',
+                    $contents
+                );
+            }
+
+            // Remove class_alias for GUMP
+            if (str_contains($filePath, 'vendor/wixel/gump/gump.class.php')) {
+                $contents = str_replace(
+                    "\class_alias('TofuVendor\\GUMP', 'GUMP', \\false);",
                     '',
                     $contents
                 );
