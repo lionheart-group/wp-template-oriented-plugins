@@ -302,6 +302,15 @@ class Form
         return true;
     }
 
+    /**
+     * Verify session-stored input values and update validation errors.
+     *
+     * Uses the current field values loaded from the session to run validation
+     * and populate the internal error collection. Returns false if any
+     * validation errors are present in the session data, or true otherwise.
+     *
+     * @return bool True when the session data passes validation, false when errors exist.
+     */
     public function verifySession(): bool
     {
         // Validate input field
