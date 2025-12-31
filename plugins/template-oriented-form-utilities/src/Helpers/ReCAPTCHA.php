@@ -89,7 +89,7 @@ class ReCAPTCHA
                             (string) $code
                         );
                         // Log the unknown error code for diagnostics.
-                        Logger::error('Unknown reCAPTCHA error code', $code);
+                        Logger::error('Unknown reCAPTCHA error code', ['code' => $code]);
                         break;
                 }
             }
