@@ -306,7 +306,7 @@ class Form
     }
 
     /**
-     * Get form error messages of recaptcha
+     * Get form error messages of reCAPTCHA
      *
      * @param string $key
      * @return string[]
