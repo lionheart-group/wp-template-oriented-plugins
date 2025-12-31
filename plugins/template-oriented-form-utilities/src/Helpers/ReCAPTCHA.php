@@ -34,7 +34,7 @@ class ReCAPTCHA
             'https://www.google.com/recaptcha/api/siteverify',
             array(
                 'body'    => $request,
-                'timeout' => 5,
+                'timeout' => 10,
             )
         );
 
