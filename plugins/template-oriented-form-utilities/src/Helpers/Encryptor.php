@@ -41,7 +41,14 @@ class Encryptor
         $iv = openssl_random_pseudo_bytes($iv_length);
 
         // Serialize the data
-        $plaintext = serialize( $data );
+        $plaintext = json_encode( $data );
+        if ($plaintext === false) {
+            \wp_die(
+                'Data serialization failed. Encryption cannot proceed.',
+                'TOFU Encryption Error',
+                ['response' => 500]
+            );
+        }
 
         // Encrypt the data
         $encrypted = openssl_encrypt( $plaintext, 'AES-256-CBC', $key_for_openssl, 0, $iv );
@@ -78,6 +85,10 @@ class Encryptor
         }
 
         // Unserialize the data to get the original value
-        return unserialize( $decrypted );
+        try {
+            return json_decode( $decrypted, true, 512, JSON_THROW_ON_ERROR );
+        } catch (\JsonException $e) {
+            return false;
+        }
     }
 }
