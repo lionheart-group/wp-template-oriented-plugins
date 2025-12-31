@@ -103,6 +103,10 @@ use TofuPlugin\Helpers\Form;
 
 $formKey = 'form';
 $formAction = 'input';
+
+Form::embedScript($formKey);
+
+get_header();
 ?>
 
 <?php echo Form::formOpen($formKey, $formAction); ?>
@@ -142,6 +146,15 @@ use TofuPlugin\Helpers\Form;
 
 $formKey = 'form';
 $formAction = 'confirm';
+
+if (!Form::verifySession('form')) {
+    Form::redirect('form', 'input');
+    exit;
+}
+
+Form::embedScript($formKey);
+
+get_header();
 ?>
 
 <?php echo Form::formOpen($formKey, $formAction); ?>
@@ -160,4 +173,21 @@ $formAction = 'confirm';
         <button type="submit">Submit</button>
     </div>
 <?php echo Form::formClose($formKey, $formAction); ?>
+```
+
+**Result page**
+
+```php
+<?php
+use TofuPlugin\Helpers\Form;
+
+if (!Form::verifySubmit('form')) {
+    Form::redirect('form', 'input');
+    exit;
+}
+
+get_header();
+?>
+
+<p>Your submission has been received. Thank you!</p>
 ```

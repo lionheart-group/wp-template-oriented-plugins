@@ -149,6 +149,18 @@ class Form
     }
 
     /**
+     * Get data attribute name for the uploaded file
+     *
+     * @param string $key
+     * @param string $field
+     * @return string
+     */
+    public static function getFileDataAttribute(string $key, string $field): string
+    {
+        return sprintf('data-tofu-field="%s.%s"', esc_attr($key), esc_attr($field));
+    }
+
+    /**
      * Generate hidden input field for the uploaded file
      *
      * @param string $key
@@ -167,37 +179,72 @@ class Form
         $outputs = [];
 
         $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][name]" value="%s">',
+            '<input type="hidden" name="%s[%s][name]" value="%s" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->name)
+            esc_attr($file->name),
+            self::getFileDataAttribute($key, $file->name),
         );
         $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][fileName]" value="%s">',
+            '<input type="hidden" name="%s[%s][fileName]" value="%s" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->fileName)
+            esc_attr($file->fileName),
+            self::getFileDataAttribute($key, $file->name),
         );
         $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][mimeType]" value="%s">',
+            '<input type="hidden" name="%s[%s][mimeType]" value="%s" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->mimeType)
+            esc_attr($file->mimeType),
+            self::getFileDataAttribute($key, $file->name),
         );
         $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][tempName]" value="%s">',
+            '<input type="hidden" name="%s[%s][tempName]" value="%s" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->tempName)
+            esc_attr($file->tempName),
+            self::getFileDataAttribute($key, $file->name),
         );
         $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][size]" value="%d">',
+            '<input type="hidden" name="%s[%s][size]" value="%d" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            $file->size
+            $file->size,
+            self::getFileDataAttribute($key, $file->name),
         );
 
         return implode("", $outputs);
+    }
+
+    /**
+     * Generate file remove button
+     *
+     * @param string $key
+     * @param string $field
+     * @return string
+     */
+    public static function fileRemoveButton(string $key, string $field, ?string $label = null, array $attributes = []): string
+    {
+        $form = self::get($key);
+        $file = $form->getFiles()->getFile($field);
+
+        if ($file === null) {
+            return '';
+        }
+
+        $attrString = '';
+        foreach ($attributes as $attrKey => $attrValue) {
+            $attrString .= sprintf(' %s="%s"', $attrKey, esc_attr($attrValue));
+        }
+
+        return sprintf(
+            '<button type="button" data-tofu-target="%s.%s"%s>%s</button>',
+            esc_attr($key),
+            esc_attr($field),
+            $attrString,
+            $label !== null ? esc_html($label) : esc_html__('Remove File', Consts::TEXT_DOMAIN)
+        );
     }
 
     /**
@@ -252,7 +299,7 @@ class Form
      * use TofuPlugin\Helpers\Form;
      *
      * // Ensure scripts are enqueued before get_header().
-     * Form::embedRecaptchaScript('contact');
+     * Form::embedScript('contact');
      *
      * get_header();
      * ?>
@@ -261,9 +308,20 @@ class Form
      * @param string $key Form key used when registering the form.
      * @return void
      */
-    public static function embedRecaptchaScript(string $key): void
+    public static function embedScript(string $key): void
     {
         $form = self::get($key);
+
+        // Enqueue common script
+        wp_enqueue_script(
+            'tofu-file-input',
+            plugins_url('/assets/js/file-input.js', TOFU_PLUGIN_FILE),
+            [],
+            filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/file-input.js'),
+            false
+        );
+
+        // Check if reCAPTCHA is configured for the form
         $recaptchaConfig = $form->getRecaptchaConfig();
         if ($recaptchaConfig === null) {
             return;
@@ -395,5 +453,37 @@ class Form
     {
         $form = self::get($key);
         return $form->verifySubmit();
+    }
+
+    /**
+     * Redirect to the target page.
+     *
+     * @param string $action
+     * @return void
+     */
+    public static function redirect(string $key, string $action): void
+    {
+        // Check if the action is valid
+        if (!in_array($action, ['input', 'confirm'])) {
+            wp_die('Invalid action.', 'TOFU Form Action Error', ['response' => 400]);
+        }
+
+        $form = self::get($key);
+
+        switch ($action) {
+            case 'input':
+                $redirectUrl = $form->config->template->inputPath;
+                break;
+            case 'confirm':
+                $redirectUrl = $form->config->template->confirmPath;
+                break;
+        }
+
+        if ($redirectUrl === null) {
+            wp_die('Redirect URL is not configured.', 'TOFU Form Action Error', ['response' => 500]);
+        }
+
+        wp_redirect($redirectUrl);
+        exit;
     }
 }
