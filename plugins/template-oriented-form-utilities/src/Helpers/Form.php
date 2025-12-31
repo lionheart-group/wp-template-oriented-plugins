@@ -351,7 +351,7 @@ class Form
     /**
      * Embed hidden fields for session and nonce verification
      *
-     * @return void
+     * @return string
      */
     public static function hidden(string $key, string $action): string
     {
