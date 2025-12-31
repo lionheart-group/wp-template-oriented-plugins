@@ -36,8 +36,20 @@ class ReCAPTCHA
         $context = stream_context_create($context);
 
         $apiResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
-        $result = @json_decode($apiResponse, true);
+        $result = [];
 
+        if ($apiResponse === false) {
+            self::$erros[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
+            return false;
+        }
+
+        $decoded = json_decode($apiResponse, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $result = $decoded;
+        } else {
+            self::$erros[] = __('Unexpected response from the reCAPTCHA service. Please try again later.', Consts::TEXT_DOMAIN);
+            return false;
+        }
         if (isset($result['error-codes']) && is_array($result['error-codes'])) {
             foreach ($result['error-codes'] as $code) {
                 switch ($code) {
