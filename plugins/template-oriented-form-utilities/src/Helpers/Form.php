@@ -65,18 +65,6 @@ class Form
     }
 
     /**
-     * Get action URL for the form
-     *
-     * @param string $key
-     * @return string
-     */
-    public static function action(string $key, string $action)
-    {
-        $form = self::get($key);
-        return $form->getActionUrl($action);
-    }
-
-    /**
      * Generate form tag
      *
      * @param string $key
@@ -87,6 +75,9 @@ class Form
     {
         $form = self::get($key);
         $actionUrl = $form->getActionUrl($action);
+
+        // Forcibly set id attribute
+        $attributes['id'] = sprintf(Consts::RECAPTCHA_TOKEN_FORM_ID_FORMAT, $key);
 
         $attrString = '';
         foreach ($attributes as $attrKey => $attrValue) {
@@ -101,9 +92,9 @@ class Form
      *
      * @return string
      */
-    public static function formClose(): string
+    public static function formClose(string $key, string $action): string
     {
-        return '</form>';
+        return self::hidden($key, $action) . '</form>';
     }
 
     /**
@@ -236,14 +227,135 @@ class Form
     }
 
     /**
+     * Has reCAPTCHA configured
+     *
+     * @return bool
+     */
+    public static function hasRecaptcha(string $key): bool
+    {
+        $form = self::get($key);
+        return $form->hasRecaptcha();
+    }
+
+    /**
+     * Embed the reCAPTCHA script for the given form.
+     *
+     * This method enqueues the Google reCAPTCHA script and the plugin's
+     * own JavaScript that handles token generation. It must be called
+     * before {@see get_header()} (i.e. before WordPress outputs the
+     * <head> section) so that the scripts are properly enqueued.
+     *
+     * Typical usage in a theme template:
+     *
+     * <code>
+     * <?php
+     * use TofuPlugin\Helpers\Form;
+     *
+     * // Ensure scripts are enqueued before get_header().
+     * Form::embedRecaptchaScript('contact');
+     *
+     * get_header();
+     * ?>
+     * </code>
+     *
+     * @param string $key Form key used when registering the form.
+     * @return void
+     */
+    public static function embedRecaptchaScript(string $key): void
+    {
+        $form = self::get($key);
+        $recaptchaConfig = $form->getRecaptchaConfig();
+        if ($recaptchaConfig === null) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'tofu-google-recaptcha',
+            sprintf('https://www.google.com/recaptcha/api.js?render=%s', rawurlencode($recaptchaConfig->siteKey)),
+            [],
+            null,
+            false
+        );
+        wp_enqueue_script(
+            'tofu-user-recaptcha',
+            plugins_url('/assets/js/recaptcha.js', TOFU_PLUGIN_FILE),
+            ['tofu-google-recaptcha'],
+            filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
+            false
+        );
+        wp_localize_script(
+            'tofu-user-recaptcha',
+            'tofuRecaptchaConfig',
+            [
+                'siteKey' => $recaptchaConfig->siteKey,
+                'formId' => sprintf(Consts::RECAPTCHA_TOKEN_FORM_ID_FORMAT, $key),
+                'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key),
+            ]
+        );
+    }
+
+    /**
+     * Get hidden input field for reCAPTCHA token
+     *
+     * @param string $key
+     * @return string
+     */
+    public static function recaptchaHidden(string $key): string
+    {
+        $form = self::get($key);
+        $recaptchaConfig = $form->getRecaptchaConfig();
+        if ($recaptchaConfig === null) {
+            return '';
+        }
+
+        return sprintf(
+            '<input type="hidden" name="%s" id="%s">',
+            Consts::RECAPTCHA_TOKEN_INPUT_NAME,
+            esc_attr(sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key))
+        );
+    }
+
+    /**
+     * Check if the form has error for reCAPTCHA
+     *
+     * @param string $key
+     * @return bool
+     */
+    public static function hasRecaptchaError(string $key): bool
+    {
+        return self::hasError($key, Consts::RECAPTCHA_TOKEN_INPUT_NAME);
+    }
+
+    /**
+     * Get form error messages of reCAPTCHA
+     *
+     * @param string $key
+     * @return string[]
+     */
+    public static function recaptchaErrors(string $key): array
+    {
+        return self::errors($key, Consts::RECAPTCHA_TOKEN_INPUT_NAME);
+    }
+
+    /**
      * Generate nonce field
      *
      * @return string
      */
-    public static function generateNonceField(string $key, string $action): void
+    public static function generateNonceField(string $key, string $action): string
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $key);
-        wp_nonce_field($action, $nonceKey, false, true);
+        return wp_nonce_field($action, $nonceKey, false, false);
+    }
+
+    /**
+     * Embed hidden fields for session and nonce verification
+     *
+     * @return string
+     */
+    public static function hidden(string $key, string $action): string
+    {
+        return self::recaptchaHidden($key) . self::generateNonceField($key, $action);
     }
 
     /**

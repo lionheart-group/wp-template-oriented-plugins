@@ -55,6 +55,13 @@ class FormConfig
          * @todo Implement the save to database functionality.
          */
         public readonly bool $saveToDatabase = false,
+
+        /**
+         * reCAPTCHA setting.
+         *
+         * @var ?ReCAPTCHAConfig
+         */
+        public readonly ?ReCAPTCHAConfig $recaptcha = null,
     )
     {
     }
