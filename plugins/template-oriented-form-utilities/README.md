@@ -136,7 +136,7 @@ $formAction = 'input';
         // Embedding nonce field is required
         Form::generateNonceField($formKey, $formAction);
     ?>
-</form>
+<?php echo Form::formClose($formKey, $formAction); ?>
 ```
 
 **Confirmation page**
@@ -169,5 +169,5 @@ $formAction = 'confirm';
         // Embedding nonce field is required
         Form::generateNonceField($formKey, $formAction);
     ?>
-</form>
+<?php echo Form::formClose($formKey, $formAction); ?>
 ```
