@@ -69,3 +69,6 @@ composer.phar
 
 /.phpunit.cache
 .phpunit.result.cache
+
+# PHP-Scoper build output
+/build/
