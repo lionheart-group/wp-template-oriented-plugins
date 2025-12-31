@@ -271,7 +271,7 @@ class Form
 
         wp_enqueue_script(
             'tofu-google-recaptcha',
-            sprintf('https://www.google.com/recaptcha/api.js?render=%s', esc_attr($recaptchaConfig->siteKey)),
+            sprintf('https://www.google.com/recaptcha/api.js?render=%s', rawurlencode($recaptchaConfig->siteKey)),
             [],
             null,
             false
