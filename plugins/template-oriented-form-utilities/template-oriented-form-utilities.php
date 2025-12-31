@@ -14,7 +14,7 @@
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
  * Domain Path: /languages
- * Requires PHP: 7.4
+ * Requires PHP: 8.1
  */
 
 // If this file is called directly, abort.
