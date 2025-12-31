@@ -238,10 +238,27 @@ class Form
     }
 
     /**
-     * Embed reCAPTCHA site key
-     * Must be called before get_header() method.
+     * Embed the reCAPTCHA script for the given form.
      *
-     * @param string $key
+     * This method enqueues the Google reCAPTCHA script and the plugin's
+     * own JavaScript that handles token generation. It must be called
+     * before {@see get_header()} (i.e. before WordPress outputs the
+     * <head> section) so that the scripts are properly enqueued.
+     *
+     * Typical usage in a theme template:
+     *
+     * <code>
+     * <?php
+     * use TofuPlugin\Helpers\Form;
+     *
+     * // Ensure scripts are enqueued before get_header().
+     * Form::embedRecaptchaScript('contact');
+     *
+     * get_header();
+     * ?>
+     * </code>
+     *
+     * @param string $key Form key used when registering the form.
      * @return void
      */
     public static function embedRecaptchaScript(string $key): void
@@ -254,12 +271,17 @@ class Form
 
         wp_enqueue_script(
             'tofu-google-recaptcha',
-            sprintf('https://www.google.com/recaptcha/api.js?render=%s', esc_attr($recaptchaConfig->siteKey)),
+            sprintf('https://www.google.com/recaptcha/api.js?render=%s', rawurlencode($recaptchaConfig->siteKey)),
+            [],
+            null,
+            false
         );
         wp_enqueue_script(
             'tofu-user-recaptcha',
             plugins_url('/assets/js/recaptcha.js', TOFU_PLUGIN_FILE),
             ['tofu-google-recaptcha'],
+            filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
+            false
         );
         wp_localize_script(
             'tofu-user-recaptcha',
@@ -329,7 +351,7 @@ class Form
     /**
      * Embed hidden fields for session and nonce verification
      *
-     * @return void
+     * @return string
      */
     public static function hidden(string $key, string $action): string
     {
