@@ -30,23 +30,29 @@ class ReCAPTCHA
             'response' =>  $token,
         );
 
-        $context = array(
-            'http' => array(
-                'method' => 'POST',
-                'header' => 'Content-Type: application/x-www-form-urlencoded',
-                'content' => http_build_query($request),
-            ),
+        $response = wp_remote_post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            array(
+                'body'    => $request,
+                'timeout' => 5,
+            )
         );
-        $context = stream_context_create($context);
 
-        $apiResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
-        $result = [];
-
-        if ($apiResponse === false) {
+        if (is_wp_error($response)) {
             self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
+            Logger::error('reCAPTCHA verification request failed', $response->get_error_message());
             return false;
         }
 
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code !== 200) {
+            self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
+            Logger::error('reCAPTCHA verification returned non-200 status', (string) $status_code);
+            return false;
+        }
+
+        $apiResponse = wp_remote_retrieve_body($response);
+        $result = [];
         $decoded = json_decode($apiResponse, true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             $result = $decoded;
