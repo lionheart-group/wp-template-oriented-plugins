@@ -131,11 +131,6 @@ $formAction = 'input';
     <div>
         <button type="submit">Submit</button>
     </div>
-
-    <?php
-        // Embedding nonce field is required
-        Form::generateNonceField($formKey, $formAction);
-    ?>
 <?php echo Form::formClose($formKey, $formAction); ?>
 ```
 
@@ -164,10 +159,5 @@ $formAction = 'confirm';
         <a href="<?php echo home_url('/contact/'); ?>">Back</a>
         <button type="submit">Submit</button>
     </div>
-
-    <?php
-        // Embedding nonce field is required
-        Form::generateNonceField($formKey, $formAction);
-    ?>
 <?php echo Form::formClose($formKey, $formAction); ?>
 ```
