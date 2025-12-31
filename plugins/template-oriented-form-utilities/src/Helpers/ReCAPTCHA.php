@@ -12,7 +12,7 @@ class ReCAPTCHA
      *
      * @var string[]
      */
-    protected static array $erros = [];
+    protected static array $errors = [];
 
     /**
      * Verify the reCAPTCHA token
@@ -42,32 +42,32 @@ class ReCAPTCHA
             foreach ($result['error-codes'] as $code) {
                 switch ($code) {
                     case 'missing-input-secret':
-                        self::$erros[] = __('The secret parameter is missing.', Consts::TEXT_DOMAIN);
+                        self::$errors[] = __('The secret parameter is missing.', Consts::TEXT_DOMAIN);
                         break;
                     case 'invalid-input-secret':
-                        self::$erros[] = __('The secret parameter is invalid or malformed.', Consts::TEXT_DOMAIN);
+                        self::$errors[] = __('The secret parameter is invalid or malformed.', Consts::TEXT_DOMAIN);
                         break;
                     case 'missing-input-response':
-                        self::$erros[] = __('The response parameter is missing.', Consts::TEXT_DOMAIN);
+                        self::$errors[] = __('The response parameter is missing.', Consts::TEXT_DOMAIN);
                         break;
                     case 'invalid-input-response':
-                        self::$erros[] = __('The response parameter is invalid or malformed.', Consts::TEXT_DOMAIN);
+                        self::$errors[] = __('The response parameter is invalid or malformed.', Consts::TEXT_DOMAIN);
                         break;
                     case 'bad-request':
-                        self::$erros[] = __('The request is invalid or malformed.', Consts::TEXT_DOMAIN);
+                        self::$errors[] = __('The request is invalid or malformed.', Consts::TEXT_DOMAIN);
                         break;
                     case 'timeout-or-duplicate':
-                        self::$erros[] = __('The response is no longer valid: either is too old or has been used previously.', Consts::TEXT_DOMAIN);
+                        self::$errors[] = __('The response is no longer valid: either is too old or has been used previously.', Consts::TEXT_DOMAIN);
                         break;
                 }
             }
         }
 
         if (isset($result['score']) && $result['score'] < $config->threshold) {
-            self::$erros[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
+            self::$errors[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
         }
 
-        return isset($result['success']) && $result['success'] === true && empty(self::$erros);
+        return isset($result['success']) && $result['success'] === true && empty(self::$errors);
     }
 
     /**
@@ -77,6 +77,6 @@ class ReCAPTCHA
      */
     public static function getErrors(): array
     {
-        return self::$erros;
+        return self::$errors;
     }
 }
