@@ -3,6 +3,7 @@
 namespace TofuPlugin\Helpers;
 
 use TofuPlugin\Consts;
+use TofuPlugin\Logger;
 use TofuPlugin\Structure\ReCAPTCHAConfig;
 
 class ReCAPTCHA
@@ -82,7 +83,7 @@ class ReCAPTCHA
                             (string) $code
                         );
                         // Log the unknown error code for diagnostics.
-                        error_log('Unknown reCAPTCHA error code: ' . print_r($code, true));
+                        Logger::error('Unknown reCAPTCHA error code', $code);
                         break;
                 }
             }
