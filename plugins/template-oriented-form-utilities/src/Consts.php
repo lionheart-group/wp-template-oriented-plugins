@@ -45,4 +45,19 @@ final class Consts
      * Percentage for garbage collection.
      */
     public const GARBAGE_COLLECTION_PERCENTAGE = 10;
+
+    /**
+     * Recaptcha hidden input field ID.
+     */
+    public const RECAPTCHA_TOKEN_FORM_ID_FORMAT = '_tofu_recaptcha_form_%s';
+
+    /**
+     * Recaptcha hidden input field name.
+     */
+    public const RECAPTCHA_TOKEN_INPUT_NAME = '_tofu_recaptcha_token';
+
+    /**
+     * Recaptcha hidden input field ID.
+     */
+    public const RECAPTCHA_TOKEN_INPUT_ID_FORMAT = '_tofu_recaptcha_token_%s';
 }

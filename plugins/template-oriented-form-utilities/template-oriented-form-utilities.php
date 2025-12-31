@@ -29,6 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define('TOFU_VERSION', '0.0.1');
 define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('TOFU_PLUGIN_FILE', __FILE__);
 
 // Load autoloader
 require_once __DIR__ . '/vendor/autoload.php';

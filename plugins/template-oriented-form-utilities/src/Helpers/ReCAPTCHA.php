@@ -1,0 +1,82 @@
+<?php
+
+namespace TofuPlugin\Helpers;
+
+use TofuPlugin\Consts;
+use TofuPlugin\Structure\ReCAPTCHAConfig;
+
+class ReCAPTCHA
+{
+    /**
+     * Error messages from reCAPTCHA verification
+     *
+     * @var string[]
+     */
+    protected static array $erros = [];
+
+    /**
+     * Verify the reCAPTCHA token
+     *
+     * @return bool
+     */
+    public static function verifyToken(ReCAPTCHAConfig $config, string $token): bool
+    {
+        $request = array(
+            'secret' => $config->secretKey,
+            'response' =>  $token,
+        );
+
+        $context = array(
+            'http' => array(
+                'method' => 'POST',
+                'header' => 'Content-Type: application/x-www-form-urlencoded',
+                'content' => http_build_query($request),
+            ),
+        );
+        $context = stream_context_create($context);
+
+        $apiResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
+        $result = @json_decode($apiResponse, true);
+
+        if (isset($result['error-codes']) && is_array($result['error-codes'])) {
+            foreach ($result['error-codes'] as $code) {
+                switch ($code) {
+                    case 'missing-input-secret':
+                        self::$erros[] = __('The secret parameter is missing.', Consts::TEXT_DOMAIN);
+                        break;
+                    case 'invalid-input-secret':
+                        self::$erros[] = __('The secret parameter is invalid or malformed.', Consts::TEXT_DOMAIN);
+                        break;
+                    case 'missing-input-response':
+                        self::$erros[] = __('The response parameter is missing.', Consts::TEXT_DOMAIN);
+                        break;
+                    case 'invalid-input-response':
+                        self::$erros[] = __('The response parameter is invalid or malformed.', Consts::TEXT_DOMAIN);
+                        break;
+                    case 'bad-request':
+                        self::$erros[] = __('The request is invalid or malformed.', Consts::TEXT_DOMAIN);
+                        break;
+                    case 'timeout-or-duplicate':
+                        self::$erros[] = __('The response is no longer valid: either is too old or has been used previously.', Consts::TEXT_DOMAIN);
+                        break;
+                }
+            }
+        }
+
+        if (isset($result['score']) && $result['score'] < $config->threshold) {
+            self::$erros[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
+        }
+
+        return isset($result['success']) && $result['success'] === true && empty(self::$erros);
+    }
+
+    /**
+     * Get error messages from reCAPTCHA verification
+     *
+     * @return string[]
+     */
+    public static function getErrors(): array
+    {
+        return self::$erros;
+    }
+}

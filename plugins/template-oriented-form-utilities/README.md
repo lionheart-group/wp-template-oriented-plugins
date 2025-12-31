@@ -104,7 +104,8 @@ use TofuPlugin\Helpers\Form;
 $formKey = 'form';
 $formAction = 'input';
 ?>
-<form action="<?php echo Form::action($formKey, $formAction); ?>" method="post">
+
+<?php echo Form::formOpen($formKey, $formAction); ?>
     <div>
         <label for="name">Name</label>
         <input type="text" id="name" name="name" value="<?php echo Form::value($formKey, 'name'); ?>" required>
@@ -147,7 +148,8 @@ use TofuPlugin\Helpers\Form;
 $formKey = 'form';
 $formAction = 'confirm';
 ?>
-<form action="<?php echo Form::action($formKey, $formAction); ?>" method="post">
+
+<?php echo Form::formOpen($formKey, $formAction); ?>
     <div>
         <label for="name">Name</label>
         <?php echo Form::value($formKey, 'name'); ?>

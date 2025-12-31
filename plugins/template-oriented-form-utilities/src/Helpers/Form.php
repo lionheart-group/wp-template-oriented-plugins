@@ -65,18 +65,6 @@ class Form
     }
 
     /**
-     * Get action URL for the form
-     *
-     * @param string $key
-     * @return string
-     */
-    public static function action(string $key, string $action)
-    {
-        $form = self::get($key);
-        return $form->getActionUrl($action);
-    }
-
-    /**
      * Generate form tag
      *
      * @param string $key
@@ -87,6 +75,9 @@ class Form
     {
         $form = self::get($key);
         $actionUrl = $form->getActionUrl($action);
+
+        // Forcibly set id attribute
+        $attributes['id'] = sprintf(Consts::RECAPTCHA_TOKEN_FORM_ID_FORMAT, $key);
 
         $attrString = '';
         foreach ($attributes as $attrKey => $attrValue) {
@@ -101,8 +92,9 @@ class Form
      *
      * @return string
      */
-    public static function formClose(): string
+    public static function formClose(string $key, string $action): string
     {
+        self::hidden($key, $action);
         return '</form>';
     }
 
@@ -236,6 +228,95 @@ class Form
     }
 
     /**
+     * Has reCAPTCHA configured
+     *
+     * @return bool
+     */
+    public static function hasRecaptcha(string $key): bool
+    {
+        $form = self::get($key);
+        return $form->hasRecaptcha();
+    }
+
+    /**
+     * Embed reCAPTCHA site key
+     * Must be called before get_header() method.
+     *
+     * @param string $key
+     * @return void
+     */
+    public static function embedRecaptchaScript(string $key): void
+    {
+        $form = self::get($key);
+        $recaptchaConfig = $form->getRecaptchaConfig();
+        if ($recaptchaConfig === null) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'tofu-google-recaptcha',
+            sprintf('https://www.google.com/recaptcha/api.js?render=%s', esc_attr($recaptchaConfig->siteKey)),
+        );
+        wp_enqueue_script(
+            'tofu-user-recaptcha',
+            plugins_url('/assets/js/recaptcha.js', TOFU_PLUGIN_FILE),
+            ['tofu-google-recaptcha'],
+        );
+        wp_localize_script(
+            'tofu-user-recaptcha',
+            'tofuRecaptchaConfig',
+            [
+                'siteKey' => $recaptchaConfig->siteKey,
+                'formId' => sprintf(Consts::RECAPTCHA_TOKEN_FORM_ID_FORMAT, $key),
+                'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key),
+            ]
+        );
+    }
+
+    /**
+     * Get hidden input field for reCAPTCHA token
+     *
+     * @param string $key
+     * @return string
+     */
+    public static function recaptchaHidden(string $key): string
+    {
+        $form = self::get($key);
+        $recaptchaConfig = $form->getRecaptchaConfig();
+        if ($recaptchaConfig === null) {
+            return '';
+        }
+
+        return sprintf(
+            '<input type="hidden" name="%s" id="%s">',
+            Consts::RECAPTCHA_TOKEN_INPUT_NAME,
+            esc_attr(sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key))
+        );
+    }
+
+    /**
+     * Check if the form has error for recpatcha
+     *
+     * @param string $key
+     * @return bool
+     */
+    public static function hasRecaptchaError(string $key): bool
+    {
+        return self::hasError($key, Consts::RECAPTCHA_TOKEN_INPUT_NAME);
+    }
+
+    /**
+     * Get form error messages of recaptcha
+     *
+     * @param string $key
+     * @return string[]
+     */
+    public static function recaptchaErrors(string $key): array
+    {
+        return self::errors($key, Consts::RECAPTCHA_TOKEN_INPUT_NAME);
+    }
+
+    /**
      * Generate nonce field
      *
      * @return string
@@ -244,6 +325,17 @@ class Form
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $key);
         wp_nonce_field($action, $nonceKey, false, true);
+    }
+
+    /**
+     * Embed hidden fields for session and nonce verification
+     *
+     * @return void
+     */
+    public static function hidden(string $key, string $action): void
+    {
+        echo self::recaptchaHidden($key);
+        self::generateNonceField($key, $action);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace TofuPlugin\Models;
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Encryptor;
 use TofuPlugin\Helpers\Form as FormHelper;
+use TofuPlugin\Helpers\ReCAPTCHA;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Template;
 use TofuPlugin\Helpers\Uploader;
@@ -12,6 +13,7 @@ use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
+use TofuPlugin\Structure\ReCAPTCHAConfig;
 use TofuPlugin\Structure\UploadedFile;
 
 class Form
@@ -158,6 +160,26 @@ class Form
     }
 
     /**
+     * Check if reCAPTCHA is configured
+     *
+     * @return bool
+     */
+    public function hasRecaptcha(): bool
+    {
+        return $this->config->recaptcha !== null;
+    }
+
+    /**
+     * Get the reCAPTCHA configuration
+     *
+     * @return ?ReCAPTCHAConfig
+     */
+    public function getRecaptchaConfig(): ?ReCAPTCHAConfig
+    {
+        return $this->config->recaptcha;
+    }
+
+    /**
      * Store the values in the Session table.
      */
     protected function storeSession(?string $flushValue = null): void
@@ -234,6 +256,9 @@ class Form
         $validation = new Validation();
         $validation->validate($this, array_merge($_POST, $_FILES));
 
+        // reCAPTCHA validation
+        $this->verifyRecaptcha($_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '');
+
         // Store the input values in the Session table
         $this->storeSession();
 
@@ -256,6 +281,27 @@ class Form
         exit;
     }
 
+    /**
+     * Verify reCAPTCHA token
+     *
+     * @return boolean
+     */
+    public function verifyRecaptcha($token): bool
+    {
+        if ($this->config->recaptcha === null) {
+            return true;
+        }
+
+        $isValidRecaptcha = ReCAPTCHA::verifyToken($this->config->recaptcha, $token);
+        if (!$isValidRecaptcha) {
+            foreach (ReCAPTCHA::getErrors() as $errorMessage) {
+                $this->errors->addError(Consts::RECAPTCHA_TOKEN_INPUT_NAME, $errorMessage);
+            }
+            return false;
+        }
+        return true;
+    }
+
     public function verifySession(): bool
     {
         // Validate input field
@@ -273,7 +319,13 @@ class Form
             }
 
             // Verify session data
-            if (!$this->verifySession()) {
+            $this->verifySession();
+
+            // Verify reCAPTCHA
+            $this->verifyRecaptcha($_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '');
+
+            // Redirect back for errors
+            if ($this->errors->hasErrors()) {
                 // Store the input values in the Session table
                 $this->storeSession();
 
