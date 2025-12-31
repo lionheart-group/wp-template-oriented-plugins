@@ -15,7 +15,7 @@ final class Consts
     public const SESSION_COOKIE_KEY = '_tofu_session_key';
 
     /**
-     * Session expuiry time in seconds. (24 hours)
+     * Session expiry time in seconds. (24 hours)
      */
     public const SESSION_EXPIRY = 86400;
 
