@@ -94,8 +94,7 @@ class Form
      */
     public static function formClose(string $key, string $action): string
     {
-        self::hidden($key, $action);
-        return '</form>';
+        return self::hidden($key, $action) . '</form>';
     }
 
     /**
@@ -321,10 +320,10 @@ class Form
      *
      * @return string
      */
-    public static function generateNonceField(string $key, string $action): void
+    public static function generateNonceField(string $key, string $action): string
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $key);
-        wp_nonce_field($action, $nonceKey, false, true);
+        return wp_nonce_field($action, $nonceKey, false, false);
     }
 
     /**
@@ -332,10 +331,9 @@ class Form
      *
      * @return void
      */
-    public static function hidden(string $key, string $action): void
+    public static function hidden(string $key, string $action): string
     {
-        echo self::recaptchaHidden($key);
-        self::generateNonceField($key, $action);
+        return self::recaptchaHidden($key) . self::generateNonceField($key, $action);
     }
 
     /**
