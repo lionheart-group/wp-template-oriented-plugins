@@ -27,7 +27,7 @@ class ReCAPTCHA
 
         $request = array(
             'secret' => $config->secretKey,
-            'response' =>  $token,
+            'response' => $token,
         );
 
         $response = wp_remote_post(
