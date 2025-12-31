@@ -26,6 +26,9 @@ document.addEventListener('submit', async function (e) {
         grecaptcha.execute(tofuRecaptchaConfig.siteKey, { action: 'submit' }).then(function (token) {
             inputField.value = token;
             form.submit(); // Now submit the form programmatically
+        }).catch(function (error) {
+            console.error('reCAPTCHA execution failed.', error);
+            alert('reCAPTCHA verification failed. Please try again.');
         });
     });
 });
