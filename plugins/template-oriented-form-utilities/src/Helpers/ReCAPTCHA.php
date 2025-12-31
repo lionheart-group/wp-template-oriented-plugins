@@ -22,7 +22,8 @@ class ReCAPTCHA
     public static function verifyToken(ReCAPTCHAConfig $config, string $token): bool
     {
         // Reset errors for this verification attempt to avoid accumulation across calls.
-        self::$erros = [];
+        self::$errors = [];
+
         $request = array(
             'secret' => $config->secretKey,
             'response' =>  $token,
@@ -41,7 +42,7 @@ class ReCAPTCHA
         $result = [];
 
         if ($apiResponse === false) {
-            self::$erros[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
+            self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
             return false;
         }
 
@@ -49,9 +50,10 @@ class ReCAPTCHA
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             $result = $decoded;
         } else {
-            self::$erros[] = __('Unexpected response from the reCAPTCHA service. Please try again later.', Consts::TEXT_DOMAIN);
+            self::$errors[] = __('Unexpected response from the reCAPTCHA service. Please try again later.', Consts::TEXT_DOMAIN);
             return false;
         }
+
         if (isset($result['error-codes']) && is_array($result['error-codes'])) {
             foreach ($result['error-codes'] as $code) {
                 switch ($code) {
