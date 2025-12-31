@@ -7,7 +7,7 @@ use Monolog\Handler\StreamHandler;
 
 class Logger
 {
-    /** @var Logger */
+    /** @var MonologLogger */
     protected static $logger;
 
     /** @var string */

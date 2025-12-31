@@ -26,7 +26,7 @@ class Optional
             return $this->value->{$key} ?? null;
         }
 
-        if (is_array($this->value) || $this->value instanceof ArrayAccess) {
+        if (is_array($this->value)) {
             return $this->value[$key] ?? null;
         }
 
@@ -39,7 +39,7 @@ class Optional
             return isset($this->value->{$key});
         }
 
-        if (is_array($this->value) || $this->value instanceof ArrayAccess) {
+        if (is_array($this->value)) {
             return isset($this->value[$key]);
         }
 

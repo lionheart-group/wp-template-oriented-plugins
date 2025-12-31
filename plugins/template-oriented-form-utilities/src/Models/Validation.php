@@ -129,7 +129,7 @@ GUMP::add_validator(
 GUMP::add_validator(
     'mime_type',
     function ($field, array $input, array $params) {
-        if (!isset($params) || empty($params)) {
+        if (empty($params)) {
             throw new \InvalidArgumentException('Mime type parameters are required for mime_type validation.');
         }
 

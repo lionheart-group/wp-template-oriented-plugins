@@ -32,8 +32,6 @@ class Form
                 'TOFU Form Registration Error',
                 ['response' => 500]
             );
-
-            return;
         }
 
         self::$forms[] = new \TofuPlugin\Models\Form($config);
@@ -58,7 +56,6 @@ class Form
                 'TOFU Form Action Error',
                 ['response' => 500]
             );
-            exit;
         } else {
             return false;
         }
