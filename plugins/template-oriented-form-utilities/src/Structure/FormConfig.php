@@ -48,7 +48,7 @@ class FormConfig
         public readonly ValidationConfig $validation,
 
         /**
-         * Enabeld to save the form data to the database.
+         * Enabled to save the form data to the database.
          * If you want to skip saving the form data, set this to false.
          *
          * @var bool
