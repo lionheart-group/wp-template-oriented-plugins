@@ -88,8 +88,12 @@ class ReCAPTCHA
             }
         }
 
-        if (isset($result['score']) && $result['score'] < $config->threshold) {
-            self::$errors[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
+        if ($config->threshold > 0) {
+            if (!isset($result['score'])) {
+                self::$errors[] = __('Failed to verify reCAPTCHA score. Please try again later.', Consts::TEXT_DOMAIN);
+            } elseif ($result['score'] < $config->threshold) {
+                self::$errors[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
+            }
         }
 
         return isset($result['success']) && $result['success'] === true && empty(self::$errors);
