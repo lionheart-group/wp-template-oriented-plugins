@@ -40,14 +40,14 @@ class ReCAPTCHA
 
         if (is_wp_error($response)) {
             self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
-            Logger::error('reCAPTCHA verification request failed', $response->get_error_message());
+            Logger::error('reCAPTCHA verification request failed', ['errors' => $response->get_error_message()]);
             return false;
         }
 
         $status_code = wp_remote_retrieve_response_code($response);
         if ($status_code !== 200) {
             self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', Consts::TEXT_DOMAIN);
-            Logger::error('reCAPTCHA verification returned non-200 status', (string) $status_code);
+            Logger::error('reCAPTCHA verification returned non-200 status', ['code' => (string) $status_code]);
             return false;
         }
 
