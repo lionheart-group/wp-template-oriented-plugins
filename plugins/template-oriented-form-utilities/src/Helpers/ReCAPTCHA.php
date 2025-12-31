@@ -21,6 +21,8 @@ class ReCAPTCHA
      */
     public static function verifyToken(ReCAPTCHAConfig $config, string $token): bool
     {
+        // Reset errors for this verification attempt to avoid accumulation across calls.
+        self::$erros = [];
         $request = array(
             'secret' => $config->secretKey,
             'response' =>  $token,
