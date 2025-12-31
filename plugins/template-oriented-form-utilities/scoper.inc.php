@@ -88,9 +88,6 @@ return [
         'WP',
         'WP_*',
 
-        // GUMP (validation library)
-        'GUMP',
-
         // Our own plugin namespace (already unique)
         'TofuPlugin',
     ],
@@ -113,9 +110,6 @@ return [
         'Walker_Nav_Menu',
         'WP_List_Table',
         'PHPMailer',
-
-        // GUMP (validation library)
-        'GUMP',
     ],
 
     'exclude-functions' => [
@@ -256,52 +250,6 @@ return [
                 $contents = preg_replace(
                     '/^namespace\s+' . preg_quote($prefix, '/') . ';\s*\n/m',
                     '',
-                    $contents
-                );
-            }
-
-            // Remove prefix from GUMP use statements
-            if (str_contains($filePath, 'vendor/wixel/gump/') && str_ends_with($baseName, '.php')) {
-                $contents = preg_replace(
-                    '/(use|namespace)\s+' . preg_quote($prefix, '/') . '\\\\GUMP/',
-                    '$1 GUMP',
-                    $contents
-                );
-                $contents = preg_replace(
-                    '/namespace\s+' . preg_quote($prefix, '/') . ';/',
-                    '',
-                    $contents
-                );
-            }
-
-            // Remove prefix from GUMP use statements in composer.json
-            if (str_contains($filePath, 'vendor/wixel/gump/') && str_ends_with($baseName, 'composer.json')) {
-                $contents = str_replace(
-                    $prefix . '\\\\GUMP',
-                    'GUMP',
-                    $contents
-                );
-                $contents = str_replace(
-                    $prefix . '\\\\Tests',
-                    'Tests',
-                    $contents
-                );
-            }
-
-            // Remove class_alias for GUMP
-            if (str_contains($filePath, 'vendor/wixel/gump/gump.class.php')) {
-                $contents = str_replace(
-                    "\class_alias('TofuVendor\\GUMP', 'GUMP', \\false);",
-                    '',
-                    $contents
-                );
-            }
-
-            // GUMP uses global namespace and should not be prefixed in use statements
-            if (str_contains($filePath, 'src/')) {
-                $contents = preg_replace(
-                    '/use\s+' . preg_quote($prefix, '/') . '\\\\GUMP;/',
-                    'use GUMP;',
                     $contents
                 );
             }
