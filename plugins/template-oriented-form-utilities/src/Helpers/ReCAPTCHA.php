@@ -98,7 +98,7 @@ class ReCAPTCHA
         if (!isset($result['score'])) {
             self::$errors[] = __('Failed to verify reCAPTCHA score. Please try again later.', Consts::TEXT_DOMAIN);
         } elseif ($config->threshold > 0) {
-             if ($result['score'] < $config->threshold) {
+            if ($result['score'] < $config->threshold) {
                 self::$errors[] = __('Verification failed. Please try again later.', Consts::TEXT_DOMAIN);
             }
         }
