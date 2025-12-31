@@ -15,11 +15,21 @@ class Session
     protected static function getSessionId()
     {
         if (isset($_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY])) {
-            return $_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY];
+            $value = $_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY];
+        } else {
+            $value = \wp_generate_password( 32, false, false );
         }
+        $value = \sanitize_text_field(\wp_unslash($value));
 
-        $value = \wp_generate_password( 32, false, false );
-        setcookie(Consts::SESSION_COOKIE_KEY, \sanitize_text_field(\wp_unslash($value)), time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
+        setcookie(
+            Consts::SESSION_COOKIE_KEY,
+            $value,
+            time() + Consts::SESSION_EXPIRY,
+            COOKIEPATH,
+            COOKIE_DOMAIN,
+            \is_ssl(),
+            true
+        );
 
         return $value;
     }
