@@ -47,7 +47,7 @@ final class Consts
     public const GARBAGE_COLLECTION_PERCENTAGE = 10;
 
     /**
-     * Recaptcha hidden input field ID.
+     * Recaptcha form element ID format.
      */
     public const RECAPTCHA_TOKEN_FORM_ID_FORMAT = '_tofu_recaptcha_form_%s';
 

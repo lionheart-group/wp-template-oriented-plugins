@@ -295,7 +295,7 @@ class Form
     }
 
     /**
-     * Check if the form has error for recpatcha
+     * Check if the form has error for reCAPTCHA
      *
      * @param string $key
      * @return bool
