@@ -272,11 +272,16 @@ class Form
         wp_enqueue_script(
             'tofu-google-recaptcha',
             sprintf('https://www.google.com/recaptcha/api.js?render=%s', esc_attr($recaptchaConfig->siteKey)),
+            [],
+            null,
+            false
         );
         wp_enqueue_script(
             'tofu-user-recaptcha',
             plugins_url('/assets/js/recaptcha.js', TOFU_PLUGIN_FILE),
             ['tofu-google-recaptcha'],
+            filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
+            false
         );
         wp_localize_script(
             'tofu-user-recaptcha',
