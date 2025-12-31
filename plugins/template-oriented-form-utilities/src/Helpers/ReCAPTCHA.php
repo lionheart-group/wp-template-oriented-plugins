@@ -75,6 +75,15 @@ class ReCAPTCHA
                     case 'timeout-or-duplicate':
                         self::$errors[] = __('The response is no longer valid: either is too old or has been used previously.', Consts::TEXT_DOMAIN);
                         break;
+                    default:
+                        // Handle any unexpected or new error codes to avoid silent failures.
+                        self::$errors[] = sprintf(
+                            __('An unknown reCAPTCHA error occurred (code: %s). Please try again later.', Consts::TEXT_DOMAIN),
+                            (string) $code
+                        );
+                        // Log the unknown error code for diagnostics.
+                        error_log('Unknown reCAPTCHA error code: ' . print_r($code, true));
+                        break;
                 }
             }
         }
