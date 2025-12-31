@@ -274,7 +274,8 @@ class Form
 
         // If the URL is not set, trigger the confirmation action
         if (empty($url)) {
-            return $this->actionConfirm(skipVerify: true);
+            $this->actionConfirm(skipVerify: true);
+            return;
         }
 
         wp_redirect($url);

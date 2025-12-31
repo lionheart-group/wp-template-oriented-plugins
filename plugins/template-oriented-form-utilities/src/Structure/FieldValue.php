@@ -2,6 +2,10 @@
 
 namespace TofuPlugin\Structure;
 
+/**
+ * @property string $field
+ * @property mixed $value
+ */
 class FieldValue
 {
     protected array $data = [];

@@ -1,0 +1,19 @@
+parameters:
+    level: 5
+    phpVersion: 80200
+    paths:
+        - src
+    excludePaths:
+        - vendor
+    bootstrapFiles:
+        - tests/bootstrap-phpstan.php
+    parallel:
+        maximumNumberOfProcesses: 1
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # Plugin-specific constants
+        - '#Constant TOFU_PLUGIN_FILE not found\.#'
+        - '#Constant TOFU_PLUGIN_DIR not found\.#'
+        - '#Constant COOKIEPATH not found\.#'
+        - '#Constant COOKIE_DOMAIN not found\.#'

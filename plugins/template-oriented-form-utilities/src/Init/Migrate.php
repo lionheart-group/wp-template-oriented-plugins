@@ -63,7 +63,6 @@ class Migrate
         ] as $migrate) {
             Logger::info("Migration {$migrate} start.");
             $migrateKey = static::getMigrateKey($migrate);
-            Logger::info(!$migrateKey);
             if ($migrateKey) {
                 Logger::info("Migration {$migrate} already executed.");
                 continue;
