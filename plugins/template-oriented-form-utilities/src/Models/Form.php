@@ -286,7 +286,7 @@ class Form
      *
      * @return boolean
      */
-    public function verifyRecaptcha($token): bool
+    public function verifyRecaptcha(string $token): bool
     {
         if ($this->config->recaptcha === null) {
             return true;

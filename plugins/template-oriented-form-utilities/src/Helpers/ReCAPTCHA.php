@@ -75,12 +75,25 @@ class ReCAPTCHA
                     case 'timeout-or-duplicate':
                         self::$errors[] = __('The response is no longer valid: either is too old or has been used previously.', Consts::TEXT_DOMAIN);
                         break;
+                    default:
+                        // Handle any unexpected or new error codes to avoid silent failures.
+                        self::$errors[] = sprintf(
+                            __('An unknown reCAPTCHA error occurred (code: %s). Please try again later.', Consts::TEXT_DOMAIN),
+                            (string) $code
+                        );
+                        // Log the unknown error code for diagnostics.
+                        error_log('Unknown reCAPTCHA error code: ' . print_r($code, true));
+                        break;
                 }
             }
         }
 
-        if (isset($result['score']) && $result['score'] < $config->threshold) {
-            self::$errors[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
+        if ($config->threshold > 0) {
+            if (!isset($result['score'])) {
+                self::$errors[] = __('Failed to verify reCAPTCHA score. Please try again later.', Consts::TEXT_DOMAIN);
+            } elseif ($result['score'] < $config->threshold) {
+                self::$errors[] = __('Failed to submit, please try again after some time or contact us by phone.', Consts::TEXT_DOMAIN);
+            }
         }
 
         return isset($result['success']) && $result['success'] === true && empty(self::$errors);

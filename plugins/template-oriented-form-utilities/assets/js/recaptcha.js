@@ -1,4 +1,4 @@
-document.addEventListener('submit', async function (e) {
+document.addEventListener('submit', function (e) {
     // Check the triggering element to ensure it's the correct form
     const form = e.target;
     if (form.id !== tofuRecaptchaConfig.formId) {
