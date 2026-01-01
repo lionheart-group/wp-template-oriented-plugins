@@ -70,6 +70,7 @@ return [
         Finder::create()->append([
             'template-oriented-form-utilities.php',
             'index.php',
+            'readme.txt',
         ]),
     ],
 

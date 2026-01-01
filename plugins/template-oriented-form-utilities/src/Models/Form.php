@@ -69,6 +69,10 @@ class Form
         if ($sessionValues) {
             if (isset($sessionValues['values']) && $sessionValues['values']) {
                 foreach ($sessionValues['values'] as $field => $value) {
+                    if ($field === Consts::UPLOADED_FILES_INPUT_NAME) {
+                        continue;
+                    }
+
                     $this->values->addValue($field, $value);
                 }
             }
@@ -264,9 +268,7 @@ class Form
 
         // Redirect back for errors
         if ($this->errors->hasErrors()) {
-            $redirect = $this->config->template->inputPath;
-            wp_redirect($redirect);
-            exit;
+            $this->redirect('input');
         }
 
         // Redirect to the confirmation page
@@ -278,8 +280,7 @@ class Form
             return;
         }
 
-        wp_redirect($url);
-        exit;
+        $this->redirect('confirm');
     }
 
     /**
@@ -340,9 +341,7 @@ class Form
                 $this->storeSession();
 
                 // Redirect back for errors
-                $redirect = $this->config->template->inputPath;
-                wp_redirect($redirect);
-                exit;
+                $this->redirect('input');
             }
         }
 
@@ -425,7 +424,7 @@ class Form
         foreach ($this->files->getAllFiles() as $uploadedFile) {
             $tempPath = Uploader::getTempFilePath($uploadedFile->tempName);
             if (file_exists($tempPath)) {
-                unlink($tempPath);
+                wp_delete_file($tempPath);
             }
         }
 
@@ -442,9 +441,7 @@ class Form
         ]));
 
         // Redirect to the result page
-        $url = $this->config->template->resultPath;
-        wp_redirect($url);
-        exit;
+        $this->redirect('result');
     }
 
     public function verifySubmit(): bool
@@ -469,5 +466,35 @@ class Form
         }
 
         return true;
+    }
+
+    public function redirect(string $action): void
+    {
+        // Check if the action is valid
+        if (!in_array($action, ['input', 'confirm', 'result'])) {
+            wp_die('Invalid action.', 'TOFU Form Action Error', ['response' => 400]);
+        }
+
+        switch ($action) {
+            case 'input':
+                $redirectUrl = $this->config->template->inputPath;
+                break;
+            case 'confirm':
+                $redirectUrl = $this->config->template->confirmPath;
+                break;
+            case 'result':
+                $redirectUrl = $this->config->template->resultPath;
+                break;
+            default:
+                $redirectUrl = null;
+                break;
+        }
+
+        if ($redirectUrl === null) {
+            wp_die('Redirect URL is not configured.', 'TOFU Form Action Error', ['response' => 500]);
+        }
+
+        wp_safe_redirect($redirectUrl);
+        exit;
     }
 }

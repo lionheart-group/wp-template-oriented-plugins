@@ -16,7 +16,7 @@ class UploadedFile
         $tempPath = Uploader::getTempFilePath($this->tempName);
 
         if (!file_exists($tempPath)) {
-            throw new \RuntimeException(sprintf('Temporary file does not exist: %s', $tempPath));
+            throw new \RuntimeException(sprintf('Temporary file does not exist: %s', esc_html($tempPath)));
         }
     }
 

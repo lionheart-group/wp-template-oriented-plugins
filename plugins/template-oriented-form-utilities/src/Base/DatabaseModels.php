@@ -47,7 +47,7 @@ abstract class DatabaseModels {
         foreach ($columns as $column) {
             if (!array_key_exists($column->name, $data)) {
                 if ($column->required && $checkRequired) {
-                    throw new \InvalidArgumentException("Missing required column: {$column->name}");
+                    throw new \InvalidArgumentException(sprintf("Missing required column: %s", esc_html($column->name)));
                 } else {
                     continue;
                 }
@@ -60,7 +60,7 @@ abstract class DatabaseModels {
                     break;
                 case DatabaseModelColumn::COLUMN_INT:
                     if (!is_numeric($data[$column->name]) && isset($data[$column->name])) {
-                        throw new \InvalidArgumentException("Invalid integer for column: {$column->name}");
+                        throw new \InvalidArgumentException(sprintf("Invalid integer for column: %s", esc_html($column->name)));
                     }
 
                     $values[$column->name] = intval($data[$column->name]);
@@ -68,7 +68,7 @@ abstract class DatabaseModels {
                     break;
                 case DatabaseModelColumn::COLUMN_FLOAT:
                     if (!is_numeric($data[$column->name]) && isset($data[$column->name])) {
-                        throw new \InvalidArgumentException("Invalid number for column: {$column->name}");
+                        throw new \InvalidArgumentException(sprintf("Invalid number for column: %s", esc_html($column->name)));
                     }
 
                     $values[$column->name] = floatval($data[$column->name]);
@@ -81,19 +81,19 @@ abstract class DatabaseModels {
                     } else {
                         if (is_numeric($data[$column->name]) && $data[$column->name] > 0) {
                             // If it's a timestamp, convert it to a date string
-                            $data[$column->name] = date('Y-m-d H:i:s', intval($data[$column->name]));
+                            $data[$column->name] = gmdate('Y-m-d H:i:s', intval($data[$column->name]));
                         }
 
                         if (strtotime($data[$column->name]) === false) {
-                            throw new \InvalidArgumentException("Invalid datetime for column: {$column->name}");
+                            throw new \InvalidArgumentException(sprintf("Invalid datetime for column: %s", esc_html($column->name)));
                         }
 
-                        $values[$column->name] = date('Y-m-d H:i:s', strtotime($data[$column->name]));
+                        $values[$column->name] = gmdate('Y-m-d H:i:s', strtotime($data[$column->name]));
                     }
                     $formats[] = '%s';
                     break;
                 default:
-                    throw new \InvalidArgumentException("Unsupported column type: {$column->type}");
+                    throw new \InvalidArgumentException(sprintf("Unsupported column type: %s", esc_html($column->type)));
             }
         }
 

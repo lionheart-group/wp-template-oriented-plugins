@@ -43,6 +43,10 @@ class Validation
 
         // Collect sanitized values
         foreach ($sanitizedData as $key => $value) {
+            if ($key === Consts::UPLOADED_FILES_INPUT_NAME) {
+                continue;
+            }
+
             $values->addValue($key, $value);
         }
 
