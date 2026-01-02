@@ -69,7 +69,8 @@ class Form
         if ($sessionValues) {
             if (isset($sessionValues['values']) && $sessionValues['values']) {
                 foreach ($sessionValues['values'] as $field => $value) {
-                    if ($field === Consts::UPLOADED_FILES_INPUT_NAME) {
+                    // If not defined rule, skip to add value
+                    if (!isset($this->config->validation->rules[$field])) {
                         continue;
                     }
 
@@ -79,6 +80,11 @@ class Form
 
             if (isset($sessionValues['errors']) && $sessionValues['errors']) {
                 foreach ($sessionValues['errors'] as $field => $messages) {
+                    // If not defined rule, skip to add value
+                    if (!isset($this->config->validation->rules[$field])) {
+                        continue;
+                    }
+
                     foreach ($messages as $message) {
                         $this->errors->addError($field, $message);
                     }
@@ -87,6 +93,11 @@ class Form
 
             if (isset($sessionValues['files']) && $sessionValues['files']) {
                 foreach ($sessionValues['files'] as $fileData) {
+                    // If not defined rule, skip to add file
+                    if (!isset($this->config->validation->rules[$fileData['name']])) {
+                        continue;
+                    }
+
                     $this->files->addFile(new UploadedFile(
                         name: $fileData['name'] ?? '',
                         fileName: $fileData['fileName'] ?? '',

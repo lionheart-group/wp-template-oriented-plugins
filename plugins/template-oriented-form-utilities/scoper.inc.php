@@ -165,6 +165,7 @@ return [
         'wp_upload_dir',
         'wp_unslash',
         'wp_timezone',
+        'wp_generate_password',
         'maybe_serialize',
         'maybe_unserialize',
         'set_transient',

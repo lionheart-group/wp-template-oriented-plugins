@@ -20,9 +20,7 @@
  */
 
 // If this file is called directly, abort.
-if ( !defined('WPINC') || !defined('ABSPATH') ) {
-	die;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Currently plugin version.
