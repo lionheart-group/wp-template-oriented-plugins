@@ -275,7 +275,7 @@ class Form
      */
     public function actionInput()
     {
-        if (!$this->verifyNonceField('input') === false) {
+        if ($this->verifyNonceField('input') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
