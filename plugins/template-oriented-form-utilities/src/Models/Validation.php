@@ -10,11 +10,14 @@ use TofuPlugin\Structure\UploadedFile;
 
 class Validation
 {
-    public function validate(Form $form, array $targetValues): void
+    public function validate(Form $form, array $postValues, array $fileValues = []): void
     {
         $values = $form->getValues();
         $errors = $form->getErrors();
         $files = $form->getFiles();
+
+        // Merge $_POST and $_FILES to validate at once
+        $targetValues = array_merge($postValues, $fileValues);
 
         // Get locale
         $full_locale = get_locale();
@@ -73,7 +76,7 @@ class Validation
 
         // Upload files
         foreach ($targetValues as $name => $_) {
-            if (isset($_FILES[$name]) && isset($_FILES[$name]['error']) && $_FILES[$name]['error'] === UPLOAD_ERR_OK) {
+            if (isset($fileValues[$name]) && isset($fileValues[$name]['error']) && $fileValues[$name]['error'] === UPLOAD_ERR_OK) {
                 // If not defined rule, skip to add file
                 if (!isset($form->config->validation->rules[$name])) {
                     continue;

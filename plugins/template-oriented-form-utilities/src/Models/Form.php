@@ -251,6 +251,23 @@ class Form
     }
 
     /**
+     * Verify nonce field
+     *
+     * @return bool
+     */
+    public function verifyNonceField($action): bool
+    {
+        $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
+        $nonce = $_POST[$nonceKey] ?? null;
+
+        if (!isset($nonce)) {
+            return false;
+        }
+
+        return wp_verify_nonce(wp_unslash($nonce), $action);
+    }
+
+    /**
      * Input action.
      * Validate the input and store the input data.
      *
@@ -258,7 +275,7 @@ class Form
      */
     public function actionInput()
     {
-        if (FormHelper::verifyNonceField($this->getKey(), 'input') === false) {
+        if (!$this->verifyNonceField('input') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
@@ -269,7 +286,7 @@ class Form
 
         // Validate input field
         $validation = new Validation();
-        $validation->validate($this, array_merge($_POST, $_FILES));
+        $validation->validate($this, $_POST, $_FILES);
 
         // reCAPTCHA validation
         $this->verifyRecaptcha($_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '');
@@ -333,10 +350,17 @@ class Form
         return !$this->errors->hasErrors();
     }
 
+    /**
+     * Confirm action.
+     * Send emails and clear the session data.
+     *
+     * @param bool $skipVerify Whether to skip verification steps.
+     * @return void
+     */
     public function actionConfirm(bool $skipVerify = false)
     {
         if ($skipVerify === false) {
-            if (FormHelper::verifyNonceField($this->getKey(), 'confirm') === false) {
+            if ($this->verifyNonceField('confirm') === false) {
                 wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
             }
 
