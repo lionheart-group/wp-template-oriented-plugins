@@ -51,7 +51,7 @@ class Uploader
         if ($movedFile === null || isset($movedFile['error'])) {
             \wp_die(
                 'Failed to upload file',
-                sprintf('TOFU File Upload Error: %s', esc_html($movedFile['error'])),
+                sprintf('TOFU File Upload Error: %s', esc_html($movedFile['error'] ?? 'Unknown error')),
                 ['response' => 500]
             );
         }
