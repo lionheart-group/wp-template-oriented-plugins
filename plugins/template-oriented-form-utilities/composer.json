@@ -2,7 +2,7 @@
     "name": "lionheart-group/template-oriented-form-utilities",
     "description": "Template-Oriented Form Utilities",
     "type": "library",
-    "license": "GPL-2.0-or-later",
+    "license": "GPL-3.0-or-later",
     "autoload": {
         "psr-4": {
             "TofuPlugin\\": "src/"

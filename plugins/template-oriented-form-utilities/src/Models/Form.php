@@ -255,7 +255,7 @@ class Form
      *
      * @return bool
      */
-    public function verifyNonceField($action): bool
+    public function verifyNonceField(string $action): bool
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
         $nonce = $_POST[$nonceKey] ?? null;
