@@ -1,0 +1,177 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Code } from 'astro:components';
+import TofuCube from '../components/TofuCube.astro';
+
+const codeExample = `add_action('init', function () {
+    $template = new \\TofuPlugin\\Structure\\TemplateConfig(
+        inputPath: '/contact/',
+        confirmPath: '/contact/confirm/',
+        resultPath: '/contact/result/',
+    );
+
+
+    \\TofuPlugin\\Helpers\\Form::register(new \\TofuPlugin\\Structure\\FormConfig(
+        key: 'form',
+        name: 'Contact Form',
+        template: $template,
+        // ... mail and validation config
+    ));
+});`;
+---
+
+<Layout title="TOFU - Template-Oriented Form Utilities">
+	<div class="fixed top-0 left-0 w-full h-full bg-white z-[-1]">
+		<div class="absolute top-0 right-0 -mr-20 -mt-20 w-128 h-128 rounded-full blur-3xl opacity-20 bg-indigo-500"></div>
+		<div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full blur-3xl opacity-20 bg-teal-500"></div>
+	</div>
+
+	<main class="max-w-6xl mx-auto px-6 py-12 md:py-20 lg:py-24">
+		<!-- Header -->
+		<header class="flex justify-between items-center mb-16 md:mb-24">
+			<div class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-teal-500">
+				TOFU
+			</div>
+			<div class="flex gap-4 items-center">
+				<a href="https://github.com/lionheart-group/template-oriented-form-utilities?tab=readme-ov-file#tofu" target="_blank" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Documentation</a>
+				<a href="https://github.com/lionheart-group/template-oriented-form-utilities" target="_blank" class="text-slate-900 hover:text-indigo-600 transition-colors">
+					<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+						<path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+					</svg>
+				</a>
+			</div>
+		</header>
+
+		<!-- Hero Section -->
+		<section class="relative mb-32">
+			<!-- Background Animation -->
+			<div class="absolute inset-0 z-0 flex items-center justify-center opacity-40 pointer-events-none overflow-hidden">
+				<div class="w-full h-full max-w-4xl max-h-4xl scale-150">
+					<TofuCube />
+				</div>
+			</div>
+
+			<div class="grid md:grid-cols-2 gap-12 items-center relative z-10">
+				<div class="space-y-6">
+					<h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight">
+						Template Oriented <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-teal-500">Form Utilities</span>
+					</h1>
+					<p class="text-lg text-slate-600 leading-relaxed max-w-lg">
+						A powerful WordPress plugin that bridges the gap between complex form logic and template flexibility. Define your structure in PHP, render freely in HTML.
+					</p>
+					<div class="flex flex-wrap gap-4 pt-4">
+						<a href="#get-started" class="px-8 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all hover:scale-105 shadow-lg shadow-slate-200">
+							Get Started
+						</a>
+						<a href="#how-it-works" class="px-8 py-4 bg-white text-slate-900 border border-slate-200 font-semibold rounded-xl hover:bg-slate-50 transition-all hover:border-slate-300">
+							How it works
+						</a>
+					</div>
+				</div>
+				<div class="relative">
+					<div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-teal-500 rounded-2xl blur-lg opacity-20 transform rotate-2"></div>
+					<div class="relative bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-800">
+						<div class="flex items-center gap-2 px-4 py-3 border-b border-slate-800 bg-slate-900/50">
+							<div class="w-3 h-3 rounded-full bg-red-500"></div>
+							<div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+							<div class="w-3 h-3 rounded-full bg-green-500"></div>
+							<div class="ml-2 text-xs text-slate-500 font-mono">functions.php</div>
+						</div>
+						<div class="p-6 overflow-x-auto text-sm">
+							<Code code={codeExample} lang="php" theme="dracula" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Feature Grid -->
+		<section id="how-it-works" class="mb-32">
+			<div class="text-center mb-16">
+				<h2 class="text-3xl font-bold text-slate-900">Why TOFU?</h2>
+				<p class="text-slate-600 mt-4">Simple configuration, powerful results.</p>
+			</div>
+
+			<div class="grid md:grid-cols-3 gap-8">
+				<div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+					<div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 mb-6">
+						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-slate-900 mb-3">Template Config</h3>
+					<p class="text-slate-600 leading-relaxed">
+						Define paths for input, confirmation, and result pages explicitly. Maintain control over your form flow without hidden redirects.
+					</p>
+				</div>
+
+				<div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+					<div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 mb-6">
+						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-slate-900 mb-3">Mail Engine</h3>
+					<p class="text-slate-600 leading-relaxed">
+						Complex mail routing made simple. Configure auto-replies, admin notifications, and CC/BCC rules directly in your PHP code.
+					</p>
+				</div>
+
+				<div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+					<div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 mb-6">
+						<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+					</div>
+					<h3 class="text-xl font-bold text-slate-900 mb-3">Clean Validation</h3>
+					<p class="text-slate-600 leading-relaxed">
+						Powerful validation rules like <code>required</code>, <code>max_len</code>, and <code>valid_email</code>. Plus custom filters and error messages.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Installation -->
+		<section id="get-started" class="bg-slate-900 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+			<div class="relative z-10 max-w-2xl">
+				<h2 class="text-3xl font-bold mb-6">Ready to install?</h2>
+				<p class="text-slate-300 mb-8 text-lg">
+					Get started by uploading the plugin to your WordPress installation.
+				</p>
+
+				<div class="space-y-4">
+					<div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 flex items-center gap-4">
+						<div class="text-slate-400 font-mono text-sm">1.</div>
+						<p class="text-slate-200">Upload to <code class="bg-slate-800 px-2 py-1 rounded text-teal-400">/wp-content/plugins/</code></p>
+					</div>
+					<div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 flex items-center gap-4">
+						<div class="text-slate-400 font-mono text-sm">2.</div>
+						<p class="text-slate-200">Activate through WordPress 'Plugins' screen</p>
+					</div>
+				</div>
+
+				<div class="mt-8">
+					<a href="https://github.com/lionheart-group/template-oriented-form-utilities?tab=readme-ov-file#tofu" target="_blank" class="inline-flex items-center gap-2 text-teal-400 hover:text-teal-300 font-medium">
+						View full documentation
+						<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+						</svg>
+					</a>
+				</div>
+			</div>
+
+			<!-- Abstract shapes -->
+			<div class="absolute right-0 top-0 -mr-20 -mt-20 w-96 h-96 bg-indigo-600 rounded-full blur-3xl opacity-30"></div>
+			<div class="absolute right-0 bottom-0 -mr-10 -mb-10 w-72 h-72 bg-teal-600 rounded-full blur-3xl opacity-30"></div>
+		</section>
+
+		<footer class="mt-24 pt-8 border-t border-slate-100 text-center text-slate-500 text-sm">
+			<div class="flex justify-center gap-6 mb-4">
+				<a href="https://github.com/lionheart-group/template-oriented-form-utilities" target="_blank" class="hover:text-slate-900">GitHub</a>
+				<a href="https://github.com/lionheart-group/template-oriented-form-utilities/issues" target="_blank" class="hover:text-slate-900">Issues</a>
+				<a href="https://github.com/lionheart-group/template-oriented-form-utilities?tab=readme-ov-file#tofu" target="_blank" class="hover:text-slate-900">Documentation</a>
+			</div>
+			<p>&copy; {new Date().getFullYear()} TOFU. Released under the GPL-3.0+ License.</p>
+		</footer>
+	</main>
+</Layout>
