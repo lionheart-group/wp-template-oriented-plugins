@@ -1,5 +1,5 @@
 === TOFU (Template-Oriented Form Utilities) ===
-Contributors: sushat4692
+Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.2
