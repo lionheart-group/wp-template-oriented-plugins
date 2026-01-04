@@ -164,7 +164,7 @@ class Mail
     {
         $subject = Template::getTemplateContent($templatePath);
         if (empty($subject)) {
-            throw new \RuntimeException('Mail subject template is empty: ' . $templatePath);
+            throw new \RuntimeException('Mail subject template is empty: ' . esc_html($templatePath));
         }
         $this->setSubject($subject);
         return $this;
@@ -192,7 +192,7 @@ class Mail
     {
         $body = Template::getTemplateContent($templatePath);
         if (empty($body)) {
-            throw new \RuntimeException('Mail body template is empty: ' . $templatePath);
+            throw new \RuntimeException('Mail body template is empty: ' . esc_html($templatePath));
         }
         $this->setBody($body);
         return $this;

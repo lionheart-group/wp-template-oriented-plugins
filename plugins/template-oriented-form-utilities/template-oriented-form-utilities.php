@@ -6,21 +6,21 @@
  * @package Tofu
  *
  * @wordpress-plugin
- * Plugin Name: TOFU
+ * Plugin Name: TOFU (Template-Oriented Form Utilities)
  * Plugin URI: https://www.lionheart.co.jp/
- * Description: Template-Oriented Form Utilities
+ * Description: Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner.
  * Version: 0.0.1
  * Author: LionHeart Group
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
  * Domain Path: /languages
  * Requires PHP: 8.2
+ * License: GPL-3.0+
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Currently plugin version.
@@ -39,14 +39,10 @@ use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
-use TofuPlugin\Init\Migrate;
 use TofuPlugin\Logger;
 
 // Prepare Logger
 Logger::init('tofu');
-
-// Prepare Migrate Class
-Migrate::prepareWpdb();
 
 // Register hooks that are fired when the plugin is activated or deactivated.
 register_activation_hook(__FILE__, function () {
@@ -72,7 +68,7 @@ add_action('wp_mail_failed', function ($wp_error) {
 
 // Garbage collection for expired sessions
 add_action('init', function () {
-    $rand = mt_rand(1, 100);
+    $rand = wp_rand(1, 100);
 
     if ($rand <= Consts::GARBAGE_COLLECTION_PERCENTAGE) {
         Session::clearExpired();

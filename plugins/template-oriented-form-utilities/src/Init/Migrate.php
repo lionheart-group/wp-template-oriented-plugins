@@ -8,36 +8,28 @@ class Migrate
 {
     const TABLE_SUFFIX = 'tofu_migrate';
 
-    /** @var \wpdb */
-    protected static $wpdb;
-
-    public static function prepareWpdb()
-    {
-        if (!static::$wpdb) {
-            /** @var \wpdb */
-            global $wpdb;
-            static::$wpdb = $wpdb;
-        }
-    }
-
     public static function getTableName()
     {
-        return esc_sql(static::$wpdb->prefix . static::TABLE_SUFFIX);
+        global $wpdb;
+        return esc_sql($wpdb->prefix . static::TABLE_SUFFIX);
     }
 
     protected static function checkMigrateTable()
     {
+        global $wpdb;
         $table_name = static::getTableName();
-        $charset_collate = static::$wpdb->get_charset_collate();
 
-        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
-            `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-            `key` varchar(128) NOT NULL,
-            `created_at` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `updated_at` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            UNIQUE INDEX `key` (`key`),
-            PRIMARY KEY  (id)
-        ) {$charset_collate};";
+        $sql = $wpdb->prepare(
+            "CREATE TABLE IF NOT EXISTS %i (
+                `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+                `key` varchar(128) NOT NULL,
+                `created_at` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+                `updated_at` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+                UNIQUE INDEX `key` (`key`),
+                PRIMARY KEY  (id)
+            ) " . $wpdb->get_charset_collate(),
+            $table_name
+        );
 
         Logger::info($sql);
 
@@ -47,14 +39,14 @@ class Migrate
 
     protected static function getMigrateKey($key)
     {
+        global $wpdb;
         $table_name = static::getTableName();
-        $key = esc_sql($key);
-        $sql = "SELECT * FROM {$table_name} WHERE `key` = '{$key}'";
-        return static::$wpdb->get_row($sql);
+        return $wpdb->get_row($wpdb->prepare("SELECT * FROM %i WHERE `key` = %s", $table_name, $key));
     }
 
     public static function migrate()
     {
+        global $wpdb;
         static::checkMigrateTable();
 
         foreach ([
@@ -80,7 +72,7 @@ class Migrate
             $key = esc_sql($migrate);
             $created_at = current_time('mysql');
             $updated_at = current_time('mysql');
-            static::$wpdb->insert($table_name, [
+            $wpdb->insert($table_name, [
                 'key' => $key,
                 'created_at' => $created_at,
                 'updated_at' => $updated_at,
@@ -90,7 +82,7 @@ class Migrate
 
     public static function dropTable($table_name)
     {
-        $sql = "DROP TABLE IF EXISTS {$table_name};";
-        static::$wpdb->query($sql);
+        global $wpdb;
+        $wpdb->query($wpdb->prepare("DROP TABLE IF EXISTS %i", $table_name));
     }
 }

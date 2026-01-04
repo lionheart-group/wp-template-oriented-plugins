@@ -21,29 +21,50 @@ class Uploader
             return null;
         }
 
-        // Mime type and size
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->file($filePost['tmp_name']);
-        $size = $filePost['size'];
+        // Load required file for handling uploads
+        if (!function_exists('wp_handle_upload')) {
+            if (!defined('ABSPATH')) {
+                exit;
+            }
 
-        // Rename and move the uploaded file to a temporary directory
-        $fileName = $filePost['name'];
-        $extension = strtolower((string) pathinfo($fileName, PATHINFO_EXTENSION));
-        $tempName = wp_generate_password(32, false) . '.' . $extension;
-        $tempPath = self::getTempFilePath($tempName);
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        // Prepare temporary filter to move the specified directory
+        $tempDir = self::getTempDir();
+        $change_upload_dir = function ($param) use ($tempDir) {
+            // Override path and url
+            $param['path'] = $tempDir;
+            $param['url'] = '';
+            $param['subdir'] = Consts::UPLOAD_SUBFOLDER;
+            return $param;
+        };
+        add_filter('upload_dir', $change_upload_dir);
 
         // Move the uploaded file
-        if (!move_uploaded_file($filePost['tmp_name'], $tempPath)) {
-            Logger::error(sprintf('Failed to move uploaded file for field "%s" to temporary directory.', $name));
-            return null;
+        $movedFile = wp_handle_upload($filePost, [
+            'test_form' => false,
+            'test_size' => false,
+            'test_type' => false,
+        ]);
+
+        if ($movedFile === null || isset($movedFile['error'])) {
+            \wp_die(
+                'Failed to upload file',
+                sprintf('TOFU File Upload Error: %s', esc_html($movedFile['error'] ?? 'Unknown error')),
+                ['response' => 500]
+            );
         }
+
+        // Remove temporary filter
+        remove_filter('upload_dir', $change_upload_dir);
 
         return new UploadedFile(
             name: $name,
-            fileName: $fileName,
-            mimeType: $mimeType,
-            tempName: $tempName,
-            size: $size,
+            fileName: $filePost['name'],
+            mimeType: $movedFile['type'],
+            tempName: basename($movedFile['file']),
+            size: $filePost['size'],
         );
     }
 
@@ -106,7 +127,7 @@ class Uploader
             if (is_file($filePath)) {
                 $fileModTime = filemtime($filePath);
                 if ($fileModTime !== false && ($now - $fileModTime) > Consts::SESSION_EXPIRY) {
-                    unlink($filePath);
+                    wp_delete_file($filePath);
                 }
             }
         }

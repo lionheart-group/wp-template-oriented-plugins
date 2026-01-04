@@ -69,12 +69,22 @@ class Form
         if ($sessionValues) {
             if (isset($sessionValues['values']) && $sessionValues['values']) {
                 foreach ($sessionValues['values'] as $field => $value) {
+                    // If not defined rule, skip to add value
+                    if (!isset($this->config->validation->rules[$field])) {
+                        continue;
+                    }
+
                     $this->values->addValue($field, $value);
                 }
             }
 
             if (isset($sessionValues['errors']) && $sessionValues['errors']) {
                 foreach ($sessionValues['errors'] as $field => $messages) {
+                    // If not defined rule, skip to add value
+                    if (!isset($this->config->validation->rules[$field])) {
+                        continue;
+                    }
+
                     foreach ($messages as $message) {
                         $this->errors->addError($field, $message);
                     }
@@ -83,6 +93,11 @@ class Form
 
             if (isset($sessionValues['files']) && $sessionValues['files']) {
                 foreach ($sessionValues['files'] as $fileData) {
+                    // If not defined rule, skip to add file
+                    if (!isset($this->config->validation->rules[$fileData['name']])) {
+                        continue;
+                    }
+
                     $this->files->addFile(new UploadedFile(
                         name: $fileData['name'] ?? '',
                         fileName: $fileData['fileName'] ?? '',
@@ -236,6 +251,23 @@ class Form
     }
 
     /**
+     * Verify nonce field
+     *
+     * @return bool
+     */
+    public function verifyNonceField(string $action): bool
+    {
+        $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
+        $nonce = $_POST[$nonceKey] ?? null;
+
+        if (!isset($nonce)) {
+            return false;
+        }
+
+        return wp_verify_nonce(wp_unslash($nonce), $action);
+    }
+
+    /**
      * Input action.
      * Validate the input and store the input data.
      *
@@ -243,7 +275,7 @@ class Form
      */
     public function actionInput()
     {
-        if (FormHelper::verifyNonceField($this->getKey(), 'input') === false) {
+        if ($this->verifyNonceField('input') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
@@ -254,7 +286,7 @@ class Form
 
         // Validate input field
         $validation = new Validation();
-        $validation->validate($this, array_merge($_POST, $_FILES));
+        $validation->validate($this, $_POST, $_FILES);
 
         // reCAPTCHA validation
         $this->verifyRecaptcha($_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '');
@@ -264,9 +296,7 @@ class Form
 
         // Redirect back for errors
         if ($this->errors->hasErrors()) {
-            $redirect = $this->config->template->inputPath;
-            wp_redirect($redirect);
-            exit;
+            $this->redirect('input');
         }
 
         // Redirect to the confirmation page
@@ -278,8 +308,7 @@ class Form
             return;
         }
 
-        wp_redirect($url);
-        exit;
+        $this->redirect('confirm');
     }
 
     /**
@@ -321,10 +350,17 @@ class Form
         return !$this->errors->hasErrors();
     }
 
+    /**
+     * Confirm action.
+     * Send emails and clear the session data.
+     *
+     * @param bool $skipVerify Whether to skip verification steps.
+     * @return void
+     */
     public function actionConfirm(bool $skipVerify = false)
     {
         if ($skipVerify === false) {
-            if (FormHelper::verifyNonceField($this->getKey(), 'confirm') === false) {
+            if ($this->verifyNonceField('confirm') === false) {
                 wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
             }
 
@@ -340,9 +376,7 @@ class Form
                 $this->storeSession();
 
                 // Redirect back for errors
-                $redirect = $this->config->template->inputPath;
-                wp_redirect($redirect);
-                exit;
+                $this->redirect('input');
             }
         }
 
@@ -425,7 +459,7 @@ class Form
         foreach ($this->files->getAllFiles() as $uploadedFile) {
             $tempPath = Uploader::getTempFilePath($uploadedFile->tempName);
             if (file_exists($tempPath)) {
-                unlink($tempPath);
+                wp_delete_file($tempPath);
             }
         }
 
@@ -442,9 +476,7 @@ class Form
         ]));
 
         // Redirect to the result page
-        $url = $this->config->template->resultPath;
-        wp_redirect($url);
-        exit;
+        $this->redirect('result');
     }
 
     public function verifySubmit(): bool
@@ -469,5 +501,35 @@ class Form
         }
 
         return true;
+    }
+
+    public function redirect(string $action): void
+    {
+        // Check if the action is valid
+        if (!in_array($action, ['input', 'confirm', 'result'])) {
+            wp_die('Invalid action.', 'TOFU Form Action Error', ['response' => 400]);
+        }
+
+        switch ($action) {
+            case 'input':
+                $redirectUrl = $this->config->template->inputPath;
+                break;
+            case 'confirm':
+                $redirectUrl = $this->config->template->confirmPath;
+                break;
+            case 'result':
+                $redirectUrl = $this->config->template->resultPath;
+                break;
+            default:
+                $redirectUrl = null;
+                break;
+        }
+
+        if ($redirectUrl === null) {
+            wp_die('Redirect URL is not configured.', 'TOFU Form Action Error', ['response' => 500]);
+        }
+
+        wp_safe_redirect($redirectUrl);
+        exit;
     }
 }

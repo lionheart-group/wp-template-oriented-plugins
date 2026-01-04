@@ -112,6 +112,8 @@ use TofuPlugin\Helpers\Form;
 $formKey = 'form';
 $formAction = 'input';
 
+// Embed necessary scripts
+// Must be called before get_header()
 Form::embedScript($formKey);
 
 get_header();
@@ -155,11 +157,15 @@ use TofuPlugin\Helpers\Form;
 $formKey = 'form';
 $formAction = 'confirm';
 
+// Verify session data to ensure the user came from the input page
+// Must be done before get_header()
 if (!Form::verifySession('form')) {
     Form::redirect('form', 'input');
     exit;
 }
 
+// Embed necessary scripts
+// Must be called before get_header()
 Form::embedScript($formKey);
 
 get_header();
@@ -189,6 +195,8 @@ get_header();
 <?php
 use TofuPlugin\Helpers\Form;
 
+// Verify to ensure the form was submitted properly
+// Must be done before get_header()
 if (!Form::verifySubmit('form')) {
     Form::redirect('form', 'input');
     exit;

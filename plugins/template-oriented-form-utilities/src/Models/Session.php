@@ -47,13 +47,15 @@ class Session extends AbstractModels {
         global $wpdb;
         $table = static::getTableName();
 
-        $query = $wpdb->prepare(
-            "SELECT session_value FROM {$table} WHERE form_id = %s AND session_key = %s AND expiration > %s",
-            $form_id,
-            $session_key,
-            \current_time('mysql')
+        $row = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT session_value FROM %i WHERE form_id = %s AND session_key = %s AND expiration > %s",
+                $table,
+                $form_id,
+                $session_key,
+                \current_time('mysql')
+            )
         );
-        $row = $wpdb->get_var($query);
 
         return $row;
     }
@@ -70,12 +72,14 @@ class Session extends AbstractModels {
         global $wpdb;
         $table = static::getTableName();
 
-        $query = $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$table} WHERE form_id = %s AND session_key = %s",
-            $form_id,
-            $session_key
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM %i WHERE form_id = %s AND session_key = %s",
+                $table,
+                $form_id,
+                $session_key
+            )
         );
-        $count = $wpdb->get_var($query);
 
         return $count > 0;
     }
@@ -92,7 +96,8 @@ class Session extends AbstractModels {
 
         $wpdb->query(
             $wpdb->prepare(
-                "DELETE FROM {$table} WHERE expiration <= %s",
+                "DELETE FROM %i WHERE expiration <= %s",
+                $table,
                 \current_time('mysql')
             )
         );

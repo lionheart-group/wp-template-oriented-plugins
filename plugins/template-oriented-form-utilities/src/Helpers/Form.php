@@ -28,7 +28,7 @@ class Form
         $form = self::get($config->key, false);
         if ($form) {
             wp_die(
-                sprintf('Form with key "%s" is already registered.', $config->key),
+                sprintf('Form with key "%s" is already registered.', esc_html($config->key)),
                 'TOFU Form Registration Error',
                 ['response' => 500]
             );
@@ -52,7 +52,7 @@ class Form
 
         if ($isStrict) {
             wp_die(
-                sprintf('Form with key "%s" is not registered.', $key),
+                sprintf('Form with key "%s" is not registered.', esc_html($key)),
                 'TOFU Form Action Error',
                 ['response' => 500]
             );
@@ -414,23 +414,6 @@ class Form
     }
 
     /**
-     * Verify nonce field
-     *
-     * @return bool
-     */
-    public static function verifyNonceField(string $key, string $action): bool
-    {
-        $nonceKey = sprintf(Consts::NONCE_FORMAT, $key);
-        $nonce = $_POST[$nonceKey] ?? null;
-
-        if (!isset($nonce)) {
-            return false;
-        }
-
-        return wp_verify_nonce($nonce, $action);
-    }
-
-    /**
      * Verify session value
      *
      * @return bool
@@ -460,27 +443,7 @@ class Form
      */
     public static function redirect(string $key, string $action): void
     {
-        // Check if the action is valid
-        if (!in_array($action, ['input', 'confirm'])) {
-            wp_die('Invalid action.', 'TOFU Form Action Error', ['response' => 400]);
-        }
-
         $form = self::get($key);
-
-        switch ($action) {
-            case 'input':
-                $redirectUrl = $form->config->template->inputPath;
-                break;
-            case 'confirm':
-                $redirectUrl = $form->config->template->confirmPath;
-                break;
-        }
-
-        if ($redirectUrl === null) {
-            wp_die('Redirect URL is not configured.', 'TOFU Form Action Error', ['response' => 500]);
-        }
-
-        wp_redirect($redirectUrl);
-        exit;
+        $form->redirect($action);
     }
 }
