@@ -10,6 +10,10 @@ use TofuPlugin\Models\ValidationErrorCollection;
  *
  * ```php
  * new ValidationConfig(
+ *     allows: [
+ *         'name',
+ *         'email',
+ *     ],
  *     rules: [
  *         'name' => 'required|max_len:200',
  *         'email' => 'required|valid_email',
