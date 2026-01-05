@@ -134,7 +134,7 @@ class Form
         }
 
         if (is_array($fieldValue->value)) {
-            return in_array($value, $fieldValue->value);
+            return in_array($value, $fieldValue->value, true);
         }
 
         return ($fieldValue->value === $value);
