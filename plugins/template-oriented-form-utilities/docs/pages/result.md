@@ -196,7 +196,7 @@ get_header();
 
 ## Error Handling
 
-If you've configured an `errorPath` in your `TemplateConfig`, users will be redirected there if the form submission fails. Otherwise, they'll be returned to the input page with error messages displayed.
+If the form submission fails validation or cannot be processed, users will be returned to the input page with error messages displayed.
 
 For custom error handling on the result page:
 
