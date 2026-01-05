@@ -12,7 +12,7 @@ class Session
      *
      * @return string
      */
-    protected static function getSessionId()
+    protected static function getSessionId(): string
     {
         if (isset($_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY])) {
             $value = $_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY];
@@ -41,7 +41,7 @@ class Session
      * @param mixed $data
      * @return void
      */
-    public static function save($form_id, $data)
+    public static function save(string $form_id, $data): void
     {
         // Session ID
         $key = self::getSessionId();
@@ -84,7 +84,7 @@ class Session
      * @param string $form_id
      * @return ?mixed
      */
-    public static function get($form_id)
+    public static function get(string $form_id): mixed
     {
         // Session ID
         $key = self::getSessionId();
@@ -106,7 +106,7 @@ class Session
      * @param string $form_id
      * @return void
      */
-    public static function clear($form_id)
+    public static function clear(string $form_id): void
     {
         // Session ID
         $key = self::getSessionId();
@@ -123,7 +123,7 @@ class Session
      *
      * @return void
      */
-    public static function clearExpired()
+    public static function clearExpired(): void
     {
         SessionModel::clearExpired();
     }

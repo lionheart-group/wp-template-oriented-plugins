@@ -7,19 +7,12 @@ use TofuPlugin\Structure\DatabaseModelColumn;
 abstract class DatabaseModels {
     const TABLE_SUFFIX = '';
 
-    /** @var \wpdb */
-    protected $wpdb;
-
-    /** @var string */
-    protected $table = '';
-
-    public function __construct() {
-        global $wpdb;
-        $this->wpdb = $wpdb;
-        $this->table = static::getTableName();
-    }
-
-    public static function getTableName()
+    /**
+     * Get the full table name with prefix
+     *
+     * @return string
+     */
+    public static function getTableName(): string
     {
         global $wpdb;
         return esc_sql($wpdb->prefix . static::TABLE_SUFFIX);
@@ -107,15 +100,15 @@ abstract class DatabaseModels {
      * Insert a new record into the database
      *
      * @param array $data
-     * @return int Inserted record ID
+     * @return int|false Inserted record ID or false on failure
      */
-    public static function insert(array $data)
+    public static function insert(array $data): int|false
     {
         global $wpdb;
         $table = static::getTableName();
         $parsedData = static::parseData($data);
-        $wpdb->insert($table, $parsedData['values'], $parsedData['formats']);
-        return $wpdb->insert_id;
+        $result = $wpdb->insert($table, $parsedData['values'], $parsedData['formats']);
+        return $result !== false ? $wpdb->insert_id : false;
     }
 
     /**
@@ -123,9 +116,9 @@ abstract class DatabaseModels {
      *
      * @param array $data
      * @param array $where
-     * @return int Number of rows affected
+     * @return int|false Number of rows affected or false on failure
      */
-    public static function update(array $data, array $where)
+    public static function update(array $data, array $where): int|false
     {
         global $wpdb;
         $table = static::getTableName();
@@ -138,9 +131,9 @@ abstract class DatabaseModels {
      * Delete records from the database
      *
      * @param array $where
-     * @return int Number of rows deleted
+     * @return int|false Number of rows deleted or false on failure
      */
-    public static function delete(array $where)
+    public static function delete(array $where): int|false
     {
         global $wpdb;
         $table = static::getTableName();

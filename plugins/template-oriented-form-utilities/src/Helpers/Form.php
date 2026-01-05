@@ -42,7 +42,7 @@ class Form
      *
      * @return FormModel|false
      */
-    public static function get(string $key, bool $isStrict = true)
+    public static function get(string $key, bool $isStrict = true): FormModel|false
     {
         foreach (self::$forms as $form) {
             if ($form->getKey() === $key) {
@@ -56,9 +56,8 @@ class Form
                 'TOFU Form Action Error',
                 ['response' => 500]
             );
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -99,6 +98,8 @@ class Form
      *
      * @param string $key
      * @param string $field
+     * @param bool $raw
+     * @return mixed
      */
     public static function value(string $key, string $field, bool $raw = false): mixed
     {
@@ -113,10 +114,56 @@ class Form
             return $value->value;
         }
 
-        if (is_string($value->value)) {
-            return esc_html($value->value);
+        return Sanitizer::escHtmlRecursive($value->value);
+    }
+
+    /**
+     * Check if the submitted values contain the specified value for checkbox/radio/select
+     *
+     * @param string $key
+     * @param string $field
+     * @param string $value
+     * @return bool
+     */
+    public static function contains(string $key, string $field, string $value): bool
+    {
+        $form = self::get($key);
+        $fieldValue = $form->getValues()->getValue($field);
+        if ($fieldValue === null) {
+            return false;
         }
-        return $value->value;
+
+        if (is_array($fieldValue->value)) {
+            return in_array($value, $fieldValue->value, true);
+        }
+
+        return ($fieldValue->value === $value);
+    }
+
+    /**
+     * Return `checked` attribute if the checkbox/radio is checked
+     *
+     * @param string $key
+     * @param string $field
+     * @param string $value
+     * @return string
+     */
+    public static function checked(string $key, string $field, string $value): string
+    {
+        return self::contains($key, $field, $value) ? 'checked' : '';
+    }
+
+    /**
+     * Return `selected` attribute if the select option is selected
+     *
+     * @param string $key
+     * @param string $field
+     * @param string $value
+     * @return string
+     */
+    public static function selected(string $key, string $field, string $value): string
+    {
+        return self::contains($key, $field, $value) ? 'selected' : '';
     }
 
     /**
@@ -124,7 +171,7 @@ class Form
      *
      * @param string $key
      * @param string $field
-     * @return boolean
+     * @return bool
      */
     public static function hasFile(string $key, string $field): bool
     {
@@ -249,7 +296,7 @@ class Form
      *
      * @param string $key
      * @param string $field
-     * @return boolean
+     * @return bool
      */
     public static function hasError(string $key, string $field): bool
     {

@@ -10,6 +10,10 @@ use TofuPlugin\Models\ValidationErrorCollection;
  *
  * ```php
  * new ValidationConfig(
+ *     allows: [
+ *         'name',
+ *         'email',
+ *     ],
  *     rules: [
  *         'name' => 'required|max_len:200',
  *         'email' => 'required|valid_email',
@@ -46,6 +50,22 @@ use TofuPlugin\Models\ValidationErrorCollection;
 class ValidationConfig
 {
     public function __construct(
+        /**
+         * Allowed field names.
+         *
+         * If not set, the specified fields do not store values in the session.
+         *
+         * ```php
+         * allows: [
+         *     'name',
+         *     'email',
+         * ],
+         * ```
+         *
+         * @var array
+         */
+        public readonly array $allows,
+
         /**
          * Validation rules.
          *

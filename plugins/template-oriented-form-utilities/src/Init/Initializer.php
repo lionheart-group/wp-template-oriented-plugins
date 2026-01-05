@@ -10,15 +10,26 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-class Initializer {
-    public static function activate() {
+class Initializer
+{
+    /**
+     * Activate step
+     *
+     * @return void
+     */
+    public static function activate(): void {
         // Activate step
 
         // Prepare tables
         Migrate::migrate();
     }
 
-    public static function deactivate() {
+    /**
+     * Deactivate step
+     *
+     * @return void
+     */
+    public static function deactivate(): void {
         // Deactivate step
 
         // Drop tables
@@ -28,7 +39,12 @@ class Initializer {
         // Migrate::dropTable(Migrate::getTableName());
     }
 
-    public static function upgrade() {
+    /**
+     * Upgrade step
+     *
+     * @return void
+     */
+    public static function upgrade(): void {
         // Upgrade step
 
         // Prepare tables

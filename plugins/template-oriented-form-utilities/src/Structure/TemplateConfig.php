@@ -31,13 +31,5 @@ class TemplateConfig
          * @var ?string
          */
         public readonly ?string $confirmPath = null,
-
-        /**
-         * Error page path.
-         * If you want to display the input page, set this to null.
-         *
-         * @var ?string
-         */
-        public readonly ?string $errorPath = null,
     ) {}
 }

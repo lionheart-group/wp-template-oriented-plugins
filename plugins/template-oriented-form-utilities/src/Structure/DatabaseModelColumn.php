@@ -11,6 +11,9 @@ namespace TofuPlugin\Structure;
  */
 class DatabaseModelColumn
 {
+    /**
+     * Column type constants.
+     */
     const COLUMN_STRING = 'string';
     const COLUMN_INT = 'int';
     const COLUMN_FLOAT = 'float';

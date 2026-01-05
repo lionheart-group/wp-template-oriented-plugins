@@ -7,7 +7,18 @@ use GUMP;
 class MailAddress
 {
     public function __construct(
+        /**
+         * Email address
+         *
+         * @var string
+         */
         public readonly string $email,
+
+        /**
+         * Name
+         *
+         * @var string
+         */
         public readonly string $name = '',
     )
     {
@@ -22,6 +33,14 @@ class MailAddress
         }
     }
 
+    /**
+     * Convert to string
+     *
+     * If name is provided, format as "Name <email>", otherwise just return the email.
+     * If name is empty, only the email address is returned.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         if ($this->name !== '') {

@@ -4,7 +4,7 @@ use TofuPlugin\Base\Migration;
 use TofuPlugin\Models\Record;
 
 return new class extends Migration {
-    public function sql()
+    public function sql(): string
     {
         global $wpdb;
         $recordTable = Record::getTableName();

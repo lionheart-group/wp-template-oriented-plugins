@@ -7,8 +7,16 @@ use TofuPlugin\Logger;
 use TofuPlugin\Structure\DatabaseModelColumn;
 
 class Session extends AbstractModels {
+    /**
+     * Table suffix for the Session model.
+     */
     const TABLE_SUFFIX = 'tofu_sessions';
 
+    /**
+     * Define the database table columns for the Session model.
+     *
+     * @return DatabaseModelColumn[]
+     */
     protected static function columns(): array
     {
         return [

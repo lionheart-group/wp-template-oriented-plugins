@@ -53,7 +53,7 @@ class FieldValueCollection
      * Check if there are values for a specific field
      *
      * @param string $field
-     * @return boolean
+     * @return bool
      */
     public function hasValue(string $field): bool
     {

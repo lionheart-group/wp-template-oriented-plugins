@@ -7,8 +7,16 @@ use TofuPlugin\Logger;
 use TofuPlugin\Structure\DatabaseModelColumn;
 
 class Record extends AbstractModels {
+    /**
+     * Table suffix for the Record model.
+     */
     const TABLE_SUFFIX = 'tofu_records';
 
+    /**
+     * Define the database table columns for the Record model.
+     *
+     * @return DatabaseModelColumn[]
+     */
     protected static function columns(): array
     {
         return [

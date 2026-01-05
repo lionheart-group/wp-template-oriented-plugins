@@ -13,10 +13,6 @@ class UploadedFileCollection
      */
     private array $files = [];
 
-    public function __construct()
-    {
-    }
-
     /**
      * Get all files
      *
@@ -42,7 +38,7 @@ class UploadedFileCollection
      * Check if a specific uploaded file exists by name.
      *
      * @param string $name
-     * @return boolean
+     * @return bool
      */
     public function hasFile(string $name): bool
     {

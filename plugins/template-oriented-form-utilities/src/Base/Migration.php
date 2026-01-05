@@ -6,5 +6,10 @@ use Monolog\Logger as MonologLogger;
 
 abstract class Migration
 {
-    abstract public function sql();
+    /**
+     * Get the SQL statement for the migration
+     *
+     * @return string
+     */
+    abstract public function sql(): string;
 }
