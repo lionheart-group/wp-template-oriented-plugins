@@ -47,9 +47,9 @@ class ValidationConfig
 {
     public function __construct(
         /**
-         * Allowes fileds names.
+         * Allowed field names.
          *
-         * If not set, the specieid fields does not store values in the session.
+         * If not set, the specified fields do not store values in the session.
          *
          * ```php
          * allows: [
