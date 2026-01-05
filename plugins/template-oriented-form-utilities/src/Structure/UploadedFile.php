@@ -13,11 +13,6 @@ class UploadedFile
         public readonly string $tempName,
         public readonly int $size,
     ) {
-        $tempPath = Uploader::getTempFilePath($this->tempName);
-
-        if (!file_exists($tempPath)) {
-            throw new \RuntimeException(sprintf('Temporary file does not exist: %s', esc_html($tempPath)));
-        }
     }
 
     public function toArray(): array

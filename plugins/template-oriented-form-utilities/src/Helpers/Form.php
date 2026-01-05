@@ -113,10 +113,56 @@ class Form
             return $value->value;
         }
 
-        if (is_string($value->value)) {
-            return esc_html($value->value);
+        return Sanitizer::escHtmlRecursive($value->value);
+    }
+
+    /**
+     * Check if the submitted values contain the specified value for checkbox/radio/select
+     *
+     * @param string $key
+     * @param string $field
+     * @param string $value
+     * @return bool
+     */
+    public static function contains(string $key, string $field, string $value): bool
+    {
+        $form = self::get($key);
+        $fieldValue = $form->getValues()->getValue($field);
+        if ($fieldValue === null) {
+            return false;
         }
-        return $value->value;
+
+        if (is_array($fieldValue->value)) {
+            return in_array($value, $fieldValue->value);
+        }
+
+        return ($fieldValue->value === $value);
+    }
+
+    /**
+     * Return `checked` attribute if the checkbox/radio is checked
+     *
+     * @param string $key
+     * @param string $field
+     * @param string $value
+     * @return string
+     */
+    public static function checked(string $key, string $field, string $value): string
+    {
+        return self::contains($key, $field, $value) ? 'checked' : '';
+    }
+
+    /**
+     * Return `selected` attribute if the select option is selected
+     *
+     * @param string $key
+     * @param string $field
+     * @param string $value
+     * @return string
+     */
+    public static function selected(string $key, string $field, string $value): string
+    {
+        return self::contains($key, $field, $value) ? 'selected' : '';
     }
 
     /**

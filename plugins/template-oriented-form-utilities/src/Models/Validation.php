@@ -46,8 +46,8 @@ class Validation
 
         // Collect sanitized values
         foreach ($sanitizedData as $key => $value) {
-            // If not defined rule, skip to add value
-            if (!isset($form->config->validation->rules[$key])) {
+            // If not defined in `allows`, skip to add value
+            if ($form->isFieldAllowed($key) === false) {
                 continue;
             }
 
@@ -57,8 +57,8 @@ class Validation
         // Session stored uploaded files
         if (isset($targetValues[Consts::UPLOADED_FILES_INPUT_NAME]) && is_array($targetValues[Consts::UPLOADED_FILES_INPUT_NAME])) {
             foreach ($targetValues[Consts::UPLOADED_FILES_INPUT_NAME] as $fileData) {
-                // If not defined rule, skip to add file
-                if (!isset($form->config->validation->rules[$fileData['name']])) {
+                // If not defined in `allows`, skip to add value
+                if ($form->isFieldAllowed($fileData['name']) === false) {
                     continue;
                 }
 
@@ -77,8 +77,8 @@ class Validation
         // Upload files
         foreach ($targetValues as $name => $_) {
             if (isset($fileValues[$name]) && isset($fileValues[$name]['error']) && $fileValues[$name]['error'] === UPLOAD_ERR_OK) {
-                // If not defined rule, skip to add file
-                if (!isset($form->config->validation->rules[$name])) {
+                // If not defined in `allows`, skip to add value
+                if ($form->isFieldAllowed($name) === false) {
                     continue;
                 }
 

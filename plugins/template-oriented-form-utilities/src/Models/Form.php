@@ -69,8 +69,8 @@ class Form
         if ($sessionValues) {
             if (isset($sessionValues['values']) && $sessionValues['values']) {
                 foreach ($sessionValues['values'] as $field => $value) {
-                    // If not defined rule, skip to add value
-                    if (!isset($this->config->validation->rules[$field])) {
+                    // If not defined in `allows`, skip to add value
+                    if ($this->isFieldAllowed($field) === false) {
                         continue;
                     }
 
@@ -80,8 +80,8 @@ class Form
 
             if (isset($sessionValues['errors']) && $sessionValues['errors']) {
                 foreach ($sessionValues['errors'] as $field => $messages) {
-                    // If not defined rule, skip to add value
-                    if (!isset($this->config->validation->rules[$field])) {
+                    // If not defined in `allows`, skip to add value
+                    if ($this->isFieldAllowed($field) === false) {
                         continue;
                     }
 
@@ -93,8 +93,8 @@ class Form
 
             if (isset($sessionValues['files']) && $sessionValues['files']) {
                 foreach ($sessionValues['files'] as $fileData) {
-                    // If not defined rule, skip to add file
-                    if (!isset($this->config->validation->rules[$fileData['name']])) {
+                    // If not defined in `allows`, skip to add value
+                    if ($this->isFieldAllowed($fileData['name']) === false) {
                         continue;
                     }
 
@@ -192,6 +192,17 @@ class Form
     public function getRecaptchaConfig(): ?ReCAPTCHAConfig
     {
         return $this->config->recaptcha;
+    }
+
+    /**
+     * Check the specified field name is allowed to store value in the session.
+     *
+     * @param string $field The field name.
+     * @return bool
+     */
+    public function isFieldAllowed(string $field): bool
+    {
+        return in_array($field, $this->config->validation->allows, true);
     }
 
     /**
@@ -463,12 +474,6 @@ class Form
             }
         }
 
-        // Clear the session data
-        Session::clear($this->config->key);
-        $this->values = new FieldValueCollection();
-        $this->errors = new ValidationErrorCollection();
-        $this->files = new UploadedFileCollection();
-
         // Save flush value for verification in result page
         $this->storeSession(Encryptor::encrypt([
             'form_key' => $this->config->key,
@@ -484,6 +489,7 @@ class Form
         if ($this->flushValue === null) {
             return false;
         }
+        // Clear the session data
         Session::clear($this->config->key);
 
         $sessionData = Encryptor::decrypt($this->flushValue);

@@ -47,6 +47,22 @@ class ValidationConfig
 {
     public function __construct(
         /**
+         * Allowes fileds names.
+         *
+         * If not set, the specieid fields does not store values in the session.
+         *
+         * ```php
+         * allows: [
+         *     'name',
+         *     'email',
+         * ],
+         * ```
+         *
+         * @var array
+         */
+        public readonly array $allows,
+
+        /**
          * Validation rules.
          *
          * ```php
