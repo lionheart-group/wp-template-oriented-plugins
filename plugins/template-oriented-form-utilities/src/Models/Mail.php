@@ -64,19 +64,12 @@ class Mail
     protected array $attachments = [];
 
     /**
-     * Mail constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Add a recipient.
      *
      * @param string|MailAddress $to
      * @return Mail
      */
-    public function addTo($to): Mail
+    public function addTo(string|MailAddress $to): Mail
     {
         if (is_string($to)) {
             foreach (explode(',', $to) as $email) {
@@ -95,7 +88,7 @@ class Mail
      * @param string|MailAddress $cc
      * @return Mail
      */
-    public function addCc($cc): Mail
+    public function addCc(string|MailAddress $cc): Mail
     {
         if (is_string($cc)) {
             foreach (explode(',', $cc) as $email) {
@@ -114,7 +107,7 @@ class Mail
      * @param string|MailAddress $bcc
      * @return Mail
      */
-    public function addBcc($bcc): Mail
+    public function addBcc(string|MailAddress $bcc): Mail
     {
         if (is_string($bcc)) {
             foreach (explode(',', $bcc) as $email) {
@@ -133,7 +126,7 @@ class Mail
      * @param string|MailAddress $from
      * @return Mail
      */
-    public function setFrom($from): Mail
+    public function setFrom(string|MailAddress $from): Mail
     {
         if (is_string($from)) {
             $from = new MailAddress(trim($from));
@@ -254,6 +247,11 @@ class Mail
         );
     }
 
+    /**
+     * Convert mail to an array.
+     *
+     * @return array
+     */
     public function toArray(): array
     {
         return [

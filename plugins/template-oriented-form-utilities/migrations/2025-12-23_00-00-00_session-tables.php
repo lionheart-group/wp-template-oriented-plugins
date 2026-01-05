@@ -4,7 +4,7 @@ use TofuPlugin\Base\Migration;
 use TofuPlugin\Models\Session;
 
 return new class extends Migration {
-    public function sql()
+    public function sql(): string
     {
         global $wpdb;
         $sessionTable = Session::getTableName();

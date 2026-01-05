@@ -13,14 +13,10 @@ class ValidationErrorCollection
      */
     private array $errors = [];
 
-    public function __construct()
-    {
-    }
-
     /**
      * Check if there are any validation errors
      *
-     * @return boolean
+     * @return bool
      */
     public function hasErrors(): bool
     {
@@ -63,7 +59,7 @@ class ValidationErrorCollection
      * Check if there are errors for a specific field
      *
      * @param string $field
-     * @return boolean
+     * @return bool
      */
     public function hasFieldErrors(string $field): bool
     {

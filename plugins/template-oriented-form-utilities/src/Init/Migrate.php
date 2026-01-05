@@ -6,15 +6,28 @@ use TofuPlugin\Logger;
 
 class Migrate
 {
+    /**
+     * Migrate table suffix
+     */
     const TABLE_SUFFIX = 'tofu_migrate';
 
-    public static function getTableName()
+    /**
+     * Get migrate table name
+     *
+     * @return string
+     */
+    public static function getTableName(): string
     {
         global $wpdb;
         return esc_sql($wpdb->prefix . static::TABLE_SUFFIX);
     }
 
-    protected static function checkMigrateTable()
+    /**
+     * Check and create migrate table if not exists
+     *
+     * @return void
+     */
+    protected static function checkMigrateTable(): void
     {
         global $wpdb;
         $table_name = static::getTableName();
@@ -37,14 +50,26 @@ class Migrate
         dbDelta($sql);
     }
 
-    protected static function getMigrateKey($key)
+    /**
+     * Get migrate key if done
+     *
+     * @param string $key
+     * @return bool
+     */
+    protected static function checkDoneMigrateKey(string $key): bool
     {
         global $wpdb;
         $table_name = static::getTableName();
-        return $wpdb->get_row($wpdb->prepare("SELECT * FROM %i WHERE `key` = %s", $table_name, $key));
+        $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM %i WHERE `key` = %s", $table_name, $key));
+        return $result !== null;
     }
 
-    public static function migrate()
+    /**
+     * Execute migrations
+     *
+     * @return void
+     */
+    public static function migrate(): void
     {
         global $wpdb;
         static::checkMigrateTable();
@@ -54,8 +79,7 @@ class Migrate
             '2025-12-23_00-00-00_session-tables',
         ] as $migrate) {
             Logger::info("Migration {$migrate} start.");
-            $migrateKey = static::getMigrateKey($migrate);
-            if ($migrateKey) {
+            if (static::checkDoneMigrateKey($migrate)) {
                 Logger::info("Migration {$migrate} already executed.");
                 continue;
             }
@@ -80,7 +104,13 @@ class Migrate
         }
     }
 
-    public static function dropTable($table_name)
+    /**
+     * Drop migrate table
+     *
+     * @param string $table_name
+     * @return void
+     */
+    public static function dropTable(string $table_name): void
     {
         global $wpdb;
         $wpdb->query($wpdb->prepare("DROP TABLE IF EXISTS %i", $table_name));

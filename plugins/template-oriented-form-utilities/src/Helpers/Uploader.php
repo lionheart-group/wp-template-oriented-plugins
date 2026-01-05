@@ -8,7 +8,13 @@ use TofuPlugin\Structure\UploadedFile;
 
 class Uploader
 {
-    public static function upload($name): ?UploadedFile
+    /**
+     * Handle file upload for a specific field name.
+     *
+     * @param string $name
+     * @return ?UploadedFile
+     */
+    public static function upload(string $name): ?UploadedFile
     {
         if (!isset($_FILES[$name]) || empty($_FILES[$name]['tmp_name'])) {
             return null;
@@ -68,6 +74,11 @@ class Uploader
         );
     }
 
+    /**
+     * Get temporary upload directory, create if not exists
+     *
+     * @return string
+     */
     public static function getTempDir(): string
     {
         $uploadDir = wp_upload_dir();
@@ -93,6 +104,12 @@ class Uploader
         return $tempDir;
     }
 
+    /**
+     * Get full path of a temporary uploaded file by its temporary name
+     *
+     * @param string $tempName
+     * @return string
+     */
     public static function getTempFilePath(string $tempName): string
     {
         $tempDir = self::getTempDir();
@@ -104,7 +121,7 @@ class Uploader
      *
      * @return void
      */
-    public static function clearExpired()
+    public static function clearExpired(): void
     {
         $tempDir = self::getTempDir();
         if (!is_dir($tempDir)) {

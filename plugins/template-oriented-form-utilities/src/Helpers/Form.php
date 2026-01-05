@@ -42,7 +42,7 @@ class Form
      *
      * @return FormModel|false
      */
-    public static function get(string $key, bool $isStrict = true)
+    public static function get(string $key, bool $isStrict = true): FormModel|false
     {
         foreach (self::$forms as $form) {
             if ($form->getKey() === $key) {
@@ -56,9 +56,8 @@ class Form
                 'TOFU Form Action Error',
                 ['response' => 500]
             );
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -99,6 +98,8 @@ class Form
      *
      * @param string $key
      * @param string $field
+     * @param bool $raw
+     * @return mixed
      */
     public static function value(string $key, string $field, bool $raw = false): mixed
     {
@@ -170,7 +171,7 @@ class Form
      *
      * @param string $key
      * @param string $field
-     * @return boolean
+     * @return bool
      */
     public static function hasFile(string $key, string $field): bool
     {
@@ -295,7 +296,7 @@ class Form
      *
      * @param string $key
      * @param string $field
-     * @return boolean
+     * @return bool
      */
     public static function hasError(string $key, string $field): bool
     {

@@ -9,8 +9,13 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-class Endpoint {
-
+class Endpoint
+{
+    /**
+     * Initialize the endpoint
+     *
+     * @return void
+     */
     public static function init()
     {
         // Register endpoint

@@ -10,6 +10,15 @@ use TofuPlugin\Structure\UploadedFile;
 
 class Validation
 {
+    /**
+     * Validate form input values
+     *
+     * @param Form $form
+     * @param array<string, mixed> $postValues
+     * @param array<string, mixed> $fileValues
+     * @return void
+     * @throws \RuntimeException
+     */
     public function validate(Form $form, array $postValues, array $fileValues = []): void
     {
         $values = $form->getValues();

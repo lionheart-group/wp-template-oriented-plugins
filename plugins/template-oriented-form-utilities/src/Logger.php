@@ -13,7 +13,13 @@ class Logger
     /** @var string */
     protected static $filePath;
 
-    public static function init($file)
+    /**
+     * Initialize the logger.
+     *
+     * @param string $file Log file name (without path)
+     * @return void
+     */
+    public static function init(string $file): void
     {
         if (WP_DEBUG) {
             self::$filePath = WP_CONTENT_DIR . '/tofu-logs/' . $file . '.log';
@@ -22,6 +28,12 @@ class Logger
         }
     }
 
+    /**
+     * Get the log file path if logging is enabled.
+     *
+     * @return ?string
+     * @throws \Exception
+     */
     public static function getLogFilePath(): ?string
     {
         if (WP_DEBUG) {

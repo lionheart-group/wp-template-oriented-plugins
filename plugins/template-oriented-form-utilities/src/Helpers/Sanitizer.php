@@ -10,7 +10,7 @@ class Sanitizer
      * @param mixed $input The input array to sanitize.
      * @return mixed The sanitized array.
      */
-    public static function escHtmlRecursive($input)
+    public static function escHtmlRecursive($input): mixed
     {
         if (is_array($input)) {
             return array_map([self::class, 'escHtmlRecursive'], $input);
@@ -29,7 +29,7 @@ class Sanitizer
      * @param mixed $input The input array to sanitize.
      * @return mixed The sanitized array.
      */
-    public static function escAttrRecursive($input)
+    public static function escAttrRecursive($input): mixed
     {
         if (is_array($input)) {
             return array_map([self::class, 'escAttrRecursive'], $input);
