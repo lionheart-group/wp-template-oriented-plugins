@@ -51,7 +51,7 @@ class Migrate
     }
 
     /**
-     * Get migrate key if done
+     * Check migrate key if done
      *
      * @param string $key
      * @return bool
