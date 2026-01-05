@@ -39,6 +39,6 @@ class Sanitizer
             return $input;
         }
 
-        return esc_html($input);
+        return esc_attr($input);
     }
 }
