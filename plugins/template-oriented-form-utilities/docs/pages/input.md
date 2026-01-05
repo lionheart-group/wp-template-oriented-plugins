@@ -6,6 +6,20 @@ The input page is where users fill out and submit the form. This page handles:
 - Showing validation errors (when form is resubmitted with errors)
 - Pre-populating fields with previously entered values
 
+## Table of Contents
+
+- [Basic Structure](#basic-structure)
+- [Form Open and Close](#form-open-and-close)
+- [Text Input Fields](#text-input-fields)
+- [Checkbox Fields](#checkbox-fields)
+- [Radio Button Fields](#radio-button-fields)
+- [Select (Dropdown) Fields](#select-dropdown-fields)
+- [File Upload Fields](#file-upload-fields)
+- [reCAPTCHA Integration](#recaptcha-integration)
+- [Complete Example](#complete-example)
+- [Important Notes](#important-notes)
+- [Next Steps](#next-steps)
+
 ## Basic Structure
 
 ```php

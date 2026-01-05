@@ -39,6 +39,7 @@ The `TofuPlugin\Helpers\Form` class provides all the methods you need to build f
 | `Form::hasFile($key, $field)` | Check if file was uploaded for field |
 | `Form::file($key, $field)` | Get uploaded file object |
 | `Form::fileHidden($key, $field)` | Generate hidden inputs for uploaded file |
+| `Form::getFileDataAttribute($key, $field)` | Get data attribute for uploaded file |
 | `Form::fileRemoveButton($key, $field)` | Generate file remove button |
 | `Form::verifySession($key)` | Verify user has valid session data |
 | `Form::verifySubmit($key)` | Verify form was submitted successfully |

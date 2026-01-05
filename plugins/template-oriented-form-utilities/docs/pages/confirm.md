@@ -2,6 +2,17 @@
 
 The confirmation page displays the submitted form data for user review before final submission. This step is **optional** — you can skip it by setting `confirmPath: null` in your `TemplateConfig`.
 
+## Table of Contents
+
+- [Basic Structure](#basic-structure)
+- [Session Verification](#session-verification)
+- [Displaying Field Values](#displaying-field-values)
+- [Back Navigation](#back-navigation)
+- [Complete Example](#complete-example)
+- [Important Notes](#important-notes)
+- [Skipping the Confirm Page](#skipping-the-confirm-page)
+- [Next Steps](#next-steps)
+
 ## Basic Structure
 
 ```php

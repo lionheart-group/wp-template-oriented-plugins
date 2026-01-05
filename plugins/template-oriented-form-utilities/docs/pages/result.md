@@ -2,6 +2,18 @@
 
 The result page (also known as the "thank you" page) is displayed after a form has been successfully submitted. This page confirms to the user that their submission was received and any emails have been sent.
 
+## Table of Contents
+
+- [Basic Structure](#basic-structure)
+- [Submit Verification](#submit-verification)
+- [Displaying Submitted Values](#displaying-submitted-values)
+- [Complete Example](#complete-example)
+- [Advanced: Tracking Submissions](#advanced-tracking-submissions)
+- [Important Notes](#important-notes)
+- [Error Handling](#error-handling)
+- [Preventing Duplicate Submissions](#preventing-duplicate-submissions)
+- [Next Steps](#next-steps)
+
 ## Basic Structure
 
 ```php
