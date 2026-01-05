@@ -16,7 +16,7 @@ class Endpoint
      *
      * @return void
      */
-    public static function init()
+    public static function init(): void
     {
         // Register endpoint
         add_action('init', function () {
