@@ -65,7 +65,7 @@ Example subject template (`form/contact/auto-reply-subject.php`):
 New Submission Received from <?php echo Form::value('form', 'email'); ?>
 ```
 
-However, the above example is very simple, so it's able to replace with the static `subject` property as follows:
+However, the above example is very simple, so you can replace it with the static `subject` property as follows:
 
 ```php
 subject: 'New Submission Received from {email}',
