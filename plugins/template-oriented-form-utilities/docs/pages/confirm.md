@@ -151,8 +151,6 @@ For multiple checkbox values (arrays):
 </div>
 ```
 
-> **Important:** You must include `Form::fileHidden()` for each uploaded file to preserve file data across the form submission.
-
 ## Back Navigation
 
 You can provide a back link/button to allow users to return to the input page for edits:
@@ -262,9 +260,8 @@ get_header();
 
 1. **Always verify the session before displaying content** - Use `Form::verifySession()` at the very beginning of your template.
 2. **Call verification and embedScript before get_header()** - These must be called before any output to work properly.
-3. **Include hidden fields for file uploads** - Use `Form::fileHidden()` for each uploaded file to preserve the data.
-4. **The form action must be 'confirm'** - This tells the plugin to process this as the confirmation step.
-5. **Provide a way to go back** - Always include a back link/button so users can edit their submission.
+3. **The form action must be 'confirm'** - This tells the plugin to process this as the confirmation step.
+4. **Provide a way to go back** - Always include a back link/button so users can edit their submission.
 
 ## Skipping the Confirm Page
 
