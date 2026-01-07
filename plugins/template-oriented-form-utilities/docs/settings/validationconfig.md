@@ -51,7 +51,7 @@ $validation = new ValidationConfig(
 | `messages` | `array` | No | `[]` | Custom error messages per field and validation rule. |
 | `after` | `?Closure` | No | `null` | Custom callback function for additional validation logic. |
 
-## For file upload fields validation rules
+## File Upload Validation Rules
 
 The default GUMP validation does not fit well for file upload fields. You can use the following custom rules:
 
