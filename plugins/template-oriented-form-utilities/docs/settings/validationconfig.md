@@ -51,6 +51,15 @@ $validation = new ValidationConfig(
 | `messages` | `array` | No | `[]` | Custom error messages per field and validation rule. |
 | `after` | `?Closure` | No | `null` | Custom callback function for additional validation logic. |
 
+## For file upload fields validation rules
+
+The default GUMP validation does not fit well for file upload fields. You can use the following custom rules:
+
+- `custom_required_file`: Ensures a file is uploaded.
+    - **The default `required_file` rule does not work when you back to the input page after validation errors or from the confirmation page.**
+- `max_mb,<number>`: Validates the maximum file size in megabytes.
+- `mime_type,<type1>;<type2>;...`: Validates the file MIME type.
+
 ## Custom Validation with `after` Callback
 
 The `after` callback allows you to add custom validation logic:

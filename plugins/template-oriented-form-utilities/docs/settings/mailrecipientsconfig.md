@@ -12,8 +12,8 @@ $autoReply = new MailRecipientsConfig(
     recipientEmail: '{email}', // Dynamic field value
     recipientCcEmail: null,
     recipientBccEmail: null,
-    subjectPath: get_template_directory() . '/form/contact/auto-reply-subject',
-    mailBodyPath: get_template_directory() . '/form/contact/auto-reply-body',
+    subjectPath: 'form/contact/auto-reply-subject',
+    mailBodyPath: 'form/contact/auto-reply-body',
 );
 
 // Static admin notification
@@ -43,6 +43,32 @@ You can use `{field_name}` syntax in email addresses to dynamically insert form 
 ```php
 recipientEmail: '{email}',      // Uses the value from the 'email' form field
 recipientCcEmail: '{cc_email}', // Uses the value from the 'cc_email' form field
+```
+
+## Subject and Body Templates
+
+When using `subjectPath` or `mailBodyPath`, it returns the output of the specified template file by using `get_template_part()`. The template files can access form data to generate dynamic content.
+
+```php
+<?php
+use TofuPlugin\Structure\MailRecipientsConfig;
+
+$mailRecipient = new MailRecipientsConfig(
+    // ...
+    subjectPath: 'form/contact/auto-reply-subject',
+    // ...
+);
+```
+
+Example subject template (`form/contact/auto-reply-subject.php`):
+```php
+New Submission Received from <?php echo Form::value('form', 'email'); ?>
+```
+
+However, the above example is very simple, so it's able to replace with the static `subject` property as follows:
+
+```php
+subject: 'New Submission Received from {email}',
 ```
 
 ## Notes

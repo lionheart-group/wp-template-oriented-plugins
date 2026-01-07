@@ -185,13 +185,9 @@ get_header();
 ## Important Notes
 
 1. **Always verify the submission** - Use `Form::verifySubmit()` to ensure the form was properly processed.
-
 2. **No form is needed on this page** - The result page is just for displaying a success message.
-
 3. **Session data is cleared** - After successful submission, the session data may be cleared to prevent duplicate submissions.
-
 4. **Don't allow refresh resubmission** - The verification prevents users from refreshing the page and resubmitting the form.
-
 5. **Provide clear next steps** - Include links to help users navigate after submitting the form.
 
 ## Error Handling

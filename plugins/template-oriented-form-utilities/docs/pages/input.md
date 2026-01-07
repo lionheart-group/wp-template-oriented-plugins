@@ -492,11 +492,8 @@ get_header();
 ## Important Notes
 
 1. **Always call `Form::embedScript()` before `get_header()`** - This ensures JavaScript files are properly enqueued in the page head.
-
 2. **Use `Form::value()` for all field values** - This automatically escapes output and retrieves stored session values.
-
 3. **The field `name` attribute must match validation rules** - Field names in your HTML must match the keys defined in `ValidationConfig`.
-
 4. **Error handling is automatic** - If validation fails, users are redirected back to the input page with errors and their previously entered values preserved.
 
 ## Next Steps

@@ -22,15 +22,15 @@ add_action('init', function () {
             // Auto-reply to the user
             new \TofuPlugin\Structure\MailRecipientsConfig(
                 recipientEmail: '{email}',
-                subjectPath: get_template_directory() . '/form/contact/auto-reply-subject.php',
-                mailBodyPath: get_template_directory() . '/form/contact/auto-reply-body.php',
+                subjectPath: 'form/contact/auto-reply-subject',
+                mailBodyPath: 'form/contact/auto-reply-body',
             ),
             // Notification to admin
             new \TofuPlugin\Structure\MailRecipientsConfig(
                 recipientEmail: 'admin@example.com',
                 recipientCcEmail: 'manager@example.com',
-                subjectPath: get_template_directory() . '/form/contact/admin-subject.php',
-                mailBodyPath: get_template_directory() . '/form/contact/admin-body.php',
+                subjectPath: 'form/contact/admin-subject',
+                mailBodyPath: 'form/contact/admin-body',
             ),
         ]),
     );
