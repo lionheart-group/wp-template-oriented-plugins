@@ -81,10 +81,10 @@ $values = $form->getValues();
 
     <dl>
         <dt>Name</dt>
-        <dd><?php echo esc_html($values->getValue('name')?->value ?? ''); ?></dd>
+        <dd><?php echo Form::value($formKey, 'name'); ?></dd>
 
         <dt>Email</dt>
-        <dd><?php echo esc_html($values->getValue('email')?->value ?? ''); ?></dd>
+        <dd><?php echo Form::value($formKey, 'email'); ?></dd>
     </dl>
 </div>
 ```
