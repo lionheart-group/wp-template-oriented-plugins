@@ -13,6 +13,17 @@ Template-Oriented Form Utilities is a WordPress plugin that provides a set of ut
 
 Template-Oriented Form Utilities (TOFU) is designed to streamline the process of creating and managing forms within WordPress themes and plugins. By adopting a template-oriented approach, TOFU allows developers to define form structures and behaviors using reusable templates, making it easier to manage/maintain with team collaboration through version control systems.
 
+== External services ==
+
+This plugin relies on third-party services to protect your website from spam and automated attacks. Depending on your configuration, this plugin connects to the following services:
+
+= Google reCAPTCHA =
+* **Purpose:** Protecting forms from spam and bot abuse.
+* **When data is sent:** When a page containing a reCAPTCHA-protected form is loaded or submitted.
+* **Data sent:** IP address, mouse movements, browser/device information, and duration of stay.
+* **Service Provider:** Google LLC.
+* **Links:** [Google Privacy Policy](https://policies.google.com/privacy), [Google Terms of Service](https://policies.google.com/terms).
+
 == Installation ==
 
 1. From the WP admin panel, click "Plugins" -> "Add new".
