@@ -73,7 +73,7 @@ class Form
         $actionUrl = $form->getActionUrl($action);
 
         // Forcibly set id attribute
-        $attributes['id'] = sprintf(Consts::RECAPTCHA_TOKEN_FORM_ID_FORMAT, $key);
+        $attributes['id'] = sprintf(Consts::FORM_ID_FORMAT, $key);
 
         $attrString = '';
         foreach ($attributes as $attrKey => $attrValue) {
@@ -220,45 +220,16 @@ class Form
             return '';
         }
 
-        $outputs = [];
-
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][name]" value="%s" %s />',
+        // Embed hidden input field for the uploaded file
+        // The input name is like: __tofu_uploaded_files[field_name]
+        // The input value is the unique ID of the uploaded file that can be used to retrieve the file info from the session
+        return sprintf(
+            '<input type="hidden" name="%s[%s]" value="%s" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->name),
+            esc_attr($file->getId()),
             self::getFileDataAttribute($key, $file->name),
         );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][fileName]" value="%s" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            esc_attr($file->fileName),
-            self::getFileDataAttribute($key, $file->name),
-        );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][mimeType]" value="%s" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            esc_attr($file->mimeType),
-            self::getFileDataAttribute($key, $file->name),
-        );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][tempName]" value="%s" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            esc_attr($file->tempName),
-            self::getFileDataAttribute($key, $file->name),
-        );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][size]" value="%d" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            $file->size,
-            self::getFileDataAttribute($key, $file->name),
-        );
-
-        return implode("", $outputs);
     }
 
     /**
@@ -329,12 +300,12 @@ class Form
     }
 
     /**
-     * Embed the reCAPTCHA script for the given form.
+     * Embed the reCAPTCHA/Turnstile script for the given form.
      *
-     * This method enqueues the Google reCAPTCHA script and the plugin's
-     * own JavaScript that handles token generation. It must be called
-     * before {@see get_header()} (i.e. before WordPress outputs the
-     * <head> section) so that the scripts are properly enqueued.
+     * This method enqueues the Google reCAPTCHA/Cloudflare Turnstile script and
+     * the plugin's own JavaScript that handles token generation.
+     * It must be called before {@see get_header()} (i.e. before WordPress
+     * outputs the <head> section) so that the scripts are properly enqueued.
      *
      * Typical usage in a theme template:
      *
@@ -367,33 +338,43 @@ class Form
 
         // Check if reCAPTCHA is configured for the form
         $recaptchaConfig = $form->getRecaptchaConfig();
-        if ($recaptchaConfig === null) {
-            return;
+        if ($recaptchaConfig !== null) {
+            wp_enqueue_script(
+                'tofu-google-recaptcha',
+                sprintf('https://www.google.com/recaptcha/api.js?render=%s', rawurlencode($recaptchaConfig->siteKey)),
+                [],
+                null,
+                false
+            );
+            wp_enqueue_script(
+                'tofu-user-recaptcha',
+                plugins_url('/assets/js/recaptcha.js', TOFU_PLUGIN_FILE),
+                ['tofu-google-recaptcha'],
+                filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
+                false
+            );
+            wp_localize_script(
+                'tofu-user-recaptcha',
+                'tofuRecaptchaConfig',
+                [
+                    'siteKey' => $recaptchaConfig->siteKey,
+                    'formId' => sprintf(Consts::FORM_ID_FORMAT, $key),
+                    'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key),
+                ]
+            );
         }
 
-        wp_enqueue_script(
-            'tofu-google-recaptcha',
-            sprintf('https://www.google.com/recaptcha/api.js?render=%s', rawurlencode($recaptchaConfig->siteKey)),
-            [],
-            null,
-            false
-        );
-        wp_enqueue_script(
-            'tofu-user-recaptcha',
-            plugins_url('/assets/js/recaptcha.js', TOFU_PLUGIN_FILE),
-            ['tofu-google-recaptcha'],
-            filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
-            false
-        );
-        wp_localize_script(
-            'tofu-user-recaptcha',
-            'tofuRecaptchaConfig',
-            [
-                'siteKey' => $recaptchaConfig->siteKey,
-                'formId' => sprintf(Consts::RECAPTCHA_TOKEN_FORM_ID_FORMAT, $key),
-                'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key),
-            ]
-        );
+        // Check if Turnstile is configured for the form
+        $turnstileConfig = $form->getTurnstileConfig();
+        if ($turnstileConfig !== null) {
+            wp_enqueue_script(
+                'tofu-cloudflare-turnstile',
+                'https://challenges.cloudflare.com/turnstile/v0/api.js',
+                [],
+                null,
+                false
+            );
+        }
     }
 
     /**
@@ -437,6 +418,97 @@ class Form
     public static function recaptchaErrors(string $key): array
     {
         return self::errors($key, Consts::RECAPTCHA_TOKEN_INPUT_NAME);
+    }
+
+    /**
+     * Has Turnstile configured
+     *
+     * @return bool
+     */
+    public static function hasTurnstile(string $key): bool
+    {
+        $form = self::get($key);
+        return $form->hasTurnstile();
+    }
+
+    /**
+     * Get hidden input field for Turnstile token
+     *
+     * @param string $key
+     * @return string
+     */
+    public static function turnstileWidget(string $key, array $attributes = []): string
+    {
+        $form = self::get($key);
+        $turnstileConfig = $form->getTurnstileConfig();
+        if ($turnstileConfig === null) {
+            return '';
+        }
+
+        $attributes = shortcode_atts(
+            [
+                'data-action' => null,
+                'data-cdata' => null,
+                'data-callback' => null,
+                'data-error-callback' => null,
+                'data-execution' => null,
+                'data-expired-callback' => null,
+                'data-before-interactive-callback' => null,
+                'data-after-interactive-callback' => null,
+                'data-unsupported-callback' => null,
+                'data-theme' => null,
+                'data-language' => null,
+                'data-tabindex' => null,
+                'data-timeout-callback' => null,
+                'data-response-field' => null,
+                'data-size' => null,
+                'data-retry' => null,
+                'data-retry-interval' => null,
+                'data-refresh-expired' => null,
+                'data-refresh-timeout' => null,
+                'data-appearance' => null,
+                'data-feedback-enabled' => null,
+            ],
+            $attributes,
+        );
+
+        $display = [];
+        foreach ($attributes as $k => $a) {
+            if (empty($a)) {
+                continue;
+            }
+
+            $display[] = sprintf('%s="%s"', esc_attr($k), esc_attr($a));
+        }
+        $display[] = 'data-response-field-name="' . esc_attr(Consts::TURNSTILE_TOKEN_INPUT_NAME) . '"';
+
+        return sprintf(
+            '<div class="cf-turnstile" data-sitekey="%s" %s></div>',
+            esc_attr($turnstileConfig->siteKey),
+            implode(' ', $display)
+        );
+    }
+
+    /**
+     * Check if the form has error for Turnstile
+     *
+     * @param string $key
+     * @return bool
+     */
+    public static function hasTurnstileError(string $key): bool
+    {
+        return self::hasError($key, Consts::TURNSTILE_TOKEN_INPUT_NAME);
+    }
+
+    /**
+     * Get form error messages of Turnstile
+     *
+     * @param string $key
+     * @return string[]
+     */
+    public static function turnstileErrors(string $key): array
+    {
+        return self::errors($key, Consts::TURNSTILE_TOKEN_INPUT_NAME);
     }
 
     /**

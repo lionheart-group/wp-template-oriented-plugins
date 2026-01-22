@@ -11,6 +11,7 @@ TOFU can be configured in your WordPress theme's `functions.php` file using the 
     - [MailRecipientsConfig](settings/mailrecipientsconfig.md)
   - [ValidationConfig](settings/validationconfig.md)
   - [ReCAPTCHAConfig](settings/recaptchaconfig.md)
+  - [TurnstileConfig](settings/turnstileconfig.md)
 
 Here's a complete example showing how to set up a form with all configurations:
 

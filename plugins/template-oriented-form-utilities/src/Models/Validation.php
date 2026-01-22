@@ -56,35 +56,38 @@ class Validation
         // Collect sanitized values
         foreach ($sanitizedData as $key => $value) {
             // If not defined in `allows`, skip to add value
-            if ($form->isFieldAllowed($key) === false) {
+            if ($form->isFieldAllowed($key, [Consts::UPLOADED_FILES_INPUT_NAME]) === false) {
                 continue;
             }
 
             $values->addValue($key, $value);
         }
 
-        // Session stored uploaded files
-        if (isset($targetValues[Consts::UPLOADED_FILES_INPUT_NAME]) && is_array($targetValues[Consts::UPLOADED_FILES_INPUT_NAME])) {
-            foreach ($targetValues[Consts::UPLOADED_FILES_INPUT_NAME] as $fileData) {
-                // If not defined in `allows`, skip to add value
-                if ($form->isFieldAllowed($fileData['name']) === false) {
-                    continue;
-                }
+        // Clean up uploaded files
+        // Remove files not exists in previous values or with different ID
+        $currentFiles = $files->getAllFiles();
+        $previousValues = $targetValues[Consts::UPLOADED_FILES_INPUT_NAME] ?? null;
+        foreach ($currentFiles as $uploadedFile) {
+            // Unset value to avoid duplication
+            $values->unsetValue($uploadedFile->name);
 
-                $uploadedFile = new UploadedFile(
-                    name: $fileData['name'] ?? '',
-                    fileName: $fileData['fileName'] ?? '',
-                    mimeType: $fileData['mimeType'] ?? '',
-                    tempName: $fileData['tempName'] ?? '',
-                    size: (int)($fileData['size'] ?? 0),
-                );
-                $files->addFile($uploadedFile);
-                $values->unsetValue($uploadedFile->name);
+            if (!is_array($previousValues) || !isset($previousValues[$uploadedFile->name])) {
+                // If not exists in previous values, remove it
+                $files->removeFile($uploadedFile->name);
+                continue;
+            }
+
+            // If exists, compare ID to keep the file
+            // If ID is different, remove it
+            $previousFileData = $previousValues[$uploadedFile->name];
+            if ($previousFileData !== $uploadedFile->getId()) {
+                $files->removeFile($uploadedFile->name);
+                continue;
             }
         }
 
         // Upload files
-        foreach ($targetValues as $name => $_) {
+        foreach ($fileValues as $name => $_) {
             if (isset($fileValues[$name]) && isset($fileValues[$name]['error']) && $fileValues[$name]['error'] === UPLOAD_ERR_OK) {
                 // If not defined in `allows`, skip to add value
                 if ($form->isFieldAllowed($name) === false) {
@@ -95,6 +98,14 @@ class Validation
                 if ($uploadedFile) {
                     $files->addFile($uploadedFile);
                     $values->unsetValue($uploadedFile->name);
+
+                    // Add uploaded file ID as value
+                    $currentValues = $values->getValue(Consts::UPLOADED_FILES_INPUT_NAME);
+                    if (!is_array($currentValues)) {
+                        $currentValues = [];
+                    }
+                    $currentValues[$uploadedFile->name] = $uploadedFile->getId();
+                    $values->addValue(Consts::UPLOADED_FILES_INPUT_NAME, $currentValues);
                 }
             }
         }
@@ -121,7 +132,7 @@ GUMP::add_validator(
         // If session stored file is exists, return true
         if (isset($input[Consts::UPLOADED_FILES_INPUT_NAME])) {
             $uploadedFiles = $input[Consts::UPLOADED_FILES_INPUT_NAME];
-            if (isset($uploadedFiles[$field]) && is_array($uploadedFiles[$field])) {
+            if (isset($uploadedFiles[$field]) && !empty($uploadedFiles[$field])) {
                 return true;
             }
         }

@@ -3,23 +3,23 @@
 namespace TofuPlugin\Helpers;
 
 use TofuPlugin\Logger;
-use TofuPlugin\Structure\ReCAPTCHAConfig;
+use TofuPlugin\Structure\TurnstileConfig;
 
-class ReCAPTCHA
+class Turnstile
 {
     /**
-     * Error messages from reCAPTCHA verification
+     * Error messages from Turnstile verification
      *
      * @var string[]
      */
     protected static array $errors = [];
 
     /**
-     * Verify the reCAPTCHA token
+     * Verify the Turnstile token
      *
      * @return bool
      */
-    public static function verifyToken(ReCAPTCHAConfig $config, string $token): bool
+    public static function verifyToken(TurnstileConfig $config, string $token): bool
     {
         // Reset errors for this verification attempt to avoid accumulation across calls.
         self::$errors = [];
@@ -30,7 +30,7 @@ class ReCAPTCHA
         );
 
         $response = wp_remote_post(
-            'https://www.google.com/recaptcha/api/siteverify',
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
             array(
                 'body'    => $request,
                 'timeout' => 10,
@@ -38,15 +38,15 @@ class ReCAPTCHA
         );
 
         if (is_wp_error($response)) {
-            self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', 'template-oriented-form-utilities');
-            Logger::error('reCAPTCHA verification request failed', ['errors' => $response->get_error_message()]);
+            self::$errors[] = __('Failed to verify Turnstile at this time. Please try again later.', 'template-oriented-form-utilities');
+            Logger::error('Turnstile verification request failed', ['errors' => $response->get_error_message()]);
             return false;
         }
 
         $status_code = wp_remote_retrieve_response_code($response);
         if ($status_code !== 200) {
-            self::$errors[] = __('Failed to verify reCAPTCHA at this time. Please try again later.', 'template-oriented-form-utilities');
-            Logger::error('reCAPTCHA verification returned non-200 status', ['code' => (string) $status_code]);
+            self::$errors[] = __('Failed to verify Turnstile at this time. Please try again later.', 'template-oriented-form-utilities');
+            Logger::error('Turnstile verification returned non-200 status', ['code' => (string) $status_code]);
             return false;
         }
 
@@ -56,9 +56,9 @@ class ReCAPTCHA
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             $result = $decoded;
         } else {
-            self::$errors[] = __('Unexpected response from the reCAPTCHA service. Please try again later.', 'template-oriented-form-utilities');
+            self::$errors[] = __('Unexpected response from the Turnstile service. Please try again later.', 'template-oriented-form-utilities');
             Logger::error(
-                'reCAPTCHA verification returned invalid JSON response',
+                'Turnstile verification returned invalid JSON response',
                 [
                     'body'       => Sanitizer::getSanitizedLoggerString($apiResponse),
                     'json_error' => function_exists('json_last_error_msg') ? json_last_error_msg() : (string) json_last_error(),
@@ -88,24 +88,19 @@ class ReCAPTCHA
                     case 'timeout-or-duplicate':
                         self::$errors[] = __('The response is no longer valid: either is too old or has been used previously.', 'template-oriented-form-utilities');
                         break;
+                    case 'internal-error':
+                        self::$errors[] = __('An internal error occurred while verifying the response.', 'template-oriented-form-utilities');
+                        break;
                     default:
                         // Handle any unexpected or new error codes to avoid silent failures.
                         self::$errors[] = sprintf(
-                            /* translators: %s is the error code */ __('An unknown reCAPTCHA error occurred (code: %s). Please try again later.', 'template-oriented-form-utilities'),
+                            /* translators: %s is the error code */ __('An unknown Turnstile error occurred (code: %s). Please try again later.', 'template-oriented-form-utilities'),
                             Sanitizer::getSanitizedLoggerString($code)
                         );
                         // Log the unknown error code for diagnostics.
-                        Logger::error('Unknown reCAPTCHA error code', ['code' => Sanitizer::getSanitizedLoggerString($code)]);
+                        Logger::error('Unknown Turnstile error code', ['code' => Sanitizer::getSanitizedLoggerString($code)]);
                         break;
                 }
-            }
-        }
-
-        if (!isset($result['score'])) {
-            self::$errors[] = __('Failed to verify reCAPTCHA score. Please try again later.', 'template-oriented-form-utilities');
-        } elseif ($config->threshold > 0) {
-            if ($result['score'] < $config->threshold) {
-                self::$errors[] = __('Verification failed. Please try again later.', 'template-oriented-form-utilities');
             }
         }
 
@@ -113,7 +108,7 @@ class ReCAPTCHA
     }
 
     /**
-     * Get error messages from reCAPTCHA verification
+     * Get error messages from Turnstile verification
      *
      * @return string[]
      */

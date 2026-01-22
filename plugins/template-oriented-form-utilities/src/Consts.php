@@ -29,7 +29,12 @@ final class Consts
     /**
      * Upload directory subfolder for form files.
      */
-    public const UPLOAD_SUBFOLDER = 'tofu_uploads';
+    public const UPLOAD_SUBFOLDER = 'tofu-uploads';
+
+    /**
+     * Upload directory subfolder for log files.
+     */
+    public const LOG_SUBFOLDER = 'tofu-logs';
 
     /**
      * Uploaded files temporary input field name.
@@ -42,9 +47,9 @@ final class Consts
     public const GARBAGE_COLLECTION_PERCENTAGE = 10;
 
     /**
-     * reCAPTCHA form element ID format.
+     * Form element ID format.
      */
-    public const RECAPTCHA_TOKEN_FORM_ID_FORMAT = '_tofu_recaptcha_form_%s';
+    public const FORM_ID_FORMAT = '_tofu_form_%s';
 
     /**
      * reCAPTCHA hidden input field name.
@@ -55,4 +60,9 @@ final class Consts
      * reCAPTCHA hidden input field ID.
      */
     public const RECAPTCHA_TOKEN_INPUT_ID_FORMAT = '_tofu_recaptcha_token_%s';
+
+    /**
+     * Turnstile hidden input field name.
+     */
+    public const TURNSTILE_TOKEN_INPUT_NAME = '_tofu_turnstile_token';
 }

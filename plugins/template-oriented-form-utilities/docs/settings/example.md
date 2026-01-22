@@ -86,6 +86,12 @@ add_action('init', function () {
         threshold: 0.5,
     );
 
+    // Turnstile configuration (optional)
+    $turnstile = new \TofuPlugin\Structure\TurnstileConfig(
+        siteKey: 'your-site-key',
+        secretKey: 'your-secret-key',
+    );
+
     // Register the form
     \TofuPlugin\Helpers\Form::register(new \TofuPlugin\Structure\FormConfig(
         key: 'contact',
@@ -95,6 +101,7 @@ add_action('init', function () {
         validation: $validation,
         saveToDatabase: false,
         recaptcha: $recaptcha,
+        turnstile: $turnstile,
     ));
 });
 ```

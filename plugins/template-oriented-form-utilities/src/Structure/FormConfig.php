@@ -62,6 +62,13 @@ class FormConfig
          * @var ?ReCAPTCHAConfig
          */
         public readonly ?ReCAPTCHAConfig $recaptcha = null,
+
+        /**
+         * Turnstile setting.
+         *
+         * @var ?TurnstileConfig
+         */
+        public readonly ?TurnstileConfig $turnstile = null,
     )
     {
     }

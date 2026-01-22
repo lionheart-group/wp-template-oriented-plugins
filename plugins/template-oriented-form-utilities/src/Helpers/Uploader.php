@@ -23,7 +23,11 @@ class Uploader
 
         // Error check
         if ($filePost['error'] !== UPLOAD_ERR_OK) {
-            Logger::error(sprintf('File upload error for field "%s": %s', $name, $filePost['error']));
+            Logger::error(sprintf(
+                'File upload error for field "%s": %s',
+                $name,
+                Sanitizer::getSanitizedLoggerString($filePost['error'])
+            ));
             return null;
         }
 
@@ -67,10 +71,10 @@ class Uploader
 
         return new UploadedFile(
             name: $name,
-            fileName: $filePost['name'],
+            fileName: sanitize_text_field(wp_unslash($filePost['name'])),
             mimeType: $movedFile['type'],
-            tempName: basename($movedFile['file']),
-            size: $filePost['size'],
+            tempName: $movedFile['file'],
+            size: (int)$filePost['size'],
         );
     }
 
@@ -81,39 +85,7 @@ class Uploader
      */
     public static function getTempDir(): string
     {
-        $uploadDir = wp_upload_dir();
-        $tempDir = $uploadDir['basedir'] . DIRECTORY_SEPARATOR . Consts::UPLOAD_SUBFOLDER;
-
-        if (!is_dir($tempDir)) {
-            wp_mkdir_p($tempDir);
-
-            file_put_contents($tempDir . DIRECTORY_SEPARATOR . 'index.php', '<?php // Silence is golden.');
-
-            // Create .htaccess to prevent direct access
-            // Apache 2.4 or later: "Require all denied", Apache 2.2 or earlier: "Order Deny,Allow\nDeny from all"
-            $htaccessContent  = '<IfModule mod_authz_core.c>' . PHP_EOL;
-            $htaccessContent .= '   Require all denied' . PHP_EOL;
-            $htaccessContent .= '</IfModule>' . PHP_EOL;
-            $htaccessContent .= '<IfModule !mod_authz_core.c>' . PHP_EOL;
-            $htaccessContent .= '    Order Deny,Allow' . PHP_EOL;
-            $htaccessContent .= '    Deny from all' . PHP_EOL;
-            $htaccessContent .= '</IfModule>' . PHP_EOL;
-            file_put_contents($tempDir . DIRECTORY_SEPARATOR . '.htaccess', $htaccessContent);
-        }
-
-        return $tempDir;
-    }
-
-    /**
-     * Get full path of a temporary uploaded file by its temporary name
-     *
-     * @param string $tempName
-     * @return string
-     */
-    public static function getTempFilePath(string $tempName): string
-    {
-        $tempDir = self::getTempDir();
-        return $tempDir . DIRECTORY_SEPARATOR . $tempName;
+        return Directory::createUploadSubDirectory(Consts::UPLOAD_SUBFOLDER);
     }
 
     /**

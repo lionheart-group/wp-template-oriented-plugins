@@ -4,6 +4,7 @@ namespace TofuPlugin;
 
 use Monolog\Logger as MonologLogger;
 use Monolog\Handler\StreamHandler;
+use TofuPlugin\Helpers\Directory;
 
 class Logger
 {
@@ -22,7 +23,8 @@ class Logger
     public static function init(string $file): void
     {
         if (WP_DEBUG) {
-            self::$filePath = WP_CONTENT_DIR . '/tofu-logs/' . $file . '.log';
+            $logDir = Directory::createUploadSubDirectory(Consts::LOG_SUBFOLDER);
+            self::$filePath = $logDir . \DIRECTORY_SEPARATOR . $file . '.log';
             $handler = new StreamHandler(self::$filePath);
             self::$logger = new MonologLogger('tofu', [$handler]);
         }
