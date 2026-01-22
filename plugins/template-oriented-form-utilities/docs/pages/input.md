@@ -496,14 +496,16 @@ get_header();
         <?php endif; ?>
 
         <!-- Turnstile errors -->
-        <?php if (Form::hasTurnstile($formKey) && Form::hasTurnstileError($formKey)): ?>
+        <?php if (Form::hasTurnstile($formKey)): ?>
             <?php echo Form::turnstileWidget($formKey); ?>
 
-            <div class="form-group">
-                <?php foreach (Form::turnstileErrors($formKey) as $errorMessage): ?>
-                    <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
-                <?php endforeach; ?>
-            </div>
+            <?php if (Form::hasTurnstileError($formKey)): ?>
+                <div class="form-group">
+                    <?php foreach (Form::turnstileErrors($formKey) as $errorMessage): ?>
+                        <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
 
         <!-- Submit -->
