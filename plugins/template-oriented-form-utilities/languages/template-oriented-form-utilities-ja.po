@@ -1,12 +1,12 @@
-# Copyright (C) 2025 LionHeart Group
-# This file is distributed under the same license as the TOFU plugin.
+# Copyright (C) 2026 lionheartgroup
+# This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: TOFU 0.0.1\n"
+"Project-Id-Version: TOFU (Template-Oriented Form Utilities) 0.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/template-oriented-"
 "form-utilities\n"
-"POT-Creation-Date: 2025-12-31T13:37:11+09:00\n"
-"PO-Revision-Date: 2025-12-31 12:43+0800\n"
+"POT-Creation-Date: 2026-01-22T09:05:14+00:00\n"
+"PO-Revision-Date: 2026-01-22 17:12+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -18,92 +18,120 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: template-oriented-form-utilities.php
-msgid "TOFU"
-msgstr "TOFU"
+msgid "TOFU (Template-Oriented Form Utilities)"
+msgstr "TOFU (Template-Oriented Form Utilities)"
 
 #. Plugin URI of the plugin
+#: template-oriented-form-utilities.php
+msgid "https://lionheart-group.github.io/template-oriented-form-utilities/"
+msgstr "https://lionheart-group.github.io/template-oriented-form-utilities/"
+
+#. Description of the plugin
+#: template-oriented-form-utilities.php
+msgid ""
+"Template-Oriented Form Utilities is a WordPress plugin that provides a set "
+"of utilities for handling forms in a template-oriented manner."
+msgstr ""
+"Template-Oriented Form Utilitiesは、テンプレート指向でフォームを扱うための"
+"ユーティリティを提供するWordPressプラグインです。"
+
+#. Author of the plugin
+#: template-oriented-form-utilities.php
+msgid "lionheartgroup"
+msgstr "lionheartgroup"
+
 #. Author URI of the plugin
 #: template-oriented-form-utilities.php
 msgid "https://www.lionheart.co.jp/"
 msgstr "https://www.lionheart.co.jp/"
 
-#. Description of the plugin
-#: template-oriented-form-utilities.php
-msgid "Template-Oriented Form Utilities"
-msgstr "Template-Oriented Form Utilities"
-
-#. Author of the plugin
-#: template-oriented-form-utilities.php
-msgid "LionHeart Group"
-msgstr "ライオンハートグループ"
-
-#: src/Helpers/Form.php:246
+#: src/Helpers/Form.php:262
 msgid "Remove File"
 msgstr "ファイルの削除"
 
-#: src/Helpers/ReCAPTCHA.php:42 src/Helpers/ReCAPTCHA.php:49
+#: src/Helpers/ReCAPTCHA.php:41 src/Helpers/ReCAPTCHA.php:48
 msgid "Failed to verify reCAPTCHA at this time. Please try again later."
 msgstr "reCAPTCHAの検証に失敗しました。後ほど再度お試しください。"
 
-#: src/Helpers/ReCAPTCHA.php:60
+#: src/Helpers/ReCAPTCHA.php:59
 msgid "Unexpected response from the reCAPTCHA service. Please try again later."
 msgstr ""
-"reCAPTCHAサービスの不明のエラーが発生しました。後ほど再度お試しください。"
+"reCAPTCHAサービスから予期せぬ応答がありました。後でもう一度お試しください。"
 
-#: src/Helpers/ReCAPTCHA.php:68
+#: src/Helpers/ReCAPTCHA.php:67 src/Helpers/Turnstile.php:67
 msgid "The secret parameter is missing."
 msgstr "シークレットパラメータがありません."
 
-#: src/Helpers/ReCAPTCHA.php:71
+#: src/Helpers/ReCAPTCHA.php:70 src/Helpers/Turnstile.php:70
 msgid "The secret parameter is invalid or malformed."
 msgstr "シークレットパラメータが無効か、または形式が正しくありません."
 
-#: src/Helpers/ReCAPTCHA.php:74
+#: src/Helpers/ReCAPTCHA.php:73 src/Helpers/Turnstile.php:73
 msgid "The response parameter is missing."
 msgstr "レスポンスのパラメーターがありません."
 
-#: src/Helpers/ReCAPTCHA.php:77
+#: src/Helpers/ReCAPTCHA.php:76 src/Helpers/Turnstile.php:76
 msgid "The response parameter is invalid or malformed."
 msgstr "レスポンスのパラメータが正しくないか、形が正しくありません。"
 
-#: src/Helpers/ReCAPTCHA.php:80
+#: src/Helpers/ReCAPTCHA.php:79 src/Helpers/Turnstile.php:79
 msgid "The request is invalid or malformed."
 msgstr "リクエストが正しくないか、形式が正しくありません。"
 
-#: src/Helpers/ReCAPTCHA.php:83
+#: src/Helpers/ReCAPTCHA.php:82 src/Helpers/Turnstile.php:82
 msgid ""
 "The response is no longer valid: either is too old or has been used "
 "previously."
 msgstr ""
-"レスポンスが有効ではありません。有効期限が切れているか、すでに使われていま"
-"す。"
+"レスポンスが有効ではありません。有効期限が切れているか、以前に使用された可能"
+"性があります。"
 
 #. translators: %s is the error code
-#: src/Helpers/ReCAPTCHA.php:88
+#: src/Helpers/ReCAPTCHA.php:87
 #, php-format
 msgid "An unknown reCAPTCHA error occurred (code: %s). Please try again later."
 msgstr ""
 "reCAPTCHAの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてく"
 "ださい。"
 
-#: src/Helpers/ReCAPTCHA.php:99
+#: src/Helpers/ReCAPTCHA.php:98
 msgid "Failed to verify reCAPTCHA score. Please try again later."
 msgstr ""
 "reCAPTCHAのスコアを確認することができませんでした。後でもう一度試してみてくだ"
 "さい。"
 
-#: src/Helpers/ReCAPTCHA.php:102
+#: src/Helpers/ReCAPTCHA.php:101
 msgid "Verification failed. Please try again later."
-msgstr "確認に失敗しました。後でもう一度試してみてください。"
+msgstr "認証に失敗しました。後でもう一度お試しください。"
 
-#: src/Models/Validation.php:103
+#: src/Helpers/Turnstile.php:41 src/Helpers/Turnstile.php:48
+msgid "Failed to verify Turnstile at this time. Please try again later."
+msgstr "Turnstile の認証に失敗しました。後でもう一度お試しください。"
+
+#: src/Helpers/Turnstile.php:59
+msgid "Unexpected response from the Turnstile service. Please try again later."
+msgstr "Turnstileから予期せぬ応答がありました。後でもう一度お試しください。"
+
+#: src/Helpers/Turnstile.php:85
+msgid "An internal error occurred while verifying the response."
+msgstr "応答の検証中に内部エラーが発生しました。"
+
+#. translators: %s is the error code
+#: src/Helpers/Turnstile.php:90
+#, php-format
+msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
+msgstr ""
+"Turnstileの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてく"
+"ださい。"
+
+#: src/Models/Validation.php:134
 msgid "The {field} field is required."
 msgstr "{field} の項目は必ず入力してください。"
 
-#: src/Models/Validation.php:124
+#: src/Models/Validation.php:155
 msgid "The {field} field must be less than {param[0]} MB in size."
 msgstr "{field} の項目は{param[0]} MBより小さくなければなりません。"
 
-#: src/Models/Validation.php:145
+#: src/Models/Validation.php:176
 msgid "The {field} field must be a file of type: {param}."
 msgstr "{field} の項目は {param} の種類のファイルでなければなりません。"
