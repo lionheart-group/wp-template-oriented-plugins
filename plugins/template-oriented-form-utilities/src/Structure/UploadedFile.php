@@ -2,8 +2,6 @@
 
 namespace TofuPlugin\Structure;
 
-use TofuPlugin\Helpers\Uploader;
-
 class UploadedFile
 {
     public function __construct(
@@ -41,7 +39,28 @@ class UploadedFile
          * @var int
          */
         public readonly int $size,
+
+        /**
+         * Unique ID for the uploaded file
+         *
+         * @var string
+         */
+        protected ?string $id = null,
     ) {
+        // Generate a unique ID for the uploaded file
+        if ($this->id === null) {
+            $this->id = bin2hex(random_bytes(16));
+        }
+    }
+
+    /**
+     * Get the unique ID of the uploaded file.
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     /**
@@ -52,6 +71,7 @@ class UploadedFile
     public function toArray(): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'fileName' => $this->fileName,
             'mimeType' => $this->mimeType,

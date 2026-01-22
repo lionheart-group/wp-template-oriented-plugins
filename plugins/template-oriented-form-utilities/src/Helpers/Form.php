@@ -189,7 +189,8 @@ class Form
     public static function file(string $key, string $field): ?UploadedFile
     {
         $form = self::get($key);
-        return $form->getFiles()->getFile($field);
+        $file = $form->getFiles()->getFile($field);
+        return $file;
     }
 
     /**
@@ -220,45 +221,16 @@ class Form
             return '';
         }
 
-        $outputs = [];
-
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][name]" value="%s" %s />',
+        // Embed hidden input field for the uploaded file
+        // The input name is like: __tofu_uploaded_files[field_name]
+        // The input value is the unique ID of the uploaded file that can be used to retrieve the file info from the session
+        return sprintf(
+            '<input type="hidden" name="%s[%s]" value="%s" %s />',
             Consts::UPLOADED_FILES_INPUT_NAME,
             esc_attr($file->name),
-            esc_attr($file->name),
+            esc_attr($file->getId()),
             self::getFileDataAttribute($key, $file->name),
         );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][fileName]" value="%s" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            esc_attr($file->fileName),
-            self::getFileDataAttribute($key, $file->name),
-        );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][mimeType]" value="%s" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            esc_attr($file->mimeType),
-            self::getFileDataAttribute($key, $file->name),
-        );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][tempName]" value="%s" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            esc_attr($file->tempName),
-            self::getFileDataAttribute($key, $file->name),
-        );
-        $outputs[] = sprintf(
-            '<input type="hidden" name="%s[%s][size]" value="%d" %s />',
-            Consts::UPLOADED_FILES_INPUT_NAME,
-            esc_attr($file->name),
-            $file->size,
-            self::getFileDataAttribute($key, $file->name),
-        );
-
-        return implode("", $outputs);
     }
 
     /**

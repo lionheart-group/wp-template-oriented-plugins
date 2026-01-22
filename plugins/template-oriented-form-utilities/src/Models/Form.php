@@ -99,6 +99,7 @@ class Form
                     }
 
                     $this->files->addFile(new UploadedFile(
+                        id: $fileData['id'] ?? null,
                         name: $fileData['name'] ?? '',
                         fileName: $fileData['fileName'] ?? '',
                         mimeType: $fileData['mimeType'] ?? '',
@@ -202,6 +203,11 @@ class Form
      */
     public function isFieldAllowed(string $field): bool
     {
+        // Keep uploaded files input name always allowed
+        if ($field === Consts::UPLOADED_FILES_INPUT_NAME) {
+            return true;
+        }
+
         return in_array($field, $this->config->validation->allows, true);
     }
 
@@ -271,11 +277,12 @@ class Form
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
         $nonce = $_POST[$nonceKey] ?? null;
 
-        if (!isset($nonce)) {
+        // If nonce is missing or not a string, return false
+        if (empty($nonce) || !is_string($nonce)) {
             return false;
         }
 
-        return wp_verify_nonce(wp_unslash($nonce), $action);
+        return wp_verify_nonce(sanitize_text_field(wp_unslash($nonce)), $action);
     }
 
     /**
@@ -291,16 +298,16 @@ class Form
         }
 
         // Initialize values and errors
+        // Files filed will be handled in the validation step
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
-        $this->files = new UploadedFileCollection();
 
         // Validate input field
         $validation = new Validation();
         $validation->validate($this, $_POST, $_FILES);
 
         // reCAPTCHA validation
-        $this->verifyRecaptcha($_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '');
+        $this->verifyRecaptcha();
 
         // Store the input values in the Session table
         $this->storeSession();
@@ -327,12 +334,21 @@ class Form
      *
      * @return bool
      */
-    public function verifyRecaptcha(string $token): bool
+    public function verifyRecaptcha(): bool
     {
         if ($this->config->recaptcha === null) {
             return true;
         }
 
+        // Verification type and sanitize input
+        $token = $_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '';
+        if (empty($token) || !is_string($token)) {
+            $this->errors->addError(Consts::RECAPTCHA_TOKEN_INPUT_NAME, 'reCAPTCHA token is missing.');
+            return false;
+        }
+        $token = sanitize_text_field(wp_unslash($token));
+
+        // Verify the token
         $isValidRecaptcha = ReCAPTCHA::verifyToken($this->config->recaptcha, $token);
         if (!$isValidRecaptcha) {
             foreach (ReCAPTCHA::getErrors() as $errorMessage) {
@@ -379,7 +395,7 @@ class Form
             $this->verifySession();
 
             // Verify reCAPTCHA
-            $this->verifyRecaptcha($_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '');
+            $this->verifyRecaptcha();
 
             // Redirect back for errors
             if ($this->errors->hasErrors()) {
@@ -457,7 +473,7 @@ class Form
 
             // Attach uploaded files
             foreach ($this->files->getAllFiles() as $uploadedFile) {
-                $mail->addAttachment($uploadedFile->fileName, Uploader::getTempFilePath($uploadedFile->tempName));
+                $mail->addAttachment($uploadedFile->fileName, $uploadedFile->tempName);
             }
 
             if (!$mail->send()) {
@@ -468,7 +484,7 @@ class Form
 
         // Delete uploaded files
         foreach ($this->files->getAllFiles() as $uploadedFile) {
-            $tempPath = Uploader::getTempFilePath($uploadedFile->tempName);
+            $tempPath = $uploadedFile->tempName;
             if (file_exists($tempPath)) {
                 wp_delete_file($tempPath);
             }

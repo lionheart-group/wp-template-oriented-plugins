@@ -23,7 +23,11 @@ class Uploader
 
         // Error check
         if ($filePost['error'] !== UPLOAD_ERR_OK) {
-            Logger::error(sprintf('File upload error for field "%s": %s', $name, $filePost['error']));
+            Logger::error(sprintf(
+                'File upload error for field "%s": %s',
+                $name,
+                Sanitizer::getSanitizedLoggerString($filePost['error'])
+            ));
             return null;
         }
 
@@ -67,10 +71,10 @@ class Uploader
 
         return new UploadedFile(
             name: $name,
-            fileName: $filePost['name'],
+            fileName: sanitize_text_field(wp_unslash($filePost['name'])),
             mimeType: $movedFile['type'],
-            tempName: basename($movedFile['file']),
-            size: $filePost['size'],
+            tempName: $movedFile['file'],
+            size: (int)$filePost['size'],
         );
     }
 
@@ -102,18 +106,6 @@ class Uploader
         }
 
         return $tempDir;
-    }
-
-    /**
-     * Get full path of a temporary uploaded file by its temporary name
-     *
-     * @param string $tempName
-     * @return string
-     */
-    public static function getTempFilePath(string $tempName): string
-    {
-        $tempDir = self::getTempDir();
-        return $tempDir . DIRECTORY_SEPARATOR . $tempName;
     }
 
     /**

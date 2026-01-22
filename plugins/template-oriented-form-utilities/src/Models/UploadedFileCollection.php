@@ -57,6 +57,35 @@ class UploadedFileCollection
     }
 
     /**
+     * Get file by unique ID
+     *
+     * @param string $id
+     * @return ?UploadedFile
+     */
+    public function getFileById(string $id): ?UploadedFile
+    {
+        foreach ($this->files as $file) {
+            if ($file->getId() === $id) {
+                return $file;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Remove a file by field name
+     *
+     * @param string $name
+     * @return void
+     */
+    public function removeFile(string $name): void
+    {
+        if (isset($this->files[$name])) {
+            unset($this->files[$name]);
+        }
+    }
+
+    /**
      * Get files as array
      *
      * @return array<string, array>
