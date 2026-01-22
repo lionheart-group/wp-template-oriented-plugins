@@ -57,6 +57,13 @@ class Turnstile
             $result = $decoded;
         } else {
             self::$errors[] = __('Unexpected response from the Turnstile service. Please try again later.', 'template-oriented-form-utilities');
+            Logger::error(
+                'Turnstile verification returned invalid JSON response',
+                [
+                    'body'       => Sanitizer::getSanitizedLoggerString($apiResponse),
+                    'json_error' => function_exists('json_last_error_msg') ? json_last_error_msg() : (string) json_last_error(),
+                ]
+            );
             return false;
         }
 
