@@ -189,8 +189,7 @@ class Form
     public static function file(string $key, string $field): ?UploadedFile
     {
         $form = self::get($key);
-        $file = $form->getFiles()->getFile($field);
-        return $file;
+        return $form->getFiles()->getFile($field);
     }
 
     /**
