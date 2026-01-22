@@ -101,7 +101,7 @@ class Turnstile
     }
 
     /**
-     * Get error messages from reCAPTCHA verification
+     * Get error messages from Turnstile verification
      *
      * @return string[]
      */
