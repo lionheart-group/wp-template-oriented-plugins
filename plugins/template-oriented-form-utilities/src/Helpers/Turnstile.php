@@ -88,10 +88,10 @@ class Turnstile
                         // Handle any unexpected or new error codes to avoid silent failures.
                         self::$errors[] = sprintf(
                             /* translators: %s is the error code */ __('An unknown Turnstile error occurred (code: %s). Please try again later.', 'template-oriented-form-utilities'),
-                            (string) $code
+                            Sanitizer::getSanitizedLoggerString($code)
                         );
                         // Log the unknown error code for diagnostics.
-                        Logger::error('Unknown Turnstile error code', ['code' => $code]);
+                        Logger::error('Unknown Turnstile error code', ['code' => Sanitizer::getSanitizedLoggerString($code)]);
                         break;
                 }
             }

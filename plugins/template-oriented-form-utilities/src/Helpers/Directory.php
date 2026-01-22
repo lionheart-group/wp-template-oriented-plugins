@@ -29,14 +29,17 @@ class Directory
             throw new \Exception('Subfolder name length is invalid: ' . $subfolder);
         }
 
-        $tempDir = $uploadDir['basedir'] . DIRECTORY_SEPARATOR . $subfolder;
-        if (!is_dir($tempDir)) {
+        $targetDir = $uploadDir['basedir'] . DIRECTORY_SEPARATOR . $subfolder;
+        if (!is_dir($targetDir)) {
             // If not exists, create directory
-            wp_mkdir_p($tempDir);
+            $result = wp_mkdir_p($targetDir);
+            if ($result === false) {
+                throw new \Exception('Failed to create directory: ' . Sanitizer::getSanitizedLoggerString($targetDir));
+            }
 
             if ($isPrivate) {
                 // Create index.php to prevent directory listing
-                file_put_contents($tempDir . DIRECTORY_SEPARATOR . 'index.php', '<?php // Silence is golden.');
+                file_put_contents($targetDir . DIRECTORY_SEPARATOR . 'index.php', '<?php // Silence is golden.');
 
                 // Create .htaccess to prevent direct access
                 // Apache 2.4 or later: "Require all denied", Apache 2.2 or earlier: "Order Deny,Allow\nDeny from all"
@@ -47,10 +50,10 @@ class Directory
                 $htaccessContent .= '    Order Deny,Allow' . PHP_EOL;
                 $htaccessContent .= '    Deny from all' . PHP_EOL;
                 $htaccessContent .= '</IfModule>' . PHP_EOL;
-                file_put_contents($tempDir . DIRECTORY_SEPARATOR . '.htaccess', $htaccessContent);
+                file_put_contents($targetDir . DIRECTORY_SEPARATOR . '.htaccess', $htaccessContent);
             }
         }
 
-        return $tempDir;
+        return $targetDir;
     }
 }

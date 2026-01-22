@@ -356,11 +356,13 @@ If Turnstile is configured for your form, display Turnstile widget and any Turns
 <?php if (Form::hasTurnstile($formKey)): ?>
     <?php echo Form::turnstileWidget($formKey); ?>
 
+    <?php if (Form::hasTurnstileError($formKey)): ?>
     <div class="turnstile-error">
         <?php foreach (Form::turnstileErrors($formKey) as $errorMessage): ?>
             <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
         <?php endforeach; ?>
     </div>
+    <?php endif; ?>
 <?php endif; ?>
 ```
 
