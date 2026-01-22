@@ -9,8 +9,8 @@ class Directory
      *
      * @param string $subfolder Subdirectory name
      * @param bool $isPrivate Whether to restrict direct access (default: true)
-     * @return string The created directory path or false on failure
-     * @throws \Exception
+     * @return string The created directory path
+     * @throws \Exception If the upload directory is not writable or the subfolder name is invalid
      */
     public static function createUploadSubDirectory(string $subfolder, bool $isPrivate = true): string
     {
