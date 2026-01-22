@@ -353,7 +353,7 @@ If reCAPTCHA is configured for your form, display any reCAPTCHA errors:
 If Turnstile is configured for your form, display Turnstile widget and any Turnstile errors:
 
 ```php
-<?php if (Form::hasTurnstile($formKey) && Form::hasTurnstileError($formKey)): ?>
+<?php if (Form::hasTurnstile($formKey)): ?>
     <?php echo Form::turnstileWidget($formKey); ?>
 
     <div class="turnstile-error">
