@@ -16,17 +16,17 @@ class Directory
     {
         $uploadDir = wp_upload_dir();
         if (isset($uploadDir['error']) && $uploadDir['error'] !== false) {
-            throw new \Exception('Upload directory is not writable: ' . $uploadDir['error']);
+            throw new \Exception('Upload directory is not writable: ' . Sanitizer::getSanitizedLoggerString($uploadDir['error']));
         }
 
         // Allowable characters: alphanumeric, hyphen, underscore
         if (!preg_match('/^[a-zA-Z0-9_-]+$/', $subfolder)) {
-            throw new \Exception('Invalid subfolder name: ' . $subfolder);
+            throw new \Exception('Invalid subfolder name: ' . Sanitizer::getSanitizedLoggerString($subfolder));
         }
 
         // Check length (to prevent OS limitations)
         if (strlen($subfolder) > 255 || strlen($subfolder) === 0) {
-            throw new \Exception('Subfolder name length is invalid: ' . $subfolder);
+            throw new \Exception('Subfolder name length is invalid: ' . Sanitizer::getSanitizedLoggerString($subfolder));
         }
 
         $targetDir = $uploadDir['basedir'] . DIRECTORY_SEPARATOR . $subfolder;
