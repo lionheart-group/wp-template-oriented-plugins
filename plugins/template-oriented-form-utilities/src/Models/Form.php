@@ -319,7 +319,7 @@ class Form
         }
 
         // Initialize values and errors
-        // Files filed will be handled in the validation step
+        // File fields will be handled in the validation step
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
 
