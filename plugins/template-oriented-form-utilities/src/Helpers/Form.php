@@ -479,7 +479,7 @@ class Form
                 continue;
             }
 
-            $display[] = esc_attr($k) . '=' . esc_attr($a);
+            $display[] = sprintf('%s="%s"', esc_attr($k), esc_attr($a));
         }
         $display[] = 'data-response-field-name="' . esc_attr(Consts::TURNSTILE_TOKEN_INPUT_NAME) . '"';
 
