@@ -8,12 +8,14 @@ use TofuPlugin\Helpers\Form as FormHelper;
 use TofuPlugin\Helpers\ReCAPTCHA;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Template;
+use TofuPlugin\Helpers\Turnstile;
 use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Logger;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
 use TofuPlugin\Structure\ReCAPTCHAConfig;
+use TofuPlugin\Structure\TurnstileConfig;
 use TofuPlugin\Structure\UploadedFile;
 
 class Form
@@ -70,7 +72,7 @@ class Form
             if (isset($sessionValues['values']) && $sessionValues['values']) {
                 foreach ($sessionValues['values'] as $field => $value) {
                     // If not defined in `allows`, skip to add value
-                    if ($this->isFieldAllowed($field) === false) {
+                    if ($this->isFieldAllowed($field, [Consts::UPLOADED_FILES_INPUT_NAME]) === false) {
                         continue;
                     }
 
@@ -81,7 +83,7 @@ class Form
             if (isset($sessionValues['errors']) && $sessionValues['errors']) {
                 foreach ($sessionValues['errors'] as $field => $messages) {
                     // If not defined in `allows`, skip to add value
-                    if ($this->isFieldAllowed($field) === false) {
+                    if ($this->isFieldAllowed($field, [Consts::TURNSTILE_TOKEN_INPUT_NAME, Consts::RECAPTCHA_TOKEN_INPUT_NAME]) === false) {
                         continue;
                     }
 
@@ -196,15 +198,34 @@ class Form
     }
 
     /**
+     * Check if Turnstile is configured
+     *
+     * @return bool
+     */
+    public function hasTurnstile(): bool
+    {
+        return $this->config->turnstile !== null;
+    }
+
+    /**
+     * Get the Turnstile configuration
+     *
+     * @return ?TurnstileConfig
+     */
+    public function getTurnstileConfig(): ?TurnstileConfig
+    {
+        return $this->config->turnstile;
+    }
+
+    /**
      * Check the specified field name is allowed to store value in the session.
      *
      * @param string $field The field name.
      * @return bool
      */
-    public function isFieldAllowed(string $field): bool
+    public function isFieldAllowed(string $field, array $allowsList = []): bool
     {
-        // Keep uploaded files input name always allowed
-        if ($field === Consts::UPLOADED_FILES_INPUT_NAME) {
+        if (is_array($allowsList) && !empty($allowsList) && in_array($field, $allowsList, true)) {
             return true;
         }
 
@@ -309,6 +330,9 @@ class Form
         // reCAPTCHA validation
         $this->verifyRecaptcha();
 
+        // Turnstile validation
+        $this->verifyTurnstile();
+
         // Store the input values in the Session table
         $this->storeSession();
 
@@ -360,6 +384,36 @@ class Form
     }
 
     /**
+     * Verify Turnstile token
+     *
+     * @return bool
+     */
+    public function verifyTurnstile(): bool
+    {
+        if ($this->config->turnstile === null) {
+            return true;
+        }
+
+        // Verification type and sanitize input
+        $token = $_POST[Consts::TURNSTILE_TOKEN_INPUT_NAME] ?? '';
+        if (empty($token) || !is_string($token)) {
+            $this->errors->addError(Consts::TURNSTILE_TOKEN_INPUT_NAME, 'Turnstile token is missing.');
+            return false;
+        }
+        $token = sanitize_text_field(wp_unslash($token));
+
+        // Verify the token
+        $isValidTurnstile = Turnstile::verifyToken($this->config->turnstile, $token);
+        if (!$isValidTurnstile) {
+            foreach (Turnstile::getErrors() as $errorMessage) {
+                $this->errors->addError(Consts::TURNSTILE_TOKEN_INPUT_NAME, $errorMessage);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Verify session-stored input values and update validation errors.
      *
      * Uses the current field values loaded from the session to run validation
@@ -396,6 +450,9 @@ class Form
 
             // Verify reCAPTCHA
             $this->verifyRecaptcha();
+
+            // Turnstile validation
+            $this->verifyTurnstile();
 
             // Redirect back for errors
             if ($this->errors->hasErrors()) {

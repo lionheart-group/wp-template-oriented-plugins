@@ -24,6 +24,13 @@ This plugin relies on third-party services to protect your website from spam and
 * **Service Provider:** Google LLC.
 * **Links:** [Google Privacy Policy](https://policies.google.com/privacy), [Google Terms of Service](https://policies.google.com/terms).
 
+= Cloudflare Turnstile =
+* **Purpose:** Privacy-focused alternative for bot protection and spam prevention.
+* **When data is sent:** When a user interacts with a form protected by Turnstile.
+* **Data sent:** Browser/device characteristics and interaction data (privacy-friendly, does not use cookies for tracking).
+* **Service Provider:** Cloudflare, Inc.
+* **Links:** [Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/), [Cloudflare Website Terms](https://www.cloudflare.com/website-terms/).
+
 == Installation ==
 
 1. From the WP admin panel, click "Plugins" -> "Add new".
