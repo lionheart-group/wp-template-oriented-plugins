@@ -98,6 +98,14 @@ class Validation
                 if ($uploadedFile) {
                     $files->addFile($uploadedFile);
                     $values->unsetValue($uploadedFile->name);
+
+                    // Add uploaded file ID as value
+                    $currentValues = $values->getValue(Consts::UPLOADED_FILES_INPUT_NAME);
+                    if (!is_array($currentValues)) {
+                        $currentValues = [];
+                    }
+                    $currentValues[$uploadedFile->name] = $uploadedFile->getId();
+                    $values->addValue(Consts::UPLOADED_FILES_INPUT_NAME, $currentValues);
                 }
             }
         }

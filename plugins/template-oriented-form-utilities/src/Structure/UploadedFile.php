@@ -56,9 +56,9 @@ class UploadedFile
     /**
      * Get the unique ID of the uploaded file.
      *
-     * @return string
+     * @return ?string
      */
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
