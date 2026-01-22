@@ -16,6 +16,7 @@ Form::register(new FormConfig(
     validation: $validationConfig,
     saveToDatabase: false,
     recaptcha: $recaptchaConfig, // optional
+    turnstile: $turnstileConfig, // optional
 ));
 ```
 
@@ -30,3 +31,4 @@ Form::register(new FormConfig(
 | `validation` | [`ValidationConfig`](./validationconfig.md) | Yes | - | Validation rules and settings. |
 | `saveToDatabase` | `bool` | No | `false` | Whether to save form submissions to the database. |
 | `recaptcha` | [`?ReCAPTCHAConfig`](./recaptchaconfig.md) | No | `null` | Google reCAPTCHA v3 configuration. |
+| `turnstile` | [`?TurnstileConfig`](./turnstileconfig.md) | No | `null` | Cloudflare Turnstile configuration. |

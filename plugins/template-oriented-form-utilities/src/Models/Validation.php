@@ -56,7 +56,7 @@ class Validation
         // Collect sanitized values
         foreach ($sanitizedData as $key => $value) {
             // If not defined in `allows`, skip to add value
-            if ($form->isFieldAllowed($key) === false) {
+            if ($form->isFieldAllowed($key, [Consts::UPLOADED_FILES_INPUT_NAME]) === false) {
                 continue;
             }
 
@@ -87,7 +87,7 @@ class Validation
         }
 
         // Upload files
-        foreach ($targetValues as $name => $_) {
+        foreach ($fileValues as $name => $_) {
             if (isset($fileValues[$name]) && isset($fileValues[$name]['error']) && $fileValues[$name]['error'] === UPLOAD_ERR_OK) {
                 // If not defined in `allows`, skip to add value
                 if ($form->isFieldAllowed($name) === false) {

@@ -47,6 +47,10 @@ The `TofuPlugin\Helpers\Form` class provides all the methods you need to build f
 | `Form::hasRecaptcha($key)` | Check if reCAPTCHA is configured |
 | `Form::hasRecaptchaError($key)` | Check if reCAPTCHA validation failed |
 | `Form::recaptchaErrors($key)` | Get reCAPTCHA error messages |
+| `Form::hasTurnstile($key)` | Check if Turnstile is configured |
+| `Form::hasTurnstileError($key)` | Check if Turnstile validation failed |
+| `Form::turnstileErrors($key)` | Get Turnstile error messages |
+| `Form::turnstileWidget($key)` | Get Turnstile widget HTML |
 
 ## Next Steps
 

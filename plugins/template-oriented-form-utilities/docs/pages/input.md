@@ -16,6 +16,7 @@ The input page is where users fill out and submit the form. This page handles:
 - [Select (Dropdown) Fields](#select-dropdown-fields)
 - [File Upload Fields](#file-upload-fields)
 - [reCAPTCHA Integration](#recaptcha-integration)
+- [Turnstile Integration](#turnstile-integration)
 - [Complete Example](#complete-example)
 - [Important Notes](#important-notes)
 - [Next Steps](#next-steps)
@@ -347,6 +348,22 @@ If reCAPTCHA is configured for your form, display any reCAPTCHA errors:
 
 > **Note:** The reCAPTCHA script and hidden token field are automatically handled by `Form::embedScript()` and `Form::formClose()`.
 
+## Turnstile Integration
+
+If Turnstile is configured for your form, display Turnstile widget and any Turnstile errors:
+
+```php
+<?php if (Form::hasTurnstile($formKey) && Form::hasTurnstileError($formKey)): ?>
+    <?php echo Form::turnstileWidget($formKey); ?>
+
+    <div class="turnstile-error">
+        <?php foreach (Form::turnstileErrors($formKey) as $errorMessage): ?>
+            <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+```
+
 ## Complete Example
 
 ```php
@@ -473,6 +490,17 @@ get_header();
         <?php if (Form::hasRecaptcha($formKey) && Form::hasRecaptchaError($formKey)): ?>
             <div class="form-group">
                 <?php foreach (Form::recaptchaErrors($formKey) as $errorMessage): ?>
+                    <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Turnstile errors -->
+        <?php if (Form::hasTurnstile($formKey) && Form::hasTurnstileError($formKey)): ?>
+            <?php echo Form::turnstileWidget($formKey); ?>
+
+            <div class="form-group">
+                <?php foreach (Form::turnstileErrors($formKey) as $errorMessage): ?>
                     <p class="error-message"><?php echo esc_html($errorMessage); ?></p>
                 <?php endforeach; ?>
             </div>
