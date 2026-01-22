@@ -29,7 +29,12 @@ final class Consts
     /**
      * Upload directory subfolder for form files.
      */
-    public const UPLOAD_SUBFOLDER = 'tofu_uploads';
+    public const UPLOAD_SUBFOLDER = 'tofu-uploads';
+
+    /**
+     * Upload directory subfolder for log files.
+     */
+    public const LOG_SUBFOLDER = 'tofu-logs';
 
     /**
      * Uploaded files temporary input field name.
