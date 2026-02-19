@@ -2,6 +2,7 @@
 
 /**
  * @link https://www.lionheart.co.jp/
+ * @since 0.0.2 - Changed required PHP version to 8.1
  * @since 0.0.1
  * @package Tofu
  *
@@ -9,7 +10,7 @@
  * Plugin Name: TOFU (Template-Oriented Form Utilities)
  * Plugin URI: https://lionheart-group.github.io/template-oriented-form-utilities/
  * Description: Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
@@ -27,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('TOFU_VERSION', '0.0.1');
+define('TOFU_VERSION', '0.0.2');
 define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TOFU_PLUGIN_FILE', __FILE__);
 
