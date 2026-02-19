@@ -2,16 +2,20 @@
 Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
-Requires PHP: 8.2
-Stable tag: 0.0.1
+Requires PHP: 8.1
+Stable tag: 0.0.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
-Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner. It simplifies form creation, validation, and processing by leveraging templates for rendering and managing form data.
+Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing through template-based rendering and data management.
 
 == Description ==
 
 Template-Oriented Form Utilities (TOFU) is designed to streamline the process of creating and managing forms within WordPress themes and plugins. By adopting a template-oriented approach, TOFU allows developers to define form structures and behaviors using reusable templates, making it easier to manage/maintain with team collaboration through version control systems.
+
+GitHub and documentation for this plugin can be found at:
+
+[https://github.com/lionheart-group/template-oriented-form-utilities](https://github.com/lionheart-group/template-oriented-form-utilities)
 
 == External services ==
 
@@ -57,6 +61,7 @@ OR…
 == Changelog ==
 
 * v0.0.1 - Initial release.
+* v0.0.2 - Arranged required PHP version to 8.1, added external services section to the readme.
 
 
 == Upgrade Notice ==
