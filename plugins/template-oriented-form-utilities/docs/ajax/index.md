@@ -1,0 +1,94 @@
+# AJAX / Headless Mode
+
+TOFU includes a WP REST API layer that lets you submit forms via JavaScript
+without full-page reloads, or from a completely separate frontend application.
+
+## Overview
+
+| Mode | Description | Cookie requirement |
+|---|---|---|
+| **Same-origin AJAX** | JS runs on the same WordPress domain | `SameSite=Lax` (automatic) |
+| **Cross-origin / Headless** | Separate frontend (Next.js, Nuxt, etc.) calling WP as an API | `SameSite=None; Secure` + HTTPS |
+
+## How it works
+
+1. **Register the form** in `functions.php` with `ajaxEnabled: true`
+2. **Fetch a nonce** from `GET /wp-json/tofu/v1/forms/{key}/nonce`
+3. **Submit** `POST /wp-json/tofu/v1/forms/{key}/input` with `FormData`
+4. On success, the JSON response contains the redirect URL for the next step
+5. If there is a confirm step, show it and submit `POST …/confirm`
+
+## Endpoints
+
+| Method | URL | Purpose |
+|---|---|---|
+| `GET` | `/wp-json/tofu/v1/forms/{key}/nonce` | Get a fresh TOFU nonce |
+| `POST` | `/wp-json/tofu/v1/forms/{key}/input` | Submit input step |
+| `POST` | `/wp-json/tofu/v1/forms/{key}/confirm` | Submit confirm step |
+
+## Response format
+
+**Success (HTTP 200):**
+```json
+{ "success": true, "redirect": "/contact/confirm/" }
+```
+
+**Validation error (HTTP 422):**
+```json
+{
+  "success": false,
+  "errors": {
+    "name":  ["Please enter your name."],
+    "email": ["Please enter a valid email address."]
+  }
+}
+```
+
+**Nonce (GET):**
+```json
+{ "nonce": "abc123…", "field_name": "_tofu_contact_nonce", "action": "input" }
+```
+
+## PHP Setup
+
+Enable AJAX mode in `functions.php`:
+
+```php
+add_action('init', function () {
+    \TofuPlugin\Helpers\Form::register(new \TofuPlugin\Structure\FormConfig(
+        key:  'contact',
+        name: 'Contact Form',
+
+        // Same-origin: omit corsOrigins
+        ajaxEnabled: true,
+
+        // Cross-origin (headless): add your frontend URL
+        // ajaxEnabled:  true,
+        // corsOrigins: ['https://frontend.example.com'],
+
+        template: new \TofuPlugin\Structure\TemplateConfig(
+            inputPath:  '/contact/',
+            resultPath: '/contact/result/',
+            // confirmPath: '/contact/confirm/',  // optional
+        ),
+        mail:       $mailConfig,
+        validation: $validationConfig,
+    ));
+});
+```
+
+See [FormConfig](../settings/formconfig.md) for the full list of options.
+
+## Guides
+
+- [Vanilla JavaScript](./vanilla-js.md) — No framework, works in any WP theme
+- [React](./react.md) — React hooks with multi-step form state
+- [Vue 3](./vue.md) — Vue 3 Composition API
+- [Headless / Cross-Origin Setup](./headless.md) — Separate frontend domain (Next.js, Nuxt, etc.)
+
+## Notes
+
+- reCAPTCHA and Cloudflare Turnstile are fully supported in AJAX mode
+- File uploads are supported via `FormData` (multipart)
+- The traditional redirect-based endpoint (`?_tofu_key=…`) is unchanged
+  — you can use both modes in the same installation
