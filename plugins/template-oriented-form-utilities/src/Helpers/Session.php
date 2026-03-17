@@ -8,6 +8,29 @@ use TofuPlugin\Models\Session as SessionModel;
 class Session
 {
     /**
+     * Whether CORS mode is active (set by RestEndpoint for cross-origin requests).
+     *
+     * When true, the session cookie is issued with SameSite=None; Secure
+     * so that cross-domain AJAX with `credentials: 'include'` works.
+     *
+     * @var bool
+     */
+    protected static bool $corsMode = false;
+
+    /**
+     * Enable CORS mode for the session cookie.
+     *
+     * Must be called before any session read/write when handling a
+     * cross-origin REST request.
+     *
+     * @return void
+     */
+    public static function enableCors(): void
+    {
+        static::$corsMode = true;
+    }
+
+    /**
      * Get unique cookie name for identifying the session
      *
      * @return string
@@ -24,11 +47,14 @@ class Session
         setcookie(
             Consts::SESSION_COOKIE_KEY,
             $value,
-            time() + Consts::SESSION_EXPIRY,
-            COOKIEPATH,
-            COOKIE_DOMAIN,
-            \is_ssl(),
-            true
+            array_filter([
+                'expires'  => time() + Consts::SESSION_EXPIRY,
+                'path'     => COOKIEPATH,
+                'domain'   => COOKIE_DOMAIN,
+                'secure'   => \is_ssl() || static::$corsMode,
+                'httponly' => true,
+                'samesite' => static::$corsMode ? 'None' : 'Lax',
+            ], fn ($v) => $v !== null)
         );
 
         return $value;

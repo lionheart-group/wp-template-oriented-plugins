@@ -40,9 +40,12 @@ class Form
     /**
      * Get form by key
      *
+     * @param string $key      Form key.
+     * @param bool   $strict   When true, calls wp_die() if the form is not found.
+     *                         When false, returns false silently.
      * @return FormModel|false
      */
-    public static function get(string $key, bool $isStrict = true): FormModel|false
+    public static function get(string $key, bool $strict = true): FormModel|false
     {
         foreach (self::$forms as $form) {
             if ($form->getKey() === $key) {
@@ -50,7 +53,7 @@ class Form
             }
         }
 
-        if ($isStrict) {
+        if ($strict) {
             wp_die(
                 sprintf('Form with key "%s" is not registered.', esc_html($key)),
                 'TOFU Form Action Error',
@@ -58,6 +61,16 @@ class Form
             );
         }
         return false;
+    }
+
+    /**
+     * Get all registered forms.
+     *
+     * @return FormModel[]
+     */
+    public static function getAll(): array
+    {
+        return self::$forms;
     }
 
     /**

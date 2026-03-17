@@ -40,6 +40,7 @@ use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
+use TofuPlugin\Init\RestEndpoint;
 use TofuPlugin\Logger;
 
 // Prepare Logger
@@ -79,3 +80,6 @@ add_action('init', function () {
 
 // Initialize endpoint
 Endpoint::init();
+
+// Initialize REST endpoint (AJAX / headless support)
+RestEndpoint::init();

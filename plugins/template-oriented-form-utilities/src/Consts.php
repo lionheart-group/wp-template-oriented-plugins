@@ -65,4 +65,16 @@ final class Consts
      * Turnstile hidden input field name.
      */
     public const TURNSTILE_TOKEN_INPUT_NAME = '_tofu_turnstile_token';
+
+    /**
+     * WP REST API namespace for TOFU endpoints.
+     */
+    public const REST_NAMESPACE = 'tofu/v1';
+
+    /**
+     * REST API nonce action format.
+     *
+     * 1st parameter: Form key
+     */
+    public const REST_NONCE_ACTION_FORMAT = '_tofu_%s_rest_nonce';
 }

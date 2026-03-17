@@ -292,3 +292,89 @@ composer build            # PHP Scoper production build → build/
 - Never output raw `Form::value()` inside HTML attributes — use `$raw = false` (default)
 - Use `Form::verifySession()` on confirm page and `Form::verifySubmit()` on result page
 - Store secrets (reCAPTCHA / Turnstile keys) in environment variables or `wp-config.php`, not hardcoded
+- For AJAX: `ajaxEnabled: false` by default — never expose a form over REST unless explicitly opted in
+- For cross-origin AJAX: `corsOrigins` must list exact origins; wildcard `*` is not supported
+
+---
+
+## AJAX / REST API Endpoint
+
+TOFU includes an opt-in WP REST API layer for AJAX and headless (separate-domain) frontends.
+
+### Enable per form
+
+```php
+\TofuPlugin\Helpers\Form::register(new \TofuPlugin\Structure\FormConfig(
+    key:          'contact',
+    ajaxEnabled:  true,                                    // required to expose REST routes
+    corsOrigins:  ['https://frontend.example.com'],        // omit = same-origin only
+    // … rest of config unchanged
+));
+```
+
+### Routes (registered only for forms with `ajaxEnabled: true`)
+
+| Method | Route | Description |
+|---|---|---|
+| `GET` | `/wp-json/tofu/v1/forms/{key}/nonce?action=input` | Get a fresh TOFU nonce |
+| `POST` | `/wp-json/tofu/v1/forms/{key}/input` | Submit input step |
+| `POST` | `/wp-json/tofu/v1/forms/{key}/confirm` | Submit confirm step |
+
+### JSON responses
+
+**Success (HTTP 200):**
+```json
+{ "success": true, "redirect": "/contact/confirm/" }
+```
+**Validation error (HTTP 422):**
+```json
+{ "success": false, "errors": { "name": ["Please enter your name."] } }
+```
+**Nonce (GET):**
+```json
+{ "nonce": "abc123…", "field_name": "_tofu_contact_nonce", "action": "input" }
+```
+
+### Client-side usage
+
+```javascript
+// 1. Fetch nonce
+const { nonce, field_name } = await fetch('/wp-json/tofu/v1/forms/contact/nonce')
+    .then(r => r.json());
+
+// 2. Submit form (supports file uploads via FormData)
+const body = new FormData(document.querySelector('form'));
+body.append(field_name, nonce);
+
+const res = await fetch('/wp-json/tofu/v1/forms/contact/input', {
+    method: 'POST',
+    body,
+    credentials: 'include',  // required for cross-origin
+});
+const data = await res.json();
+if (data.success) { window.location = data.redirect; }
+else              { /* show data.errors */ }
+```
+
+### Cross-origin (headless / separate domain)
+
+- Set `corsOrigins: ['https://your-frontend.com']` in `FormConfig`
+- Session cookie is automatically issued with `SameSite=None; Secure` (requires HTTPS)
+- Client must send `credentials: 'include'` in fetch/axios requests
+- `corsOrigins: []` (default) = same-origin only, `SameSite=Lax` cookie
+
+### New FormConfig parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `ajaxEnabled` | `bool` | `false` | Enable REST API routes for this form |
+| `corsOrigins` | `string[]` | `[]` | Allowed CORS origins; empty = same-origin only |
+
+### Key source files (REST)
+
+| File | Role |
+|---|---|
+| `src/Init/RestEndpoint.php` | Route registration, CORS headers, nonce/input/confirm handlers |
+| `src/Models/Form.php` | `processInput()`, `processConfirm()` — pure processing, no redirect/wp_die |
+| `src/Helpers/Session.php` | `enableCors()` — sets `SameSite=None; Secure` for cross-origin cookies |
+| `src/Consts.php` | `REST_NAMESPACE = 'tofu/v1'`, `REST_NONCE_ACTION_FORMAT` |

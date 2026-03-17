@@ -43,6 +43,8 @@ if (!isset($GLOBALS['wpdb'])) {
         }
 
         public function prepare($query, ...$args) {
+            // Replace %i (WP identifier specifier) with a plain string placeholder first
+            $query = str_replace('%i', '`%s`', $query);
             return vsprintf(str_replace(['%s', '%d', '%f'], ["'%s'", '%d', '%f'], $query), $args);
         }
 
@@ -134,3 +136,59 @@ if (!function_exists('wp_mkdir_p')) {
         return @mkdir($target, 0755, true);
     }
 }
+
+if (!function_exists('wp_die')) {
+    function wp_die($message = '', $title = '', $args = []) {
+        $status = is_array($args) ? ($args['response'] ?? 500) : 500;
+        throw new \RuntimeException(
+            sprintf('wp_die called: [%d] %s — %s', $status, $title, $message)
+        );
+    }
+}
+
+if (!function_exists('wp_generate_password')) {
+    function wp_generate_password(int $length = 12, bool $special_chars = true, bool $extra_special_chars = false): string {
+        return bin2hex(random_bytes((int) ceil($length / 2)));
+    }
+}
+
+if (!function_exists('wp_unslash')) {
+    function wp_unslash($value) {
+        return is_array($value) ? array_map('wp_unslash', $value) : stripslashes($value);
+    }
+}
+
+if (!function_exists('is_ssl')) {
+    function is_ssl(): bool {
+        return false;
+    }
+}
+
+if (!function_exists('current_time')) {
+    function current_time(string $type, bool $gmt = false): string|int {
+        if ($type === 'timestamp' || $type === 'U') {
+            return time();
+        }
+        return date('Y-m-d H:i:s');
+    }
+}
+
+if (!function_exists('wp_timezone')) {
+    function wp_timezone(): \DateTimeZone {
+        return new \DateTimeZone('UTC');
+    }
+}
+
+if (!defined('COOKIEPATH')) {
+    define('COOKIEPATH', '/');
+}
+
+if (!defined('COOKIE_DOMAIN')) {
+    define('COOKIE_DOMAIN', '');
+}
+
+// Initialize TOFU Logger for tests (WP_DEBUG=true requires it to be set up before Form is constructed)
+\TofuPlugin\Logger::init('test');
+
+// Namespace-level mock for setcookie() — must be in its own file
+require_once __DIR__ . '/bootstrap-helpers.php';
