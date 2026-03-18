@@ -136,7 +136,7 @@ document.getElementById('contact-form').addEventListener('submit', async (e) => 
     const data = await res.json();
 
     if (data.success) {
-        // Redirect to result (or confirm) page
+        // data.next is 'confirm' or 'result'
         window.location.href = data.redirect;
     } else {
         showErrors(data.errors);
@@ -158,7 +158,7 @@ template: new \TofuPlugin\Structure\TemplateConfig(
 ),
 ```
 
-The `/input` response will now return `"redirect": "/contact/confirm/"` on success.
+The `/input` response will now return `"next": "confirm"` and `"redirect": "/contact/confirm/"` on success.
 Load the confirm page normally — TOFU stores submitted values in the session.
 
 On the confirm page, add a second form that posts to the `/confirm` endpoint:
@@ -397,6 +397,7 @@ form.addEventListener('submit', async (e) => {
         const data = await res.json();
 
         if (data.success) {
+            // data.next: 'confirm' | 'result'
             window.location.href = data.redirect;
         } else {
             showErrors(data.errors);

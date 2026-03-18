@@ -41,6 +41,7 @@ if ( ! defined( 'WPINC' ) ) {
  *     method: 'POST', body, credentials: 'include',
  * });
  * const data = await res.json();
+ * // data.next is 'confirm' | 'result' — use it to drive SPA step state
  * if (data.success) { window.location = data.redirect; }
  * else              { /* show data.errors *\/ }
  * ```
@@ -179,12 +180,17 @@ class RestEndpoint
      *
      * Success response (HTTP 200):
      * ```json
-     * { "success": true, "redirect": "/contact/confirm/" }
+     * { "success": true, "next": "confirm", "redirect": "/contact/confirm/" }
+     * ```
+     *
+     * No confirm step — goes straight to result:
+     * ```json
+     * { "success": true, "next": "result", "redirect": "/contact/result/" }
      * ```
      *
      * Validation error response (HTTP 422):
      * ```json
-     * { "success": false, "errors": { "name": ["Please enter your name."] } }
+     * { "success": false, "next": "input", "errors": { "name": ["Please enter your name."] } }
      * ```
      *
      * @param \WP_REST_Request $request
@@ -217,12 +223,14 @@ class RestEndpoint
             }
             return new \WP_REST_Response([
                 'success' => false,
+                'next'    => 'input',
                 'errors'  => $result['errors'],
             ], 422);
         }
 
         return new \WP_REST_Response([
             'success'  => true,
+            'next'     => $result['next'],
             'redirect' => static::getRedirectUrl($form->config, $result['next']),
         ], 200);
     }
@@ -235,7 +243,7 @@ class RestEndpoint
      *
      * Success response (HTTP 200):
      * ```json
-     * { "success": true, "redirect": "/contact/result/" }
+     * { "success": true, "next": "result", "redirect": "/contact/result/" }
      * ```
      *
      * @param \WP_REST_Request $request
@@ -266,12 +274,14 @@ class RestEndpoint
             }
             return new \WP_REST_Response([
                 'success' => false,
+                'next'    => 'input',
                 'errors'  => $result['errors'],
             ], 422);
         }
 
         return new \WP_REST_Response([
             'success'  => true,
+            'next'     => 'result',
             'redirect' => static::getRedirectUrl($form->config, 'result'),
         ], 200);
     }

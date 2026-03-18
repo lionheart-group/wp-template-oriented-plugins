@@ -83,7 +83,7 @@ export function useTofu(formKey) {
      *
      * @param {'input'|'confirm'} step
      * @param {FormData|null}     formData  Pass null for the confirm step.
-     * @returns {Promise<{success: boolean, redirect?: string, errors?: object}>}
+     * @returns {Promise<{success: boolean, next: 'confirm'|'result'|'input', redirect?: string, errors?: object}>}
      */
     async function submit(step, formData = null) {
         loading.value = true;
@@ -170,7 +170,7 @@ async function handleSubmit() {
     }
     const data = await submit('input', body);
     if (data.success) {
-        emit('success', { redirect: data.redirect, values: { ...fields } });
+        emit('success', { next: data.next, redirect: data.redirect, values: { ...fields } });
     }
 }
 </script>
@@ -267,10 +267,9 @@ const FORM_KEY = 'contact';
 const step            = ref('input');
 const submittedValues = reactive({});
 
-function onInputSuccess({ redirect, values }) {
+function onInputSuccess({ next, values }) {
     Object.assign(submittedValues, values);
-    // If WP configured a confirm page, show confirm step
-    step.value = redirect ? 'confirm' : 'result';
+    step.value = next;
 }
 </script>
 ```

@@ -82,7 +82,7 @@ export function useTofu(formKey) {
      *
      * @param {'input'|'confirm'} step
      * @param {FormData|null}     formData  Pass null for the confirm step (no user data needed).
-     * @returns {Promise<{success: boolean, redirect: string}>}
+     * @returns {Promise<{success: boolean, next: 'confirm'|'result'|'input', redirect: string, errors?: object}>}
      */
     const submit = useCallback(async (step, formData = null) => {
         setLoading(true);
@@ -140,7 +140,7 @@ export function InputStep({ formKey, onSuccess }) {
         e.preventDefault();
         const data = await submit('input', new FormData(formRef.current));
         if (data.success) {
-            onSuccess(data.redirect);
+            onSuccess(data.next, data.redirect);
         }
     }
 
@@ -186,7 +186,7 @@ export function ConfirmStep({ formKey, values, onSuccess, onBack }) {
     async function handleConfirm() {
         const data = await submit('confirm');
         if (data.success) {
-            onSuccess(data.redirect);
+            onSuccess(data.next, data.redirect);
         }
     }
 
@@ -246,30 +246,20 @@ const FORM_KEY = 'contact';
 
 export function ContactForm() {
     // 'input' | 'confirm' | 'result'
-    const [step,     setStep]     = useState('input');
+    const [step,   setStep]   = useState('input');
     // store values to display on confirm page
-    const [values,   setValues]   = useState({});
-    // the redirect URL returned by the /input endpoint
-    const [redirect, setRedirect] = useState(null);
+    const [values, setValues] = useState({});
 
-    function handleInputSuccess(redirectUrl) {
-        // If WP returns a confirm URL, show confirm step
-        if (redirectUrl && redirectUrl !== window.location.pathname) {
-            // Capture current form values to display in confirm step
+    function handleInputSuccess(next) {
+        if (next === 'confirm') {
             const form = document.querySelector('form');
-            if (form) {
-                const fd = new FormData(form);
-                setValues(Object.fromEntries(fd.entries()));
-            }
-            setRedirect(redirectUrl);
-            setStep('confirm');
-        } else {
-            setStep('result');
+            if (form) setValues(Object.fromEntries(new FormData(form).entries()));
         }
+        setStep(next);
     }
 
-    function handleConfirmSuccess() {
-        setStep('result');
+    function handleConfirmSuccess(next) {
+        setStep(next);
     }
 
     return (
@@ -337,7 +327,7 @@ export function InputStep({ formKey, onSuccess }) {
         }
 
         const data = await submit('input', body);
-        if (data.success) onSuccess(data.redirect);
+        if (data.success) onSuccess(data.next, data.redirect);
     }
 
     // … rest of component
@@ -359,7 +349,7 @@ export function InputStep({ formKey, onSuccess }) {
     async function handleSubmit(e) {
         e.preventDefault();
         const data = await submit('input', new FormData(formRef.current));
-        if (data.success) onSuccess(data.redirect);
+        if (data.success) onSuccess(data.next, data.redirect);
     }
 
     return (

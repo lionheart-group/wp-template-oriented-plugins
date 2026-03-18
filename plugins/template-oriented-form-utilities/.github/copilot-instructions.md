@@ -6,9 +6,9 @@ TOFU is a WordPress plugin (PHP 8.1+, GPLv3+) for building multi-step forms usin
 It handles validation, session storage, file uploads, email notifications, and bot protection —
 all configured in code (no WP admin UI).
 
-**Namespace:** `TofuPlugin\` (PSR-4, mapped to `src/`)  
-**Entry point:** `template-oriented-form-utilities.php`  
-**Version:** 0.0.2  
+**Namespace:** `TofuPlugin\` (PSR-4, mapped to `src/`)
+**Entry point:** `template-oriented-form-utilities.php`
+**Version:** 0.0.3
 
 **Form flow:** Input Page → *(optional)* Confirm Page → Result Page
 
@@ -25,7 +25,7 @@ functions.php (FormConfig registration)
                     └── redirect()      — to input | confirm | result
 ```
 
-Custom endpoint: `?_tofu_key=<base64-JSON>` (registered via `add_rewrite_endpoint`)  
+Custom endpoint: `?_tofu_key=<base64-JSON>` (registered via `add_rewrite_endpoint`)
 Handled in `template_redirect` hook by `TofuPlugin\Init\Endpoint`.
 
 ---
@@ -252,7 +252,7 @@ Files are stored temporarily in `wp-content/uploads/tofu-uploads/`, attached to 
 | `max_mb` | `'file' => 'max_mb:5'` | Max file size in MB |
 | `mime_type` | `'file' => 'mime_type:image/jpeg,image/png'` | Allowed MIME types |
 
-Standard GUMP rules also apply: `required`, `valid_email`, `max_len`, `min_len`, `numeric`, `alpha`, `alpha_numeric`, etc.  
+Standard GUMP rules also apply: `required`, `valid_email`, `max_len`, `min_len`, `numeric`, `alpha`, `alpha_numeric`, etc.
 Standard GUMP filters: `trim`, `sanitize_string`, `sanitize_email`, `lower_case`, `sanitize_numbers`, etc.
 
 ---
@@ -324,11 +324,11 @@ TOFU includes an opt-in WP REST API layer for AJAX and headless (separate-domain
 
 **Success (HTTP 200):**
 ```json
-{ "success": true, "redirect": "/contact/confirm/" }
+{ "success": true, "next": "confirm", "redirect": "/contact/confirm/" }
 ```
 **Validation error (HTTP 422):**
 ```json
-{ "success": false, "errors": { "name": ["Please enter your name."] } }
+{ "success": false, "next": "input", "errors": { "name": ["Please enter your name."] } }
 ```
 **Nonce (GET):**
 ```json
@@ -352,7 +352,7 @@ const res = await fetch('/wp-json/tofu/v1/forms/contact/input', {
     credentials: 'include',  // required for cross-origin
 });
 const data = await res.json();
-if (data.success) { window.location = data.redirect; }
+if (data.success) { /* data.next: 'confirm'|'result' */ window.location = data.redirect; }
 else              { /* show data.errors */ }
 ```
 

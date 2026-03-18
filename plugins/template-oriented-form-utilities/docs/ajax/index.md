@@ -15,8 +15,8 @@ without full-page reloads, or from a completely separate frontend application.
 1. **Register the form** in `functions.php` with `ajaxEnabled: true`
 2. **Fetch a nonce** from `GET /wp-json/tofu/v1/forms/{key}/nonce`
 3. **Submit** `POST /wp-json/tofu/v1/forms/{key}/input` with `FormData`
-4. On success, the JSON response contains the redirect URL for the next step
-5. If there is a confirm step, show it and submit `POST …/confirm`
+4. On success, the JSON response contains `next` (`"confirm"` or `"result"`) and the redirect URL
+5. If `next` is `"confirm"`, show the confirm step and submit `POST …/confirm`
 
 ## Endpoints
 
@@ -30,13 +30,14 @@ without full-page reloads, or from a completely separate frontend application.
 
 **Success (HTTP 200):**
 ```json
-{ "success": true, "redirect": "/contact/confirm/" }
+{ "success": true, "next": "confirm", "redirect": "/contact/confirm/" }
 ```
 
 **Validation error (HTTP 422):**
 ```json
 {
   "success": false,
+  "next": "input",
   "errors": {
     "name":  ["Please enter your name."],
     "email": ["Please enter a valid email address."]
