@@ -27,13 +27,6 @@ class FormConfig
         public readonly string $name,
 
         /**
-         * Template setting.
-         *
-         * @var TemplateConfig
-         */
-        public readonly TemplateConfig $template,
-
-        /**
          * Mail setting.
          *
          * @var MailConfig
@@ -46,6 +39,16 @@ class FormConfig
          * @var ValidationConfig
          */
         public readonly ValidationConfig $validation,
+
+        /**
+         * Template setting.
+         *
+         * Required for the traditional redirect-based form flow.
+         * Can be omitted when using AJAX / headless mode only.
+         *
+         * @var ?TemplateConfig
+         */
+        public readonly ?TemplateConfig $template = null,
 
         /**
          * Enabled to save the form data to the database.
@@ -97,7 +100,32 @@ class FormConfig
          * @var string[]
          */
         public readonly array $corsOrigins = [],
+
+        /**
+         * Whether this form has a confirm step.
+         *
+         * In the traditional redirect flow this is inferred from whether
+         * `template->confirmPath` is set. In AJAX / headless mode (where
+         * `template` may be null) set this to `true` explicitly to enable
+         * the confirm step.
+         *
+         * @var bool
+         */
+        public readonly bool $confirmStep = false,
     )
     {
+    }
+
+    /**
+     * Returns true when this form has a confirmation step.
+     *
+     * Checks `confirmStep` first, then falls back to whether
+     * `template->confirmPath` is configured.
+     *
+     * @return bool
+     */
+    public function hasConfirmStep(): bool
+    {
+        return $this->confirmStep || !empty($this->template?->confirmPath);
     }
 }

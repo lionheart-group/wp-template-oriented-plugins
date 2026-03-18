@@ -41,8 +41,8 @@ if ( ! defined( 'WPINC' ) ) {
  *     method: 'POST', body, credentials: 'include',
  * });
  * const data = await res.json();
- * // data.next is 'confirm' | 'result' — use it to drive SPA step state
- * if (data.success) { window.location = data.redirect; }
+ * // data.next: 'confirm' | 'result' — drive SPA step state directly
+ * if (data.success) { showStep(data.next); }
  * else              { /* show data.errors *\/ }
  * ```
  */
@@ -180,12 +180,12 @@ class RestEndpoint
      *
      * Success response (HTTP 200):
      * ```json
-     * { "success": true, "next": "confirm", "redirect": "/contact/confirm/" }
+     * { "success": true, "next": "confirm" }
      * ```
      *
      * No confirm step — goes straight to result:
      * ```json
-     * { "success": true, "next": "result", "redirect": "/contact/result/" }
+     * { "success": true, "next": "result" }
      * ```
      *
      * Validation error response (HTTP 422):
@@ -229,9 +229,8 @@ class RestEndpoint
         }
 
         return new \WP_REST_Response([
-            'success'  => true,
-            'next'     => $result['next'],
-            'redirect' => static::getRedirectUrl($form->config, $result['next']),
+            'success' => true,
+            'next'    => $result['next'],
         ], 200);
     }
 
@@ -243,7 +242,7 @@ class RestEndpoint
      *
      * Success response (HTTP 200):
      * ```json
-     * { "success": true, "next": "result", "redirect": "/contact/result/" }
+     * { "success": true, "next": "result" }
      * ```
      *
      * @param \WP_REST_Request $request
@@ -280,9 +279,8 @@ class RestEndpoint
         }
 
         return new \WP_REST_Response([
-            'success'  => true,
-            'next'     => 'result',
-            'redirect' => static::getRedirectUrl($form->config, 'result'),
+            'success' => true,
+            'next'    => 'result',
         ], 200);
     }
 
@@ -328,19 +326,4 @@ class RestEndpoint
         }
     }
 
-    /**
-     * Resolve the redirect URL for a given next action from FormConfig template paths.
-     *
-     * @param \TofuPlugin\Structure\FormConfig $config
-     * @param string                           $next  'input'|'confirm'|'result'
-     * @return string
-     */
-    protected static function getRedirectUrl(\TofuPlugin\Structure\FormConfig $config, string $next): string
-    {
-        return match ($next) {
-            'confirm' => (string) $config->template->confirmPath,
-            'result'  => $config->template->resultPath,
-            default   => $config->template->inputPath,
-        };
-    }
 }

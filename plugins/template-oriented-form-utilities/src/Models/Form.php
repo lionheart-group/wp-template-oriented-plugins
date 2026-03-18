@@ -373,7 +373,7 @@ class Form
         }
 
         // No confirmation step — run confirm processing inline
-        if (empty($this->config->template->confirmPath)) {
+        if (!$this->config->hasConfirmStep()) {
             $confirmResult = $this->processConfirm(skipVerify: true, post: $post);
             if (!$confirmResult['success']) {
                 return $confirmResult;
@@ -626,6 +626,10 @@ class Form
 
     public function redirect(string $action): void
     {
+        if ($this->config->template === null) {
+            wp_die('Template is not configured for this form.', 'TOFU Form Config Error', ['response' => 500]);
+        }
+
         // Check if the action is valid
         if (!in_array($action, ['input', 'confirm', 'result'])) {
             wp_die('Invalid action.', 'TOFU Form Action Error', ['response' => 400]);

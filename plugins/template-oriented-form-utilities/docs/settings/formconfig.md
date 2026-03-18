@@ -8,15 +8,27 @@ The main configuration class that holds all settings for a form.
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Helpers\Form;
 
+// Traditional (redirect-based) form — template required
 Form::register(new FormConfig(
-    key: 'contact',
-    name: 'Contact Form',
-    template: $templateConfig,
-    mail: $mailConfig,
+    key:        'contact',
+    name:       'Contact Form',
+    mail:       $mailConfig,
     validation: $validationConfig,
+    template:   $templateConfig,
     saveToDatabase: false,
     recaptcha: $recaptchaConfig, // optional
     turnstile: $turnstileConfig, // optional
+));
+
+// AJAX / headless form — template optional
+Form::register(new FormConfig(
+    key:         'contact',
+    name:        'Contact Form',
+    mail:        $mailConfig,
+    validation:  $validationConfig,
+    ajaxEnabled: true,
+    confirmStep: true,           // optional: enable confirm step without template
+    corsOrigins: ['https://frontend.example.com'], // optional: cross-origin
 ));
 ```
 
@@ -26,9 +38,18 @@ Form::register(new FormConfig(
 |----------|------|----------|---------|-------------|
 | `key` | `string` | Yes | - | Unique identifier for the form. Used to reference the form throughout the application. |
 | `name` | `string` | Yes | - | Human-readable name for the form. |
-| `template` | [`TemplateConfig`](./templateconfig.md) | Yes | - | Template configuration for form pages. |
 | `mail` | [`MailConfig`](./mailconfig.md) | Yes | - | Mail configuration for sending emails. |
 | `validation` | [`ValidationConfig`](./validationconfig.md) | Yes | - | Validation rules and settings. |
+| `template` | [`?TemplateConfig`](./templateconfig.md) | No | `null` | Template configuration for WP page URLs. Required for the traditional redirect flow; can be omitted for AJAX-only forms. |
 | `saveToDatabase` | `bool` | No | `false` | Whether to save form submissions to the database. |
 | `recaptcha` | [`?ReCAPTCHAConfig`](./recaptchaconfig.md) | No | `null` | Google reCAPTCHA v3 configuration. |
 | `turnstile` | [`?TurnstileConfig`](./turnstileconfig.md) | No | `null` | Cloudflare Turnstile configuration. |
+| `ajaxEnabled` | `bool` | No | `false` | Enable the WP REST API endpoint for this form. See [AJAX / Headless Mode](../ajax/index.md). |
+| `corsOrigins` | `string[]` | No | `[]` | Allowed CORS origins for the REST endpoint. Empty = same-origin only. |
+| `confirmStep` | `bool` | No | `false` | Explicitly enable the confirm step. For AJAX-only forms (no template); for template-based forms, use `template->confirmPath` instead. |
+
+## Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `hasConfirmStep()` | `bool` | Returns `true` if this form has a confirm step. True when `confirmStep` is set, or when `template->confirmPath` is configured. |

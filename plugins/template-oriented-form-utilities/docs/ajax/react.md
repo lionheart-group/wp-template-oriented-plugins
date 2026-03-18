@@ -82,7 +82,7 @@ export function useTofu(formKey) {
      *
      * @param {'input'|'confirm'} step
      * @param {FormData|null}     formData  Pass null for the confirm step (no user data needed).
-     * @returns {Promise<{success: boolean, next: 'confirm'|'result'|'input', redirect: string, errors?: object}>}
+     * @returns {Promise<{success: boolean, next: 'confirm'|'result'|'input', errors?: object}>}
      */
     const submit = useCallback(async (step, formData = null) => {
         setLoading(true);
@@ -140,7 +140,7 @@ export function InputStep({ formKey, onSuccess }) {
         e.preventDefault();
         const data = await submit('input', new FormData(formRef.current));
         if (data.success) {
-            onSuccess(data.next, data.redirect);
+            onSuccess(data.next);
         }
     }
 
@@ -186,7 +186,7 @@ export function ConfirmStep({ formKey, values, onSuccess, onBack }) {
     async function handleConfirm() {
         const data = await submit('confirm');
         if (data.success) {
-            onSuccess(data.next, data.redirect);
+            onSuccess(data.next);
         }
     }
 
@@ -260,9 +260,7 @@ export function ContactForm() {
 
     function handleConfirmSuccess(next) {
         setStep(next);
-    }
-
-    return (
+    }    return (
         <div className="contact-form">
             {step === 'input' && (
                 <InputStep
@@ -327,7 +325,7 @@ export function InputStep({ formKey, onSuccess }) {
         }
 
         const data = await submit('input', body);
-        if (data.success) onSuccess(data.next, data.redirect);
+        if (data.success) onSuccess(data.next);
     }
 
     // … rest of component
@@ -349,7 +347,7 @@ export function InputStep({ formKey, onSuccess }) {
     async function handleSubmit(e) {
         e.preventDefault();
         const data = await submit('input', new FormData(formRef.current));
-        if (data.success) onSuccess(data.next, data.redirect);
+        if (data.success) onSuccess(data.next);
     }
 
     return (

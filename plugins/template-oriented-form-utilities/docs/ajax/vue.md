@@ -83,7 +83,7 @@ export function useTofu(formKey) {
      *
      * @param {'input'|'confirm'} step
      * @param {FormData|null}     formData  Pass null for the confirm step.
-     * @returns {Promise<{success: boolean, next: 'confirm'|'result'|'input', redirect?: string, errors?: object}>}
+     * @returns {Promise<{success: boolean, next: 'confirm'|'result'|'input', errors?: object}>}
      */
     async function submit(step, formData = null) {
         loading.value = true;
@@ -170,7 +170,7 @@ async function handleSubmit() {
     }
     const data = await submit('input', body);
     if (data.success) {
-        emit('success', { next: data.next, redirect: data.redirect, values: { ...fields } });
+        emit('success', { next: data.next, values: { ...fields } });
     }
 }
 </script>
@@ -313,7 +313,7 @@ async function handleSubmit() {
     body.append('_tofu_recaptcha_token', token);
 
     const data = await submit('input', body);
-    if (data.success) emit('success', { redirect: data.redirect });
+    if (data.success) emit('success', { next: data.next });
 }
 </script>
 ```
@@ -368,7 +368,7 @@ async function handleSubmit() {
     const body = new FormData(formRef.value);
     // File is already in FormData via the <input type="file"> in the form
     const data = await submit('input', body);
-    if (data.success) emit('success', { redirect: data.redirect });
+    if (data.success) emit('success', { next: data.next });
 }
 </script>
 ```

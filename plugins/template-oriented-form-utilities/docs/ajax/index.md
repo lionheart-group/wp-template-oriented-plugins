@@ -30,7 +30,7 @@ without full-page reloads, or from a completely separate frontend application.
 
 **Success (HTTP 200):**
 ```json
-{ "success": true, "next": "confirm", "redirect": "/contact/confirm/" }
+{ "success": true, "next": "confirm" }
 ```
 
 **Validation error (HTTP 422):**
@@ -52,30 +52,36 @@ without full-page reloads, or from a completely separate frontend application.
 
 ## PHP Setup
 
-Enable AJAX mode in `functions.php`:
+Enable AJAX mode in `functions.php`. `template` is not required for AJAX-only forms:
 
 ```php
 add_action('init', function () {
     \TofuPlugin\Helpers\Form::register(new \TofuPlugin\Structure\FormConfig(
-        key:  'contact',
-        name: 'Contact Form',
+        key:         'contact',
+        name:        'Contact Form',
+        mail:        $mailConfig,
+        validation:  $validationConfig,
 
-        // Same-origin: omit corsOrigins
+        // No template needed for pure AJAX / headless usage
         ajaxEnabled: true,
 
-        // Cross-origin (headless): add your frontend URL
-        // ajaxEnabled:  true,
-        // corsOrigins: ['https://frontend.example.com'],
+        // Enable a confirm step (no template required)
+        // confirmStep: true,
 
+        // Cross-origin (headless): add your frontend URL
+        // corsOrigins: ['https://frontend.example.com'],
+    ));
+});
+```
+
+If you also want to support the traditional WP page flow alongside AJAX, add `template`:
+
+```php
         template: new \TofuPlugin\Structure\TemplateConfig(
             inputPath:  '/contact/',
             resultPath: '/contact/result/',
-            // confirmPath: '/contact/confirm/',  // optional
+            // confirmPath: '/contact/confirm/',  // enables confirm step in both flows
         ),
-        mail:       $mailConfig,
-        validation: $validationConfig,
-    ));
-});
 ```
 
 See [FormConfig](../settings/formconfig.md) for the full list of options.

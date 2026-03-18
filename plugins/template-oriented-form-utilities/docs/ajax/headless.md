@@ -35,7 +35,7 @@ Frontend (https://frontend.example.com)
     │
     └─ POST /wp-json/tofu/v1/forms/contact/input
         → Cookie: _tofu_session_key=…
-        ← { "success": true, "redirect": "/contact/result/" }
+        ← { "success": true, "next": "result" }
 ```
 
 ---
@@ -53,13 +53,16 @@ Frontend (https://frontend.example.com)
 
 ## Step 1 — WordPress Configuration
 
-Add `ajaxEnabled: true` and `corsOrigins` to your `FormConfig` in `functions.php`:
+Add `ajaxEnabled: true` and `corsOrigins` to your `FormConfig` in `functions.php`.
+`template` is optional — omit it for pure headless forms:
 
 ```php
 add_action('init', function () {
     \TofuPlugin\Helpers\Form::register(new \TofuPlugin\Structure\FormConfig(
         key:         'contact',
         name:        'Contact Form',
+        mail:        $mailConfig,
+        validation:  $validationConfig,
         ajaxEnabled: true,
 
         // List every frontend origin that is allowed to submit this form.
@@ -69,21 +72,21 @@ add_action('init', function () {
             'https://staging.frontend.example.com',  // staging, if needed
         ],
 
-        template: new \TofuPlugin\Structure\TemplateConfig(
-            inputPath:  'https://frontend.example.com/contact/',      // full URLs when cross-domain
-            resultPath: 'https://frontend.example.com/contact/result/',
-            // confirmPath: 'https://frontend.example.com/contact/confirm/',
-        ),
-        mail:       $mailConfig,
-        validation: $validationConfig,
+        // Enable confirm step (no template pages required)
+        // confirmStep: true,
     ));
 });
 ```
 
-> **Important** — `TemplateConfig::$inputPath`, `$confirmPath`, and `$resultPath` are
-> used as redirect URLs in the traditional flow but returned as-is in the JSON
-> `"redirect"` field of the REST response. Use full URLs when the frontend is on a
-> different domain.
+If you also need the traditional WP page flow, add `template` with full frontend URLs:
+
+```php
+        template: new \TofuPlugin\Structure\TemplateConfig(
+            inputPath:  'https://frontend.example.com/contact/',
+            resultPath: 'https://frontend.example.com/contact/result/',
+            // confirmPath: 'https://frontend.example.com/contact/confirm/',
+        ),
+```
 
 ---
 

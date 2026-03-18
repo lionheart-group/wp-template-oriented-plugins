@@ -136,8 +136,9 @@ document.getElementById('contact-form').addEventListener('submit', async (e) => 
     const data = await res.json();
 
     if (data.success) {
-        // data.next is 'confirm' or 'result'
-        window.location.href = data.redirect;
+        // data.next: 'confirm' | 'result' — map to your own client-side routes
+        const routes = { confirm: '/contact/confirm/', result: '/contact/result/' };
+        window.location.href = routes[data.next];
     } else {
         showErrors(data.errors);
     }
@@ -148,18 +149,33 @@ document.getElementById('contact-form').addEventListener('submit', async (e) => 
 
 ## Three-Step Form (Input → Confirm → Result)
 
-Enable the confirm step by adding `confirmPath` to `TemplateConfig`:
+Enable the confirm step in `FormConfig`. If you have WP template pages, use `confirmPath`.
+For AJAX-only forms without a template, set `confirmStep: true`:
 
 ```php
-template: new \TofuPlugin\Structure\TemplateConfig(
-    inputPath:   '/contact/',
-    confirmPath: '/contact/confirm/',
-    resultPath:  '/contact/result/',
-),
+// AJAX-only (no template pages)
+new \TofuPlugin\Structure\FormConfig(
+    key: 'contact', name: 'Contact Form',
+    mail: $mailConfig, validation: $validationConfig,
+    ajaxEnabled: true,
+    confirmStep: true,
+)
+
+// Or with template pages (both flows supported)
+new \TofuPlugin\Structure\FormConfig(
+    key: 'contact', name: 'Contact Form',
+    mail: $mailConfig, validation: $validationConfig,
+    ajaxEnabled: true,
+    template: new \TofuPlugin\Structure\TemplateConfig(
+        inputPath:   '/contact/',
+        confirmPath: '/contact/confirm/',
+        resultPath:  '/contact/result/',
+    ),
+)
 ```
 
-The `/input` response will now return `"next": "confirm"` and `"redirect": "/contact/confirm/"` on success.
-Load the confirm page normally — TOFU stores submitted values in the session.
+When a confirm step is configured, the `/input` response returns `"next": "confirm"`.
+Show the confirm UI and submit to `/confirm` when the user approves.
 
 On the confirm page, add a second form that posts to the `/confirm` endpoint:
 
@@ -190,7 +206,8 @@ document.getElementById('confirm-form').addEventListener('submit', async (e) => 
     const data = await res.json();
 
     if (data.success) {
-        window.location.href = data.redirect;
+        // data.next is always 'result' here
+        window.location.href = '/contact/result/';
     } else {
         // Errors on confirm step (e.g., session expired)
         console.error('Confirm failed:', data.errors);
@@ -397,8 +414,9 @@ form.addEventListener('submit', async (e) => {
         const data = await res.json();
 
         if (data.success) {
-            // data.next: 'confirm' | 'result'
-            window.location.href = data.redirect;
+            // data.next: 'confirm' | 'result' — navigate to the corresponding client route
+            const routes = { confirm: '/contact/confirm/', result: '/contact/result/' };
+            window.location.href = routes[data.next];
         } else {
             showErrors(data.errors);
         }

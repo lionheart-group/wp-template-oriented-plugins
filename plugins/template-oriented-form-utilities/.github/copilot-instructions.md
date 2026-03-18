@@ -139,6 +139,8 @@ add_action('init', function () {
 });
 ```
 
+> `template` is optional for AJAX-only forms. Omit it and set `ajaxEnabled: true` (+ `confirmStep: true` if needed).
+
 ---
 
 ## Page Templates
@@ -324,7 +326,7 @@ TOFU includes an opt-in WP REST API layer for AJAX and headless (separate-domain
 
 **Success (HTTP 200):**
 ```json
-{ "success": true, "next": "confirm", "redirect": "/contact/confirm/" }
+{ "success": true, "next": "confirm" }
 ```
 **Validation error (HTTP 422):**
 ```json
@@ -352,7 +354,8 @@ const res = await fetch('/wp-json/tofu/v1/forms/contact/input', {
     credentials: 'include',  // required for cross-origin
 });
 const data = await res.json();
-if (data.success) { /* data.next: 'confirm'|'result' */ window.location = data.redirect; }
+// data.next: 'confirm' | 'result' — drive SPA step state directly
+if (data.success) { showStep(data.next); }
 else              { /* show data.errors */ }
 ```
 
@@ -363,12 +366,14 @@ else              { /* show data.errors */ }
 - Client must send `credentials: 'include'` in fetch/axios requests
 - `corsOrigins: []` (default) = same-origin only, `SameSite=Lax` cookie
 
-### New FormConfig parameters
+### FormConfig AJAX parameters
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
+| `template` | `?TemplateConfig` | `null` | Optional for AJAX-only forms; required for traditional redirect flow |
 | `ajaxEnabled` | `bool` | `false` | Enable REST API routes for this form |
 | `corsOrigins` | `string[]` | `[]` | Allowed CORS origins; empty = same-origin only |
+| `confirmStep` | `bool` | `false` | Explicitly enable confirm step (for AJAX forms without a template) |
 
 ### Key source files (REST)
 
