@@ -45,8 +45,7 @@
         "test:scoped": "phpunit -c phpunit.scoped.xml",
         "check": [
             "@phpstan",
-            "@test",
-            "@test:scoped"
+            "@test"
         ],
         "scoper": "php -d memory_limit=512M tools/php-scoper.phar add-prefix --config=scoper.inc.php --force",
         "scoper:composer": "php scripts/generate-build-composer.php",
@@ -54,7 +53,8 @@
         "build": [
             "@scoper",
             "@scoper:composer",
-            "@scoper:dump"
+            "@scoper:dump",
+            "@test:scoped"
         ]
     }
 }

@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.0.2
+Stable tag: 0.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -62,6 +62,9 @@ OR…
 
 * v0.0.1 - Initial release.
 * v0.0.2 - Arranged required PHP version to 8.1, added external services section to the readme.
+* v0.0.3
+    - Implemented Ajax form submission and validation with reCAPTCHA and Turnstile support.
+    - Fixed recaptcha issue when embedded multiple forms on the same page.
 
 
 == Upgrade Notice ==
