@@ -366,15 +366,19 @@ class Form
                 filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
                 false
             );
-            wp_localize_script(
-                'tofu-user-recaptcha',
-                'tofuRecaptchaConfig',
-                [
-                    'siteKey' => $recaptchaConfig->siteKey,
-                    'formId' => sprintf(Consts::FORM_ID_FORMAT, $key),
-                    'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key),
-                ]
-            );
+
+            $forms = [];
+            foreach (self::$forms as $form) {
+                $forms[] = [
+                    'formId' => sprintf(Consts::FORM_ID_FORMAT, $form->getKey()),
+                    'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $form->getKey()),
+                ];
+            }
+
+            wp_localize_script('tofu-user-recaptcha', 'tofuRecaptchaConfig', [
+                'siteKey' => $recaptchaConfig->siteKey,
+                'forms' => $forms,
+            ]);
         }
 
         // Check if Turnstile is configured for the form
