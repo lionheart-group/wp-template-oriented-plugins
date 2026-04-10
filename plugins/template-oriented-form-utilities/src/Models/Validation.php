@@ -27,8 +27,10 @@ class Validation
         $errors = $form->getErrors();
         $files = $form->getFiles();
 
-        // Merge $_POST and $_FILES to validate at once
-        $targetValues = array_merge($postValues, $fileValues);
+        // Merge $_POST and $_FILES to validate at once.
+        // wp_unslash() is applied to POST values because WordPress adds slashes to
+        // $_POST (magic_quotes behaviour). $_FILES values are not slashed by WordPress.
+        $targetValues = array_merge(wp_unslash($postValues), $fileValues);
 
         // Get locale
         $full_locale = get_locale();
