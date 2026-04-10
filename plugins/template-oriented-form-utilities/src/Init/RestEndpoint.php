@@ -59,78 +59,134 @@ class RestEndpoint
     }
 
     /**
-     * Register REST routes for every ajax-enabled form.
+     * Register REST routes once for all forms.
+     *
+     * Routes are registered once; the {key} path parameter is validated by each
+     * handler, which is responsible for enforcing ajaxEnabled on the requested form.
      *
      * @return void
      */
     public static function registerRoutes(): void
     {
-        $forms = FormHelper::getAll();
+        // Only register routes if at least one form has ajaxEnabled.
+        $ajaxForms = array_filter(
+            FormHelper::getAll(),
+            fn ($f) => $f->config->ajaxEnabled
+        );
 
-        foreach ($forms as $form) {
-            if (!$form->config->ajaxEnabled) {
-                continue;
-            }
-
-            $key = $form->getKey();
-
-            // GET /wp-json/tofu/v1/forms/{key}/nonce
-            register_rest_route(
-                Consts::REST_NAMESPACE,
-                '/forms/(?P<key>[a-zA-Z0-9_\-]+)/nonce',
-                [
-                    'methods'             => \WP_REST_Server::READABLE,
-                    'callback'            => [static::class, 'handleNonce'],
-                    'permission_callback' => '__return_true',
-                    'args'                => [
-                        'key' => [
-                            'required'          => true,
-                            'sanitize_callback' => 'sanitize_key',
-                        ],
-                        'action' => [
-                            'required'          => false,
-                            'default'           => 'input',
-                            'sanitize_callback' => 'sanitize_text_field',
-                            'enum'              => ['input', 'confirm'],
-                        ],
-                    ],
-                ]
-            );
-
-            // POST /wp-json/tofu/v1/forms/{key}/input
-            register_rest_route(
-                Consts::REST_NAMESPACE,
-                '/forms/(?P<key>[a-zA-Z0-9_\-]+)/input',
-                [
-                    'methods'             => \WP_REST_Server::CREATABLE,
-                    'callback'            => [static::class, 'handleInput'],
-                    'permission_callback' => '__return_true',
-                    'args'                => [
-                        'key' => [
-                            'required'          => true,
-                            'sanitize_callback' => 'sanitize_key',
-                        ],
-                    ],
-                ]
-            );
-
-            // POST /wp-json/tofu/v1/forms/{key}/confirm
-            register_rest_route(
-                Consts::REST_NAMESPACE,
-                '/forms/(?P<key>[a-zA-Z0-9_\-]+)/confirm',
-                [
-                    'methods'             => \WP_REST_Server::CREATABLE,
-                    'callback'            => [static::class, 'handleConfirm'],
-                    'permission_callback' => '__return_true',
-                    'args'                => [
-                        'key' => [
-                            'required'          => true,
-                            'sanitize_callback' => 'sanitize_key',
-                        ],
-                    ],
-                ]
-            );
+        if (empty($ajaxForms)) {
+            return;
         }
+
+        // Register routes once; the {key} path parameter is validated by handlers,
+        // which are responsible for enforcing ajaxEnabled on the requested form.
+
+        // GET /wp-json/tofu/v1/forms/{key}/nonce
+        register_rest_route(
+            Consts::REST_NAMESPACE,
+            '/forms/(?P<key>[a-zA-Z0-9_\-]+)/nonce',
+            [
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => [static::class, 'handleNonce'],
+                'permission_callback' => '__return_true',
+                'args'                => [
+                    'key' => [
+                        'required'          => true,
+                        'sanitize_callback' => 'sanitize_key',
+                    ],
+                    'action' => [
+                        'required'          => false,
+                        'default'           => 'input',
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'enum'              => ['input', 'confirm'],
+                    ],
+                ],
+            ]
+        );
+
+        // POST /wp-json/tofu/v1/forms/{key}/input
+        register_rest_route(
+            Consts::REST_NAMESPACE,
+            '/forms/(?P<key>[a-zA-Z0-9_\-]+)/input',
+            [
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => [static::class, 'handleInput'],
+                'permission_callback' => '__return_true',
+                'args'                => [
+                    'key' => [
+                        'required'          => true,
+                        'sanitize_callback' => 'sanitize_key',
+                    ],
+                ],
+            ]
+        );
+
+        // POST /wp-json/tofu/v1/forms/{key}/confirm
+        register_rest_route(
+            Consts::REST_NAMESPACE,
+            '/forms/(?P<key>[a-zA-Z0-9_\-]+)/confirm',
+            [
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => [static::class, 'handleConfirm'],
+                'permission_callback' => '__return_true',
+                'args'                => [
+                    'key' => [
+                        'required'          => true,
+                        'sanitize_callback' => 'sanitize_key',
+                    ],
+                ],
+            ]
+        );
+
+        // Build a formKey -> allowedOrigins map for cross-origin forms.
+        $corsMap = [];
+        foreach ($ajaxForms as $form) {
+            if (!empty($form->config->corsOrigins)) {
+                $corsMap[$form->getKey()] = $form->config->corsOrigins;
+            }
+        }
+
+        if (empty($corsMap)) {
+            return;
+        }
+
+        // Attach CORS headers via rest_post_dispatch so they are included on
+        // OPTIONS preflight responses. WordPress does not invoke route callbacks
+        // for OPTIONS — this filter fires after dispatch for all methods.
+        add_filter(
+            'rest_post_dispatch',
+            static function ($response, $server, $request) use ($corsMap) {
+                if (!($response instanceof \WP_REST_Response)) {
+                    return $response;
+                }
+
+                // Only act on TOFU routes: /{namespace}/forms/{key}/...
+                $pattern = '#^/' . preg_quote(Consts::REST_NAMESPACE, '#') . '/forms/([a-zA-Z0-9_\-]+)/#';
+                if (!preg_match($pattern, $request->get_route(), $matches)) {
+                    return $response;
+                }
+
+                $key = $matches[1];
+                if (!isset($corsMap[$key])) {
+                    return $response;
+                }
+
+                $origin = $request->get_header('origin');
+                if (empty($origin) || !in_array($origin, $corsMap[$key], true)) {
+                    return $response;
+                }
+
+                $response->header('Access-Control-Allow-Origin', esc_url_raw($origin));
+                $response->header('Access-Control-Allow-Credentials', 'true');
+                $response->header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+                $response->header('Access-Control-Allow-Headers', 'Content-Type, X-WP-Nonce');
+                $response->header('Vary', 'Origin');
+
+                return $response;
+            },
+            10,
+            3
+        );
     }
 
     /**
@@ -162,8 +218,6 @@ class RestEndpoint
 
         $nonce = wp_create_nonce($nonceAction);
         $fieldName = sprintf(Consts::NONCE_FORMAT, $key);
-
-        static::applyCorsHeaders($form->config->corsOrigins, $request);
 
         return new \WP_REST_Response([
             'nonce'      => $nonce,
@@ -205,7 +259,6 @@ class RestEndpoint
             return new \WP_Error('tofu_form_not_found', 'Form not found.', ['status' => 404]);
         }
 
-        static::applyCorsHeaders($form->config->corsOrigins, $request);
         static::maybeEnableCors($form->config->corsOrigins);
 
         // Verify nonce (must be in request body as _tofu_{key}_nonce)
@@ -257,7 +310,6 @@ class RestEndpoint
             return new \WP_Error('tofu_form_not_found', 'Form not found.', ['status' => 404]);
         }
 
-        static::applyCorsHeaders($form->config->corsOrigins, $request);
         static::maybeEnableCors($form->config->corsOrigins);
 
         $post = $request->get_body_params();
@@ -282,35 +334,6 @@ class RestEndpoint
             'success' => true,
             'next'    => 'result',
         ], 200);
-    }
-
-    /**
-     * Set CORS response headers if the request origin is in the allowed list.
-     *
-     * @param string[]         $corsOrigins Allowed origins from FormConfig.
-     * @param \WP_REST_Request $request
-     * @return void
-     */
-    protected static function applyCorsHeaders(array $corsOrigins, \WP_REST_Request $request): void
-    {
-        if (empty($corsOrigins)) {
-            return;
-        }
-
-        $origin = $request->get_header('origin');
-        if (empty($origin)) {
-            return;
-        }
-
-        if (!in_array($origin, $corsOrigins, true)) {
-            return;
-        }
-
-        header('Access-Control-Allow-Origin: ' . esc_url_raw($origin));
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, X-WP-Nonce');
-        header('Vary: Origin');
     }
 
     /**

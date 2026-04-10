@@ -22,7 +22,7 @@ When the browser submits to a different domain:
 
 1. The browser sends a **preflight OPTIONS request** — TOFU responds with CORS headers
 2. The browser sends the **actual POST** with `credentials: 'include'`
-3. TOFU sets the session cookie with `SameSite=None; Secure` (required for cross-origin cookies)
+3. TOFU sets the session cookie with `SameSite=None; Secure` on the **input/confirm response** (not on the nonce request)
 4. The browser stores the cookie and sends it on subsequent requests
 
 ```
@@ -31,9 +31,16 @@ Frontend (https://frontend.example.com)
     ├─ GET /wp-json/tofu/v1/forms/contact/nonce
     │   ← Access-Control-Allow-Origin: https://frontend.example.com
     │   ← Access-Control-Allow-Credentials: true
-    │   ← Set-Cookie: _tofu_session_key=…; SameSite=None; Secure
+    │   ← { "nonce": "…", "field_name": "…", "action": "input" }
+    │   (no Set-Cookie yet — session is not started by the nonce endpoint)
     │
-    └─ POST /wp-json/tofu/v1/forms/contact/input
+    ├─ POST /wp-json/tofu/v1/forms/contact/input
+    │   → Cookie: (none on first request)
+    │   ← Access-Control-Allow-Origin: https://frontend.example.com
+    │   ← Set-Cookie: _tofu_session_key=…; SameSite=None; Secure
+    │   ← { "success": true, "next": "result" }
+    │
+    └─ POST /wp-json/tofu/v1/forms/contact/confirm  (if confirm step is enabled)
         → Cookie: _tofu_session_key=…
         ← { "success": true, "next": "result" }
 ```
