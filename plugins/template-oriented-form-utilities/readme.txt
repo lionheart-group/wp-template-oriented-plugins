@@ -69,3 +69,25 @@ OR…
 
 
 == Upgrade Notice ==
+
+= 0.0.3 =
+**Breaking changes from v0.0.2:**
+
+1. **Validation rules renamed** (somnambulist/validation replaces wixel/gump):
+   - `required_file` → `custom_required_file`
+   - `max_len` → `max`
+   - `min_len` → `min`
+   - `valid_email` → `email`
+   - `numeric` stays the same
+   - `filters` parameter has been removed from `ValidationConfig` — sanitize input in the `after` hook if needed.
+
+2. **reCAPTCHA / Turnstile configuration moved to plugin level:**
+   - Remove `recaptcha: new ReCAPTCHAConfig(...)` and `turnstile: new TurnstileConfig(...)` from `FormConfig`.
+   - Call `Form::setRecaptcha(new ReCAPTCHAConfig(...))` once before registering forms.
+   - Call `Form::setTurnstile(new TurnstileConfig(...))` once before registering forms.
+   - Replace with `recaptchaEnabled: true` or `turnstileEnabled: true` in each `FormConfig`.
+
+3. **Confirm step requires explicit opt-in:**
+   - `confirmStep: true` must now be set explicitly in `FormConfig` to enable the confirm step.
+   - For the traditional redirect flow, also set `template->confirmPath`.
+   - `Form::embedScript()` is no longer needed on the confirm page template.
