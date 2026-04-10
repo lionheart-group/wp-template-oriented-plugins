@@ -156,9 +156,7 @@ class RestEndpoint
         add_filter(
             'rest_post_dispatch',
             static function ($response, $server, $request) use ($corsMap) {
-                if (!($response instanceof \WP_REST_Response)) {
-                    return $response;
-                }
+                $response = rest_ensure_response($response);
 
                 // Only act on TOFU routes: /{namespace}/forms/{key}/...
                 $pattern = '#^/' . preg_quote(Consts::REST_NAMESPACE, '#') . '/forms/([a-zA-Z0-9_\-]+)/#';
@@ -215,8 +213,8 @@ class RestEndpoint
 
         $action = $request->get_param('action') ?? 'input';
 
-        // Include the form key in the nonce action to prevent cross-form nonce reuse.
-        $nonceAction = sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key);
+        // Include the form key and action in the nonce to prevent cross-form and cross-step nonce reuse.
+        $nonceAction = sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key, $action);
         $nonce = wp_create_nonce($nonceAction);
         $fieldName = sprintf(Consts::NONCE_FORMAT, $key);
 
@@ -264,7 +262,7 @@ class RestEndpoint
 
         // Verify nonce (must be in request body as _tofu_{key}_nonce)
         $post = $request->get_body_params();
-        if ($form->verifyNonceField(sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key), $post) === false) {
+        if ($form->verifyNonceField(sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key, 'input'), $post) === false) {
             return new \WP_Error('tofu_nonce_failed', 'Nonce verification failed.', ['status' => 403]);
         }
 
@@ -314,7 +312,7 @@ class RestEndpoint
         static::maybeEnableCors($form->config->corsOrigins);
 
         $post = $request->get_body_params();
-        if ($form->verifyNonceField(sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key), $post) === false) {
+        if ($form->verifyNonceField(sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key, 'confirm'), $post) === false) {
             return new \WP_Error('tofu_nonce_failed', 'Nonce verification failed.', ['status' => 403]);
         }
 

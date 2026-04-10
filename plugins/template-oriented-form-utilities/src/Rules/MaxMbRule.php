@@ -28,6 +28,11 @@ class MaxMbRule extends Rule
         }
 
         $maxMb = (float) $this->parameter('max_mb');
+
+        if (!isset($value['size']) || !is_numeric($value['size'])) {
+            return false;
+        }
+
         $fileSizeMb = $value['size'] / (1024 * 1024);
 
         return $fileSizeMb <= $maxMb;

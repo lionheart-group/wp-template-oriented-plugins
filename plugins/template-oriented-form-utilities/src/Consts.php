@@ -76,5 +76,5 @@ final class Consts
      *
      * 1st parameter: Form key
      */
-    public const REST_NONCE_ACTION_FORMAT = '_tofu_%s_rest_nonce';
+    public const REST_NONCE_ACTION_FORMAT = '_tofu_%s_%s_rest_nonce';
 }
