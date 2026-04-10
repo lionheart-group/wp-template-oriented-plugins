@@ -3,9 +3,12 @@
 namespace TofuPlugin\Models;
 
 use finfo;
-use GUMP;
+use Somnambulist\Components\Validation\Factory;
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Uploader;
+use TofuPlugin\Rules\MaxMbRule;
+use TofuPlugin\Rules\MimeTypeRule;
+use TofuPlugin\Rules\RequiredFileRule;
 use TofuPlugin\Structure\UploadedFile;
 
 class Validation
@@ -17,7 +20,6 @@ class Validation
      * @param array<string, mixed> $postValues
      * @param array<string, mixed> $fileValues
      * @return void
-     * @throws \RuntimeException
      */
     public function validate(Form $form, array $postValues, array $fileValues = []): void
     {
@@ -32,29 +34,67 @@ class Validation
         $full_locale = get_locale();
         $locale = explode('_', $full_locale)[0];
 
-        // Validate input values
-        $gump = new GUMP($locale);
-        $gump->set_fields_error_messages($form->config->validation->messages);
-        $gump->set_field_names($form->config->validation->names);
+        $localeFile = null;
+        switch ($locale) {
+            case 'ja':
+                $localeFile = __DIR__ . '/../Resources/i18n/ja.php';
+                break;
+            case 'de':
+            case 'en':
+            case 'fr':
+            case 'tr':
+            case 'zh':
+                // Use built-in  messages, no need to load a file
+                break;
+            default:
+                // For unsupported locales, fallback to English messages
+                $locale = 'en';
+                break;
+        }
 
-        // Sanitize and validate
-        $sanitizedData = $gump->filter($targetValues, $form->config->validation->filters);
-        $isValid = $gump->validate($targetValues, $form->config->validation->rules);
+        // Build validation factory and register custom rules
+        $factory = new Factory();
+        $factory->registerLanguageMessages($locale, $localeFile);
+        $factory->addRule('custom_required_file', new RequiredFileRule());
+        $factory->addRule('max_mb', new MaxMbRule());
+        $factory->addRule('mime_type', new MimeTypeRule());
 
-        if ($isValid !== true) {
-            // Collect errors
-            $gumpErrors = $gump->get_errors_array();
-            foreach ($gumpErrors as $field => $message) {
+        // Register custom error messages in 'field:rule' format
+        $customMessages = [];
+        foreach ($form->config->validation->messages as $field => $ruleMsgs) {
+            foreach ($ruleMsgs as $rule => $message) {
+                $customMessages[$field . ':' . $rule] = $message;
+            }
+        }
+        if (!empty($customMessages)) {
+            $factory->messages()->add($locale, $customMessages);
+        }
+
+        // Register custom rule messages
+        $factory->messages()->add($locale, [
+            'rule.custom_required_file' => __('The :attribute field is required.', 'template-oriented-form-utilities'),
+            'rule.max_mb'               => __('The :attribute field must be less than :max_mb MB in size.', 'template-oriented-form-utilities'),
+            'rule.mime_type'            => __('The :attribute field must be a file of an allowed type.', 'template-oriented-form-utilities'),
+        ]);
+
+        // Create validation instance
+        $validation = $factory->make($targetValues, $form->config->validation->rules);
+
+        // Set human-readable field name aliases
+        foreach ($form->config->validation->names as $field => $alias) {
+            $validation->setAlias($field, $alias);
+        }
+
+        $validation->setLanguage($locale)->validate();
+
+        if ($validation->fails()) {
+            foreach ($validation->errors()->firstOfAll() as $field => $message) {
                 $errors->addError($field, $message);
             }
         }
 
-        if (!is_array($sanitizedData)) {
-            throw new \RuntimeException('Validation failed: sanitized data is not an array.');
-        }
-
-        // Collect sanitized values
-        foreach ($sanitizedData as $key => $value) {
+        // Collect values from raw input (filtered by allows)
+        foreach ($targetValues as $key => $value) {
             // If not defined in `allows`, skip to add value
             if ($form->isFieldAllowed($key, [Consts::UPLOADED_FILES_INPUT_NAME]) === false) {
                 continue;
@@ -117,69 +157,3 @@ class Validation
         }
     }
 }
-
-/**
- * Custom validation class for form inputs using GUMP library.
- */
-GUMP::add_validator(
-    'custom_required_file',
-    function ($field, array $input, array $params) {
-        // If uploaded file is exists, return true
-        if (isset($input[$field]) && is_array($input[$field]) && $input[$field]['error'] === \UPLOAD_ERR_OK) {
-            return true;
-        }
-
-        // If session stored file is exists, return true
-        if (isset($input[Consts::UPLOADED_FILES_INPUT_NAME])) {
-            $uploadedFiles = $input[Consts::UPLOADED_FILES_INPUT_NAME];
-            if (isset($uploadedFiles[$field]) && !empty($uploadedFiles[$field])) {
-                return true;
-            }
-        }
-
-        return false;
-    },
-    __('The {field} field is required.', 'template-oriented-form-utilities')
-);
-
-// Validate file size in MB
-GUMP::add_validator(
-    'max_mb',
-    function ($field, array $input, array $params) {
-        if (!isset($params[0]) || empty($params[0]) || !is_numeric($params[0])) {
-            throw new \InvalidArgumentException('Max MB parameter is required for max_mb validation.');
-        }
-
-        // If not exists, skip
-        if (!isset($input[$field]) || empty($input[$field]['tmp_name'])) {
-            return true;
-        }
-
-        $maxMb = (int)$params[0];
-        $fileSizeInBytes = $input[$field]['size'];
-        $fileSizeInMb = $fileSizeInBytes / (1024 * 1024);
-        return $fileSizeInMb <= $maxMb;
-    },
-    __('The {field} field must be less than {param[0]} MB in size.', 'template-oriented-form-utilities')
-);
-
-// Validate file mime type
-GUMP::add_validator(
-    'mime_type',
-    function ($field, array $input, array $params) {
-        if (empty($params)) {
-            throw new \InvalidArgumentException('Mime type parameters are required for mime_type validation.');
-        }
-
-        // If not exists, skip
-        if (!isset($input[$field]) || empty($input[$field]['tmp_name'])) {
-            return true;
-        }
-
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $fileMimeType = $finfo->file($input[$field]['tmp_name']);
-
-        return in_array($fileMimeType, $params);
-    },
-    __('The {field} field must be a file of type: {param}.', 'template-oriented-form-utilities')
-);

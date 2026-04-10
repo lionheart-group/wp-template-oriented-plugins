@@ -45,7 +45,7 @@ return [
                 'tests',
                 'Tests',
             ])
-            ->in('vendor/wixel'),
+            ->in('vendor/somnambulist'),
         Finder::create()
             ->files()
             ->ignoreVCS(true)

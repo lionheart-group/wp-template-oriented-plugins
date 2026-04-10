@@ -1,6 +1,6 @@
 # React
 
-A complete example using React hooks for a multi-step contact form.  
+A complete example using React hooks for a multi-step contact form.
 Works both as a component in a WordPress theme and as a standalone Next.js page.
 
 ## Table of Contents
@@ -35,11 +35,10 @@ add_action('init', function () {
         validation: new \TofuPlugin\Structure\ValidationConfig(
             allows:  ['name', 'email', 'message'],
             rules:   [
-                'name'    => 'required|max_len:200',
-                'email'   => 'required|valid_email',
-                'message' => 'required|max_len:2000',
+                'name'    => 'required|max:200',
+                'email'   => 'required|email',
+                'message' => 'required|max:2000',
             ],
-            filters: ['name' => 'trim|sanitize_string', 'email' => 'trim|sanitize_email|lower_case', 'message' => 'trim|sanitize_string'],
             names:   ['name' => 'Name', 'email' => 'Email', 'message' => 'Message'],
         ),
     ));

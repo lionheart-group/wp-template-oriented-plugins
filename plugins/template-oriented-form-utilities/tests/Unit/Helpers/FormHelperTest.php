@@ -45,7 +45,6 @@ class FormHelperTest extends BaseTestCase
             validation: new ValidationConfig(
                 allows:  ['name'],
                 rules:   ['name' => 'required'],
-                filters: ['name' => 'trim'],
                 names:   ['name' => 'Name'],
             ),
             ajaxEnabled: $ajaxEnabled,

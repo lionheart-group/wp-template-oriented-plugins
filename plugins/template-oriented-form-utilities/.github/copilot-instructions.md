@@ -36,7 +36,7 @@ Handled in `template_redirect` hook by `TofuPlugin\Init\Endpoint`.
 |---|---|
 | `src/Helpers/Form.php` | Static helper — form registration, rendering, value/error accessors |
 | `src/Models/Form.php` | Core form model — action flow, validation, session, reCAPTCHA/Turnstile |
-| `src/Models/Validation.php` | GUMP-based validation/filtering + custom file validators |
+| `src/Models/Validation.php` | somnambulist/validation-based validation + custom file validators |
 | `src/Models/Mail.php` | Email composition and sending via `wp_mail()` |
 | `src/Models/Session.php` | DB model for encrypted session storage |
 | `src/Models/Record.php` | DB model for optional form records |
@@ -51,7 +51,7 @@ Handled in `template_redirect` hook by `TofuPlugin\Init\Endpoint`.
 | `src/Structure/TemplateConfig.php` | Page URL paths: `inputPath`, `confirmPath`, `resultPath` |
 | `src/Structure/MailConfig.php` | Mail sender info + `MailRecipientsCollection` |
 | `src/Structure/MailRecipientsConfig.php` | Per-recipient config: email, subject, body, CC, BCC |
-| `src/Structure/ValidationConfig.php` | GUMP rules, filters, field names, messages, `after` hook |
+| `src/Structure/ValidationConfig.php` | validation rules, field names, messages, `after` hook |
 | `src/Structure/ReCAPTCHAConfig.php` | reCAPTCHA site key, secret key, threshold |
 | `src/Structure/TurnstileConfig.php` | Turnstile site key, secret key |
 | `src/Init/Initializer.php` | Activation / deactivation / upgrade lifecycle |
@@ -110,19 +110,14 @@ add_action('init', function () {
         validation: new \TofuPlugin\Structure\ValidationConfig(
             allows:   ['name', 'email', 'message'],  // whitelist — other fields are ignored
             rules:    [
-                'name'    => 'required|max_len:200',
-                'email'   => 'required|valid_email',
-                'message' => 'required|max_len:2000',
-            ],
-            filters:  [
-                'name'    => 'trim|sanitize_string',
-                'email'   => 'trim|sanitize_email|lower_case',
-                'message' => 'trim|sanitize_string',
+                'name'    => 'required|max:200',
+                'email'   => 'required|email',
+                'message' => 'required|max:2000',
             ],
             names:    ['name' => 'Full Name', 'email' => 'Email Address'],
             messages: [
                 'name'  => ['required' => 'Please enter your name.'],
-                'email' => ['valid_email' => 'Enter a valid email address.'],
+                'email' => ['email' => 'Enter a valid email address.'],
             ],
             after: function ($values, $errors) {
                 // Custom post-validation hook
@@ -254,8 +249,7 @@ Files are stored temporarily in `wp-content/uploads/tofu-uploads/`, attached to 
 | `max_mb` | `'file' => 'max_mb:5'` | Max file size in MB |
 | `mime_type` | `'file' => 'mime_type:image/jpeg,image/png'` | Allowed MIME types |
 
-Standard GUMP rules also apply: `required`, `valid_email`, `max_len`, `min_len`, `numeric`, `alpha`, `alpha_numeric`, etc.
-Standard GUMP filters: `trim`, `sanitize_string`, `sanitize_email`, `lower_case`, `sanitize_numbers`, etc.
+Standard somnambulist/validation rules also apply: `required`, `email`, `max`, `min`, `numeric`, `alpha`, `alpha_num`, etc.
 
 ---
 

@@ -1,6 +1,6 @@
 # ValidationConfig
 
-Configuration for form field validation and filtering.
+Configuration for form field validation.
 
 ## Usage
 
@@ -10,14 +10,9 @@ use TofuPlugin\Structure\ValidationConfig;
 $validation = new ValidationConfig(
     allows: ['name', 'email', 'message'],
     rules: [
-        'name' => 'required|max_len:200',
-        'email' => 'required|valid_email',
-        'message' => 'required|max_len:1000',
-    ],
-    filters: [
-        'name' => 'trim|sanitize_string',
-        'email' => 'trim|sanitize_email',
-        'message' => 'trim|sanitize_string',
+        'name' => 'required|max:200',
+        'email' => 'required|email',
+        'message' => 'required|max:1000',
     ],
     names: [
         'name' => 'Full Name',
@@ -27,11 +22,11 @@ $validation = new ValidationConfig(
     messages: [
         'name' => [
             'required' => 'Please enter your name.',
-            'max_len' => 'Your name must be within 200 characters.',
+            'max' => 'Your name must be within 200 characters.',
         ],
         'email' => [
             'required' => 'Please enter your email address.',
-            'valid_email' => 'Please enter a valid email address.',
+            'email' => 'Please enter a valid email address.',
         ],
     ],
     after: function ($values, $errors) {
@@ -45,20 +40,19 @@ $validation = new ValidationConfig(
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `allows` | `array` | Yes | - | List of allowed field names. Only specified fields are stored in the session. |
-| `rules` | `array` | Yes | - | Validation rules for each field. Uses [GUMP validation rules](https://github.com/Wixel/GUMP?tab=readme-ov-file#available-validators). |
-| `filters` | `array` | Yes | - | Filtering/sanitization rules for each field. Uses [GUMP filter rules](https://github.com/Wixel/GUMP?tab=readme-ov-file#available-filters). |
+| `rules` | `array` | Yes | - | Validation rules for each field. Uses [somnambulist/validation rules](https://github.com/somnambulist-tech/validation?tab=readme-ov-file#available-rules). |
 | `names` | `array` | Yes | - | Human-readable field names used in error messages. |
 | `messages` | `array` | No | `[]` | Custom error messages per field and validation rule. |
 | `after` | `?Closure` | No | `null` | Custom callback function for additional validation logic. |
 
 ## File Upload Validation Rules
 
-The default GUMP validation does not fit well for file upload fields. You can use the following custom rules:
+The default validation does not fit well for file upload fields. You can use the following custom rules:
 
 - `custom_required_file`: Ensures a file is uploaded.
-    - **The default `required_file` rule does not work when you return to the input page after validation errors or from the confirmation page.**
-- `max_mb,<number>`: Validates the maximum file size in megabytes.
-- `mime_type,<type1>;<type2>;...`: Validates the file MIME type.
+    - **The default `required` rule does not work when you return to the input page after validation errors or from the confirmation page.**
+- `max_mb:<number>`: Validates the maximum file size in megabytes.
+- `mime_type:<type1>,<type2>,...`: Validates the file MIME type.
 
 ## Custom Validation with `after` Callback
 

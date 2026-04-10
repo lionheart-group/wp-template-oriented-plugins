@@ -1,6 +1,6 @@
 # Vanilla JavaScript
 
-A complete, framework-free example using the Fetch API.  
+A complete, framework-free example using the Fetch API.
 Works in any WordPress theme — just enqueue a JS file and add the form HTML to a page template.
 
 ## Table of Contents
@@ -33,14 +33,9 @@ add_action('init', function () {
         validation: new \TofuPlugin\Structure\ValidationConfig(
             allows:  ['name', 'email', 'message'],
             rules:   [
-                'name'    => 'required|max_len:200',
-                'email'   => 'required|valid_email',
-                'message' => 'required|max_len:2000',
-            ],
-            filters: [
-                'name'    => 'trim|sanitize_string',
-                'email'   => 'trim|sanitize_email|lower_case',
-                'message' => 'trim|sanitize_string',
+                'name'    => 'required|max:200',
+                'email'   => 'required|email',
+                'message' => 'required|max:2000',
             ],
             names: ['name' => 'Name', 'email' => 'Email', 'message' => 'Message'],
         ),
