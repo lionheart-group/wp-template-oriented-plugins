@@ -336,16 +336,28 @@ class RestEndpoint
     }
 
     /**
-     * Enable CORS mode on the Session helper when cross-origin is configured.
+     * Enable CORS mode on the Session helper when the current request is an
+     * allowed cross-origin HTTPS request.
      *
      * @param string[] $corsOrigins
      * @return void
      */
     protected static function maybeEnableCors(array $corsOrigins): void
     {
-        if (!empty($corsOrigins)) {
-            Session::enableCors();
+        if (empty($corsOrigins) || !is_ssl()) {
+            return;
         }
+
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? trim(wp_unslash((string) $_SERVER['HTTP_ORIGIN'])) : '';
+        if ($origin === '') {
+            return;
+        }
+
+        if (!in_array($origin, $corsOrigins, true)) {
+            return;
+        }
+
+        Session::enableCors();
     }
 
 }

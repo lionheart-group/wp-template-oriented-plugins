@@ -515,6 +515,12 @@ class Form
      */
     public function processConfirm(bool $skipVerify = false): array
     {
+        // Already completed in this session — return success without re-sending emails.
+        // This makes confirm idempotent against double-submits and retries.
+        if (!empty($this->flushValue)) {
+            return ['success' => true, 'errors' => [], 'next' => 'result'];
+        }
+
         if (!$skipVerify) {
             // Validate session-stored values
             $this->verifySession();
