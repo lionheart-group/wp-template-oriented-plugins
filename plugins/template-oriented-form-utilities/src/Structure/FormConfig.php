@@ -114,18 +114,25 @@ class FormConfig
         public readonly bool $confirmStep = false,
     )
     {
+        if ($this->confirmStep && !$this->ajaxEnabled && empty($this->template?->confirmPath)) {
+            throw new \InvalidArgumentException(
+                "FormConfig '{$this->key}': confirmStep is true but template->confirmPath is not set. " .
+                'Set template->confirmPath for the redirect flow, or set ajaxEnabled: true for AJAX / headless mode.'
+            );
+        }
     }
 
     /**
      * Returns true when this form has a confirmation step.
      *
-     * Checks `confirmStep` first, then falls back to whether
-     * `template->confirmPath` is configured.
+     * This is determined solely by the `confirmStep` flag.
+     * For the traditional redirect flow, set both `confirmStep: true` and
+     * `template->confirmPath`. For AJAX / headless, set only `confirmStep: true`.
      *
      * @return bool
      */
     public function hasConfirmStep(): bool
     {
-        return $this->confirmStep || !empty($this->template?->confirmPath);
+        return $this->confirmStep;
     }
 }

@@ -214,8 +214,9 @@ class RestEndpoint
         }
 
         $action = $request->get_param('action') ?? 'input';
-        $nonceAction = $action; // 'input' or 'confirm' — matches verifyNonceField()
 
+        // Include the form key in the nonce action to prevent cross-form nonce reuse.
+        $nonceAction = sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key);
         $nonce = wp_create_nonce($nonceAction);
         $fieldName = sprintf(Consts::NONCE_FORMAT, $key);
 
@@ -263,7 +264,7 @@ class RestEndpoint
 
         // Verify nonce (must be in request body as _tofu_{key}_nonce)
         $post = $request->get_body_params();
-        if ($form->verifyNonceField('input', $post) === false) {
+        if ($form->verifyNonceField(sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key), $post) === false) {
             return new \WP_Error('tofu_nonce_failed', 'Nonce verification failed.', ['status' => 403]);
         }
 
@@ -313,11 +314,11 @@ class RestEndpoint
         static::maybeEnableCors($form->config->corsOrigins);
 
         $post = $request->get_body_params();
-        if ($form->verifyNonceField('confirm', $post) === false) {
+        if ($form->verifyNonceField(sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key), $post) === false) {
             return new \WP_Error('tofu_nonce_failed', 'Nonce verification failed.', ['status' => 403]);
         }
 
-        $result = $form->processConfirm(skipVerify: false, post: $post);
+        $result = $form->processConfirm(skipVerify: false);
 
         if (!$result['success']) {
             if ($result['next'] === 'error') {

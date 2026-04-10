@@ -374,7 +374,7 @@ class Form
 
         // No confirmation step — run confirm processing inline
         if (!$this->config->hasConfirmStep()) {
-            $confirmResult = $this->processConfirm(skipVerify: true, post: $post);
+            $confirmResult = $this->processConfirm(skipVerify: true);
             if (!$confirmResult['success']) {
                 return $confirmResult;
             }
@@ -485,7 +485,7 @@ class Form
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
-        $result = $this->processConfirm($skipVerify, $_POST);
+        $result = $this->processConfirm($skipVerify);
 
         if (!$result['success']) {
             if ($result['next'] === 'error') {
@@ -505,24 +505,19 @@ class Form
      * Returns a result array instead of redirecting/dying, making it usable
      * from both the traditional redirect flow and the REST API endpoint.
      *
-     * @param bool  $skipVerify Skip session and bot-check verification (used
+     * @param bool  $skipVerify Skip session verification (used
      *                          when confirm is called inline from processInput).
-     * @param array $post       POST field values (typically $_POST).
      * @return array{
      *   success: bool,
      *   errors:  array<string, string[]>,
      *   next:    'result'|'input'|'error'
      * }
      */
-    public function processConfirm(bool $skipVerify = false, array $post = []): array
+    public function processConfirm(bool $skipVerify = false): array
     {
         if (!$skipVerify) {
             // Validate session-stored values
             $this->verifySession();
-
-            // Bot-protection checks
-            $this->verifyRecaptcha($post);
-            $this->verifyTurnstile($post);
 
             if ($this->errors->hasErrors()) {
                 return ['success' => false, 'errors' => $this->errors->toArray(), 'next' => 'input'];

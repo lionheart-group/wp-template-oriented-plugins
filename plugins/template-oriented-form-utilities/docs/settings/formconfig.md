@@ -46,10 +46,10 @@ Form::register(new FormConfig(
 | `turnstile` | [`?TurnstileConfig`](./turnstileconfig.md) | No | `null` | Cloudflare Turnstile configuration. |
 | `ajaxEnabled` | `bool` | No | `false` | Enable the WP REST API endpoint for this form. See [AJAX / Headless Mode](../ajax/index.md). |
 | `corsOrigins` | `string[]` | No | `[]` | Allowed CORS origins for the REST endpoint. Empty = same-origin only. |
-| `confirmStep` | `bool` | No | `false` | Explicitly enable the confirm step. For AJAX-only forms (no template); for template-based forms, use `template->confirmPath` instead. |
+| `confirmStep` | `bool` | No | `false` | Enable the confirm step. For template-based forms, also set `template->confirmPath` so the redirect URL is available. |
 
 ## Methods
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `hasConfirmStep()` | `bool` | Returns `true` if this form has a confirm step. True when `confirmStep` is set, or when `template->confirmPath` is configured. |
+| `hasConfirmStep()` | `bool` | Returns `true` if this form has a confirm step. Determined solely by the `confirmStep` flag. |
