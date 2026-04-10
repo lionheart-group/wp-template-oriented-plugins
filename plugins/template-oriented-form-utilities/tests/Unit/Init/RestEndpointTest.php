@@ -20,8 +20,8 @@ class RestEndpointTest extends BaseTestCase
     public function testRestNonceActionFormatProducesExpectedString(): void
     {
         $key = 'contact';
-        $action = sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key);
-        $this->assertSame('_tofu_contact_rest_nonce', $action);
+        $action = sprintf(Consts::REST_NONCE_ACTION_FORMAT, $key, 'input');
+        $this->assertSame('_tofu_contact_input_rest_nonce', $action);
     }
 
     public function testRestNamespaceContainsVersion(): void
