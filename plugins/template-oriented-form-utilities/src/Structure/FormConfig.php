@@ -60,18 +60,24 @@ class FormConfig
         public readonly bool $saveToDatabase = false,
 
         /**
-         * reCAPTCHA setting.
+         * Enable reCAPTCHA bot protection for this form.
          *
-         * @var ?ReCAPTCHAConfig
+         * Requires `Form::setRecaptcha()` to be called with a plugin-level
+         * `ReCAPTCHAConfig` before this form is rendered.
+         *
+         * @var bool
          */
-        public readonly ?ReCAPTCHAConfig $recaptcha = null,
+        public readonly bool $recaptchaEnabled = false,
 
         /**
-         * Turnstile setting.
+         * Enable Cloudflare Turnstile bot protection for this form.
          *
-         * @var ?TurnstileConfig
+         * Requires `Form::setTurnstile()` to be called with a plugin-level
+         * `TurnstileConfig` before this form is rendered.
+         *
+         * @var bool
          */
-        public readonly ?TurnstileConfig $turnstile = null,
+        public readonly bool $turnstileEnabled = false,
 
         /**
          * Enable the WP REST API (AJAX / headless) endpoint for this form.
@@ -104,10 +110,8 @@ class FormConfig
         /**
          * Whether this form has a confirm step.
          *
-         * In the traditional redirect flow this is inferred from whether
-         * `template->confirmPath` is set. In AJAX / headless mode (where
-         * `template` may be null) set this to `true` explicitly to enable
-         * the confirm step.
+         * Must be set to `true` to enable the confirm step — for both the traditional
+         * redirect flow (also set `template->confirmPath`) and AJAX / headless mode.
          *
          * @var bool
          */
@@ -117,7 +121,7 @@ class FormConfig
         if ($this->confirmStep && !$this->ajaxEnabled && empty($this->template?->confirmPath)) {
             throw new \InvalidArgumentException(
                 "FormConfig '{$this->key}': confirmStep is true but template->confirmPath is not set. " .
-                'Set template->confirmPath for the redirect flow, or set ajaxEnabled: true for AJAX / headless mode.'
+                'For the redirect flow set template->confirmPath; for AJAX / headless set ajaxEnabled: true.'
             );
         }
     }

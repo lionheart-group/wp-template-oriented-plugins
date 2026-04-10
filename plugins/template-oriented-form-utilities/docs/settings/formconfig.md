@@ -16,8 +16,8 @@ Form::register(new FormConfig(
     validation: $validationConfig,
     template:   $templateConfig,
     saveToDatabase: false,
-    recaptcha: $recaptchaConfig, // optional
-    turnstile: $turnstileConfig, // optional
+    recaptchaEnabled: true, // optional; requires Form::setRecaptcha() called beforehand
+    turnstileEnabled: true, // optional; requires Form::setTurnstile() called beforehand
 ));
 
 // AJAX / headless form — template optional
@@ -42,8 +42,8 @@ Form::register(new FormConfig(
 | `validation` | [`ValidationConfig`](./validationconfig.md) | Yes | - | Validation rules and settings. |
 | `template` | [`?TemplateConfig`](./templateconfig.md) | No | `null` | Template configuration for WP page URLs. Required for the traditional redirect flow; can be omitted for AJAX-only forms. |
 | `saveToDatabase` | `bool` | No | `false` | Whether to save form submissions to the database. |
-| `recaptcha` | [`?ReCAPTCHAConfig`](./recaptchaconfig.md) | No | `null` | Google reCAPTCHA v3 configuration. |
-| `turnstile` | [`?TurnstileConfig`](./turnstileconfig.md) | No | `null` | Cloudflare Turnstile configuration. |
+| `recaptchaEnabled` | `bool` | No | `false` | Enable Google reCAPTCHA v3 for this form. Requires `Form::setRecaptcha()` to be called with plugin-level config. |
+| `turnstileEnabled` | `bool` | No | `false` | Enable Cloudflare Turnstile for this form. Requires `Form::setTurnstile()` to be called with plugin-level config. |
 | `ajaxEnabled` | `bool` | No | `false` | Enable the WP REST API endpoint for this form. See [AJAX / Headless Mode](../ajax/index.md). |
 | `corsOrigins` | `string[]` | No | `[]` | Allowed CORS origins for the REST endpoint. Empty = same-origin only. |
 | `confirmStep` | `bool` | No | `false` | Enable the confirm step. For template-based forms, also set `template->confirmPath` so the redirect URL is available. |

@@ -126,11 +126,16 @@ add_action('init', function () {
         ),
 
         // Optional bot protection — use reCAPTCHA OR Turnstile, not both
-        recaptcha: new \TofuPlugin\Structure\ReCAPTCHAConfig(
-            siteKey: 'SITE_KEY', secretKey: 'SECRET_KEY', threshold: 0.5,
-        ),
-        // turnstile: new \TofuPlugin\Structure\TurnstileConfig(siteKey: '...', secretKey: '...'),
+        recaptchaEnabled: true,   // enable after Form::setRecaptcha() is called
+        // turnstileEnabled: true, // enable after Form::setTurnstile() is called
     ));
+
+    // Register plugin-level reCAPTCHA config (call once before Form::register())
+    \TofuPlugin\Helpers\Form::setRecaptcha(new \TofuPlugin\Structure\ReCAPTCHAConfig(
+        siteKey: 'SITE_KEY', secretKey: 'SECRET_KEY', threshold: 0.5,
+    ));
+    // Or for Turnstile:
+    // \TofuPlugin\Helpers\Form::setTurnstile(new \TofuPlugin\Structure\TurnstileConfig(siteKey: '...', secretKey: '...'));
 });
 ```
 
@@ -173,7 +178,6 @@ get_footer();
 use TofuPlugin\Helpers\Form;
 $formKey = 'contact'; $formAction = 'confirm';
 if (!Form::verifySession($formKey)) Form::redirect($formKey, 'input'); // guard
-Form::embedScript($formKey);
 get_header();
 
 echo Form::value($formKey, 'name');  // display submitted values

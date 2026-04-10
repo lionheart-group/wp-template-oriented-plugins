@@ -80,7 +80,7 @@ If you also want to support the traditional WP page flow alongside AJAX, add `te
         template: new \TofuPlugin\Structure\TemplateConfig(
             inputPath:  '/contact/',
             resultPath: '/contact/result/',
-            // confirmPath: '/contact/confirm/',  // enables confirm step in both flows
+            // confirmPath: '/contact/confirm/',  // with confirmStep: true, enables confirm step in both flows
         ),
 ```
 

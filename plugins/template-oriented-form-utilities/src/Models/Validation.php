@@ -2,14 +2,12 @@
 
 namespace TofuPlugin\Models;
 
-use finfo;
 use Somnambulist\Components\Validation\Factory;
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Rules\MaxMbRule;
 use TofuPlugin\Rules\MimeTypeRule;
 use TofuPlugin\Rules\RequiredFileRule;
-use TofuPlugin\Structure\UploadedFile;
 
 class Validation
 {

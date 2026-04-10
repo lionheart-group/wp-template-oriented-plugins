@@ -242,14 +242,21 @@ rules: [
 
 ## reCAPTCHA Integration
 
-### 1. Add reCAPTCHA config to `FormConfig`
+### 1. Register reCAPTCHA config and enable on `FormConfig`
 
 ```php
-recaptcha: new \TofuPlugin\Structure\ReCAPTCHAConfig(
+// In functions.php — register plugin-level config once
+\TofuPlugin\Helpers\Form::setRecaptcha(new \TofuPlugin\Structure\ReCAPTCHAConfig(
     siteKey:   'YOUR_SITE_KEY',
     secretKey: 'YOUR_SECRET_KEY',
     threshold: 0.5,
-),
+));
+
+// Then enable per form
+new \TofuPlugin\Structure\FormConfig(
+    // …
+    recaptchaEnabled: true,
+)
 ```
 
 ### 2. Load the reCAPTCHA script and generate a token
@@ -289,13 +296,20 @@ The error field name is `_tofu_recaptcha_token`. Add a container for it:
 
 ## Cloudflare Turnstile Integration
 
-### 1. Add Turnstile config to `FormConfig`
+### 1. Register Turnstile config and enable on `FormConfig`
 
 ```php
-turnstile: new \TofuPlugin\Structure\TurnstileConfig(
+// In functions.php — register plugin-level config once
+\TofuPlugin\Helpers\Form::setTurnstile(new \TofuPlugin\Structure\TurnstileConfig(
     siteKey:   'YOUR_SITE_KEY',
     secretKey: 'YOUR_SECRET_KEY',
-),
+));
+
+// Then enable per form
+new \TofuPlugin\Structure\FormConfig(
+    // …
+    turnstileEnabled: true,
+)
 ```
 
 ### 2. Add the Turnstile widget

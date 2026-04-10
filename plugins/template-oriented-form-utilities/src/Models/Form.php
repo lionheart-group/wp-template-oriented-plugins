@@ -184,7 +184,7 @@ class Form
      */
     public function hasRecaptcha(): bool
     {
-        return $this->config->recaptcha !== null;
+        return $this->config->recaptchaEnabled && FormHelper::getRecaptchaConfig() !== null;
     }
 
     /**
@@ -194,7 +194,7 @@ class Form
      */
     public function getRecaptchaConfig(): ?ReCAPTCHAConfig
     {
-        return $this->config->recaptcha;
+        return $this->config->recaptchaEnabled ? FormHelper::getRecaptchaConfig() : null;
     }
 
     /**
@@ -204,7 +204,7 @@ class Form
      */
     public function hasTurnstile(): bool
     {
-        return $this->config->turnstile !== null;
+        return $this->config->turnstileEnabled && FormHelper::getTurnstileConfig() !== null;
     }
 
     /**
@@ -214,7 +214,7 @@ class Form
      */
     public function getTurnstileConfig(): ?TurnstileConfig
     {
-        return $this->config->turnstile;
+        return $this->config->turnstileEnabled ? FormHelper::getTurnstileConfig() : null;
     }
 
     /**
@@ -392,7 +392,7 @@ class Form
      */
     public function verifyRecaptcha(array $post = []): bool
     {
-        if ($this->config->recaptcha === null) {
+        if (!$this->hasRecaptcha()) {
             return true;
         }
 
@@ -409,7 +409,7 @@ class Form
         $token = sanitize_text_field(wp_unslash($token));
 
         // Verify the token
-        $isValidRecaptcha = ReCAPTCHA::verifyToken($this->config->recaptcha, $token);
+        $isValidRecaptcha = ReCAPTCHA::verifyToken($this->getRecaptchaConfig(), $token);
         if (!$isValidRecaptcha) {
             foreach (ReCAPTCHA::getErrors() as $errorMessage) {
                 $this->errors->addError(Consts::RECAPTCHA_TOKEN_INPUT_NAME, $errorMessage);
@@ -427,7 +427,7 @@ class Form
      */
     public function verifyTurnstile(array $post = []): bool
     {
-        if ($this->config->turnstile === null) {
+        if (!$this->hasTurnstile()) {
             return true;
         }
 
@@ -444,7 +444,7 @@ class Form
         $token = sanitize_text_field(wp_unslash($token));
 
         // Verify the token
-        $isValidTurnstile = Turnstile::verifyToken($this->config->turnstile, $token);
+        $isValidTurnstile = Turnstile::verifyToken($this->getTurnstileConfig(), $token);
         if (!$isValidTurnstile) {
             foreach (Turnstile::getErrors() as $errorMessage) {
                 $this->errors->addError(Consts::TURNSTILE_TOKEN_INPUT_NAME, $errorMessage);
