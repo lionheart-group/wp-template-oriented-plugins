@@ -7,7 +7,7 @@ Stable tag: 0.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
-Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing through template-based rendering and data management.
+Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing via template-based data management.
 
 == Description ==
 
@@ -65,6 +65,7 @@ OR…
 * v0.0.3
     - Implemented Ajax form submission and validation with reCAPTCHA and Turnstile support.
     - Fixed recaptcha issue when embedded multiple forms on the same page.
+    - Replaced validation library from wixel/gump to somnambulist/validation.
 
 
 == Upgrade Notice ==
