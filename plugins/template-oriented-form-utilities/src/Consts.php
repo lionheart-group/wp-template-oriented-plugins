@@ -75,6 +75,7 @@ final class Consts
      * REST API nonce action format.
      *
      * 1st parameter: Form key
+     * 2nd parameter: Nonce action (e.g. `input`/`confirm`)
      */
     public const REST_NONCE_ACTION_FORMAT = '_tofu_%s_%s_rest_nonce';
 }
