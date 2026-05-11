@@ -586,11 +586,10 @@ class Form
 
         // Save form data to database (non-fatal — do not abort on failure)
         if ($this->config->saveToDatabase) {
-            // Strip internal/unlisted fields: intersect with $allows so only
-            // fields the form owner explicitly declared can be persisted.
-            $allowedValues = !empty($this->config->validation->allows)
-                ? array_intersect_key($values, array_flip($this->config->validation->allows))
-                : $values;
+            // Strip internal/unlisted fields: always intersect with $allows so
+            // only fields the form owner explicitly declared can be persisted.
+            // When $allows is empty this intentionally produces an empty payload.
+            $allowedValues = array_intersect_key($values, array_flip($this->config->validation->allows));
 
             $recordId = Record::saveRecord(
                 $this->config->key,

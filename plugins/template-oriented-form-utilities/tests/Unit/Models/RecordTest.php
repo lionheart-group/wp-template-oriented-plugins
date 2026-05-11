@@ -321,4 +321,54 @@ class RecordTest extends BaseTestCase
             public function query($q) { return true; }
         };
     }
+
+    // -------------------------------------------------------------------------
+    // getRecord()
+    // -------------------------------------------------------------------------
+
+    /**
+     * getRecord() returns null when no row is found.
+     */
+    public function testGetRecordReturnsNullWhenNotFound(): void
+    {
+        $GLOBALS['wpdb'] = new class {
+            public $prefix = 'wp_';
+            public function prepare($q, ...$a): string { return $q; }
+            public function get_row($q, $o = OBJECT, $y = 0): ?object { return null; }
+        };
+
+        $result = Record::getRecord(999);
+
+        $this->assertNull($result);
+
+        $this->restoreDefaultWpdb();
+    }
+
+    /**
+     * getRecord() returns the row object when a matching record exists.
+     */
+    public function testGetRecordReturnsRowObjectWhenFound(): void
+    {
+        $row             = new \stdClass();
+        $row->id         = 42;
+        $row->form_id    = 'contact';
+        $row->data       = null;
+        $row->submitted_at = '2026-05-11 10:00:00';
+
+        $GLOBALS['wpdb'] = new class($row) {
+            public $prefix = 'wp_';
+            private \stdClass $row;
+            public function __construct(\stdClass $row) { $this->row = $row; }
+            public function prepare($q, ...$a): string { return $q; }
+            public function get_row($q, $o = OBJECT, $y = 0): ?object { return $this->row; }
+        };
+
+        $result = Record::getRecord(42);
+
+        $this->assertNotNull($result);
+        $this->assertSame(42, $result->id);
+        $this->assertSame('contact', $result->form_id);
+
+        $this->restoreDefaultWpdb();
+    }
 }
