@@ -61,4 +61,82 @@ class Record extends AbstractModels {
             'submitted_at' => current_time('mysql', true),
         ]);
     }
+
+    /**
+     * Query recorded submissions with optional form_id filter and pagination.
+     *
+     * @param string|null $formId  Filter by form_id; null = all forms.
+     * @param int         $perPage Rows per page.
+     * @param int         $page    1-based page number.
+     * @return array{ items: object[], total: int }
+     */
+    public static function getRecords(?string $formId = null, int $perPage = 25, int $page = 1): array
+    {
+        global $wpdb;
+        $table  = static::getTableName();
+        $offset = ($page - 1) * $perPage;
+
+        if ($formId !== null) {
+            $items = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM %i WHERE form_id = %s ORDER BY submitted_at DESC LIMIT %d OFFSET %d",
+                $table, $formId, $perPage, $offset
+            ));
+            $total = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM %i WHERE form_id = %s",
+                $table, $formId
+            ));
+        } else {
+            $items = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM %i ORDER BY submitted_at DESC LIMIT %d OFFSET %d",
+                $table, $perPage, $offset
+            ));
+            $total = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM %i",
+                $table
+            ));
+        }
+
+        return ['items' => $items ?? [], 'total' => $total];
+    }
+
+    /**
+     * Return distinct form_id values present in the records table.
+     *
+     * @return string[]
+     */
+    public static function getFormIds(): array
+    {
+        global $wpdb;
+        $table = static::getTableName();
+
+        $rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT DISTINCT form_id FROM %i ORDER BY form_id ASC",
+            $table
+        ));
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        return array_column((array) $rows, 'form_id');
+    }
+
+    /**
+     * Fetch a single record row by primary key.
+     *
+     * @param int $id Row ID.
+     * @return object|null The row object, or null if not found.
+     */
+    public static function getRecord(int $id): ?object
+    {
+        global $wpdb;
+        $table = static::getTableName();
+
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM %i WHERE id = %d",
+            $table, $id
+        ));
+
+        return $row instanceof \stdClass ? $row : null;
+    }
 }
