@@ -115,5 +115,19 @@ class ValidationConfig
          * @var ?\Closure(FieldValueCollection $values, ValidationErrorCollection $errors):void
          */
         public readonly ?\Closure $after = null,
+
+        /**
+         * Fields to persist when `FormConfig::$saveToDatabase` is true.
+         *
+         * Sits alongside `allows` so field names are easy to cross-reference.
+         * An empty array (default) stores all fields listed in `allows`.
+         * A non-empty array acts as a further filter: only the named fields are
+         * included in the encrypted payload. Fields absent from `allows` are
+         * silently skipped. Use this to exclude sensitive data (e.g. passwords,
+         * tokens) from the persisted record without changing validation rules.
+         *
+         * @var string[]
+         */
+        public readonly array $records = [],
     ) {}
 }

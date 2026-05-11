@@ -77,6 +77,7 @@ class Migrate
         foreach ([
             '2024-08-29_00-00-00_init-records',
             '2025-12-23_00-00-00_session-tables',
+            '2026-05-10_00-00-00_records-add-data-column',
         ] as $migrate) {
             Logger::info("Migration {$migrate} start.");
             if (static::checkDoneMigrateKey($migrate)) {
@@ -89,7 +90,11 @@ class Migrate
             $migrateClass = require_once TOFU_PLUGIN_DIR . '/migrations/' . $migrate . '.php';
             $sql = $migrateClass->sql();
             Logger::info($sql);
-            dbDelta($sql);
+            if ($migrateClass->useRawQuery()) {
+                $wpdb->query($sql);
+            } else {
+                dbDelta($sql);
+            }
 
             // Save migration key
             $table_name = static::getTableName();

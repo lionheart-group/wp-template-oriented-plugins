@@ -51,11 +51,16 @@ class FormConfig
         public readonly ?TemplateConfig $template = null,
 
         /**
-         * Enabled to save the form data to the database.
-         * If you want to skip saving the form data, set this to false.
+         * Enabled to save the form data to the database after emails are sent.
+         *
+         * When true, validated field values are encrypted with AES-256-CBC via
+         * `Encryptor::encrypt()` and persisted in `wp_tofu_records` immediately
+         * after all emails are dispatched successfully. A save failure is
+         * non-fatal: it is logged and the submission still completes normally.
+         *
+         * Use `validation->records` to restrict which fields are persisted.
          *
          * @var bool
-         * @todo Implement the save to database functionality.
          */
         public readonly bool $saveToDatabase = false,
 
