@@ -117,7 +117,10 @@ class Record extends AbstractModels {
             return [];
         }
 
-        return array_column((array) $rows, 'form_id');
+        return array_values(array_filter(array_map(
+            static fn ($row): ?string => isset($row->form_id) ? (string) $row->form_id : null,
+            $rows
+        ), static fn (?string $formId): bool => $formId !== null));
     }
 
     /**
