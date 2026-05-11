@@ -91,7 +91,11 @@ class Migrate
             $sql = $migrateClass->sql();
             Logger::info($sql);
             if ($migrateClass->useRawQuery()) {
-                $wpdb->query($sql);
+                $result = $wpdb->query($sql);
+                if ($result === false) {
+                    Logger::error("Migration {$migrate} raw query failed: " . $wpdb->last_error);
+                    continue;
+                }
             } else {
                 dbDelta($sql);
             }

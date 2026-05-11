@@ -291,18 +291,21 @@ class AdminPage
             return '—';
         }
 
+        $mbSub = function_exists('mb_substr') ? 'mb_substr' : 'substr';
+        $mbLen = function_exists('mb_strlen') ? 'mb_strlen' : 'strlen';
+
         $parts = [];
         foreach ($decoded as $key => $value) {
-            $keyStr   = mb_substr((string) $key, 0, 40);
+            $keyStr   = $mbSub((string) $key, 0, 40);
             $valueStr = is_array($value)
                 ? implode(', ', array_map('strval', $value))
                 : (string) $value;
-            $valueStr = mb_substr($valueStr, 0, 80);
+            $valueStr = $mbSub($valueStr, 0, 80);
             $parts[]  = $keyStr . ': ' . $valueStr;
         }
 
         $summary = implode(' | ', $parts);
 
-        return mb_strlen($summary) > 200 ? mb_substr($summary, 0, 197) . '…' : $summary;
+        return $mbLen($summary) > 200 ? $mbSub($summary, 0, 197) . '…' : $summary;
     }
 }

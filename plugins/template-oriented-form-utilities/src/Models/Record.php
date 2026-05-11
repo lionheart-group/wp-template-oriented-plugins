@@ -4,7 +4,6 @@ namespace TofuPlugin\Models;
 
 use TofuPlugin\Base\DatabaseModels as AbstractModels;
 use TofuPlugin\Helpers\Encryptor;
-use TofuPlugin\Logger;
 use TofuPlugin\Structure\DatabaseModelColumn;
 
 class Record extends AbstractModels {

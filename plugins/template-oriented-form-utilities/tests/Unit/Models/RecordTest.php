@@ -9,6 +9,22 @@ use TofuPlugin\Tests\Unit\BaseTestCase;
 class RecordTest extends BaseTestCase
 {
     /**
+     * Restore the default wpdb stub used by the bootstrap.
+     */
+    private function restoreDefaultWpdb(): void
+    {
+        $GLOBALS['wpdb'] = new class {
+            public $prefix    = 'wp_';
+            public $insert_id = 0;
+            public function insert($t, $d, $f = null) { $this->insert_id = 1; return 1; }
+            public function prepare($q, ...$a) { return $q; }
+            public function get_results($q, $o = OBJECT) { return []; }
+            public function get_var($q, $x = 0, $y = 0) { return null; }
+            public function query($q) { return true; }
+        };
+    }
+
+    /**
      * saveRecord() encrypts the values and can be decrypted back to the original data.
      */
     public function testSaveRecordEncryptsAndReturnsId(): void
@@ -21,37 +37,76 @@ class RecordTest extends BaseTestCase
     }
 
     /**
-     * Round-trip: the encrypted `data` column decrypts back to the original values.
+     * Round-trip: the encrypted `data` column written by saveRecord() decrypts
+     * back to the original values.
      */
     public function testSaveRecordEncryptedPayloadRoundTrips(): void
     {
         $values = ['name' => 'Bob', 'email' => 'bob@example.com'];
 
-        // Capture the encrypted string passed to insert() by intercepting Encryptor::encrypt
-        $encrypted = Encryptor::encrypt($values);
-        $decrypted = Encryptor::decrypt($encrypted);
+        $mock = new class {
+            public $prefix       = 'wp_';
+            public $insert_id    = 1;
+            public ?string $capturedData = null;
 
+            public function prepare($q, ...$a): string { return $q; }
+            public function insert($table, $data, $format = null): int
+            {
+                $this->capturedData = $data['data'] ?? null;
+                return 1;
+            }
+            public function get_results($q, $o = OBJECT): array { return []; }
+            public function get_var($q, $x = 0, $y = 0): ?string { return null; }
+            public function query($q) { return true; }
+        };
+        $GLOBALS['wpdb'] = $mock;
+
+        Record::saveRecord('contact', $values);
+
+        $this->assertNotNull($mock->capturedData);
+        $decrypted = Encryptor::decrypt((string) $mock->capturedData);
         $this->assertIsArray($decrypted);
         $this->assertSame($values, $decrypted);
+
+        $this->restoreDefaultWpdb();
     }
 
     /**
-     * Field filtering: only specified fields appear in the decrypted payload.
+     * Field filtering: only specified fields appear in the payload persisted by
+     * saveRecord() when $recordFields is provided.
      */
     public function testSaveRecordFiltersFieldsWhenRecordFieldsProvided(): void
     {
-        $values    = ['name' => 'Carol', 'email' => 'carol@example.com', 'message' => 'Hi'];
-        $filter    = ['name', 'email'];
+        $values = ['name' => 'Carol', 'email' => 'carol@example.com', 'message' => 'Hi'];
+        $filter = ['name', 'email'];
 
-        // Simulate the filtering logic used in saveRecord()
-        $payload   = array_intersect_key($values, array_flip($filter));
-        $encrypted = Encryptor::encrypt($payload);
-        $decrypted = Encryptor::decrypt($encrypted);
+        $mock = new class {
+            public $prefix       = 'wp_';
+            public $insert_id    = 1;
+            public ?string $capturedData = null;
 
+            public function prepare($q, ...$a): string { return $q; }
+            public function insert($table, $data, $format = null): int
+            {
+                $this->capturedData = $data['data'] ?? null;
+                return 1;
+            }
+            public function get_results($q, $o = OBJECT): array { return []; }
+            public function get_var($q, $x = 0, $y = 0): ?string { return null; }
+            public function query($q) { return true; }
+        };
+        $GLOBALS['wpdb'] = $mock;
+
+        Record::saveRecord('contact', $values, $filter);
+
+        $this->assertNotNull($mock->capturedData);
+        $decrypted = Encryptor::decrypt((string) $mock->capturedData);
         $this->assertIsArray($decrypted);
         $this->assertArrayHasKey('name', $decrypted);
         $this->assertArrayHasKey('email', $decrypted);
         $this->assertArrayNotHasKey('message', $decrypted);
+
+        $this->restoreDefaultWpdb();
     }
 
     /**
