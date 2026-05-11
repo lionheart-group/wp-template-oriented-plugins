@@ -38,6 +38,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Uploader;
+use TofuPlugin\Init\AdminPage;
 use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
 use TofuPlugin\Init\RestEndpoint;
@@ -83,3 +84,6 @@ Endpoint::init();
 
 // Initialize REST endpoint (AJAX / headless support)
 RestEndpoint::init();
+
+// Register admin UI for viewing recorded submissions
+AdminPage::register();

@@ -15,6 +15,14 @@ if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__DIR__, 4) . '/');
 }
 
+// Encryption salt constants required by Encryptor::getKey()
+if (!defined('AUTH_KEY')) {
+    define('AUTH_KEY', 'test-auth-key-for-phpunit-only');
+}
+if (!defined('SECURE_AUTH_KEY')) {
+    define('SECURE_AUTH_KEY', 'test-secure-auth-key-for-phpunit-only');
+}
+
 if (!defined('WP_CONTENT_DIR')) {
     define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
 }
