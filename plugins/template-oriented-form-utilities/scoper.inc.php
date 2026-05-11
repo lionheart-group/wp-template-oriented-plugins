@@ -111,6 +111,7 @@ return [
         'Walker_Nav_Menu',
         'WP_List_Table',
         'PHPMailer',
+        'WP_REST_Server',
     ],
 
     'exclude-functions' => [
