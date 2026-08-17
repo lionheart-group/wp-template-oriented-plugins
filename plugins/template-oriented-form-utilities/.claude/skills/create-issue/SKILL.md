@@ -1,7 +1,7 @@
 ---
 name: create-issue
 description: 'Create a new issue markdown file in the issues/ directory. Use when tracking a bug, feature request, or task for the TOFU plugin. The file name is auto-generated from the current date/time as YYYY-mm-dd-hh-ii-ss.md.'
-argument-hint: 'Brief title or description of the issue'
+allowed-tools: 'Bash(date:*), Write'
 ---
 
 # Create Issue

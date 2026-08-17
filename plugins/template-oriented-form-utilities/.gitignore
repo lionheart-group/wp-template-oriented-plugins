@@ -74,3 +74,6 @@ composer.phar
 
 # PHP-Scoper build output
 /build/
+
+# Claude Code local (per-developer) settings
+/.claude/settings.local.json

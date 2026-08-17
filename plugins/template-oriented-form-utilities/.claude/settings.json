@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer install:*)",
+      "Bash(composer test:*)",
+      "Bash(composer phpstan:*)",
+      "Bash(composer check:*)",
+      "Bash(composer dump-autoload:*)",
+      "Bash(vendor/bin/phpunit:*)",
+      "Bash(vendor/bin/phpstan:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr list:*)",
+      "Bash(date:*)"
+    ],
+    "deny": [
+      "Read(./build/**)",
+      "Read(./vendor/**)",
+      "Read(./page/node_modules/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/phpstan-check.sh\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
