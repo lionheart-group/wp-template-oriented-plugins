@@ -84,24 +84,96 @@ add_action('init', function () {
 });
 ```
 
-With this registered, `get_permalink() . 'confirm/'` becomes a real, routable URL for every single
-post, and `get_query_var('confirm')` is set (to an empty string, not `false` — check
+With this registered, `get_permalink() . 'confirm/'` becomes a real, routable URL, and
+`get_query_var('confirm')` is set (to an empty string, not `false` — check
 `get_query_var('confirm') !== ''` won't work for the default request; use
 `false !== get_query_var('confirm', false)` or a dedicated `global $wp_query; isset($wp_query->query_vars['confirm'])` check) whenever that endpoint segment is present in the request.
 
-**Setup cost:** registering an endpoint changes the rewrite rules table for **every** permalink on
-the site, and WordPress only picks up new rewrite rules after `flush_rewrite_rules()` runs (typically
-called once on theme/plugin activation, or triggered by re-saving Settings → Permalinks). Forgetting
-this step is a classic WordPress trap — it works immediately in local dev (where rewrite rules get
-flushed often) and then silently 404s in production until someone thinks to flush.
+### Exactly What `EP_PERMALINK` Attaches To
+
+`EP_PERMALINK` is not "every permalink" — it's one specific bit (value `1`) that WordPress checks
+against each rewrite structure's own mask. Verified against WordPress core
+(`wp-includes/class-wp-rewrite.php`, `wp-includes/class-wp-post-type.php`):
+
+| Registered with default settings | Included? |
+|---|---|
+| `post` (standard posts) | Yes — the main permastruct is generated with exactly `EP_PERMALINK` |
+| Custom post types with default `rewrite` settings | Yes — `ep_mask` defaults to `EP_PERMALINK` when not set explicitly |
+| Custom post types with an explicit `ep_mask` override | Only if that mask includes the `EP_PERMALINK` bit |
+| **Pages** (`page` post type) | **No** — pages are generated via a separate `EP_PAGES` mask (value `4096`), a different code path entirely |
+| Taxonomy/author/date archives, search, attachments | No — each uses its own separate mask (`EP_CATEGORIES`, `EP_AUTHORS`, `EP_DATE`, `EP_SEARCH`, a hardcoded attachment check) |
+
+The practical trap: if you embed the form on a WordPress **Page** rather than a post, the snippet
+above silently does nothing for it — `EP_PAGES & EP_PERMALINK === 0` — so `/some-page/confirm/`
+still 404s. To cover Pages too, combine the bits:
+
+```php
+add_rewrite_endpoint('confirm', EP_PERMALINK | EP_PAGES);
+add_rewrite_endpoint('thanks', EP_PERMALINK | EP_PAGES);
+```
+
+Conversely, a specific custom post type can opt out entirely via
+`register_post_type(..., ['rewrite' => ['ep_mask' => EP_NONE]])`.
+
+**Setup cost:** registering an endpoint changes the rewrite rules table for every structure whose
+mask matches, and WordPress only picks up new rewrite rules after `flush_rewrite_rules()` runs
+(typically called once on theme/plugin activation, or triggered by re-saving Settings → Permalinks).
+Forgetting this step is a classic WordPress trap — it works immediately in local dev (where rewrite
+rules get flushed often) and then silently 404s in production until someone thinks to flush.
 
 **Why doesn't the plugin do this for you?** The plugin's own submit endpoint
 (`src/Init/Endpoint.php`, `_tofu_key`) deliberately registers with `EP_NONE` — root-only — precisely
-to avoid attaching to every permalink site-wide. Doing the same for `confirm`/`thanks` would be a
-much larger blast radius that only your theme can decide is worth taking on.
+to avoid attaching to `post` and every default-`ep_mask` custom post type. Doing the same for
+`confirm`/`thanks` would be a much larger blast radius that only your theme can decide is worth
+taking on.
 
 **Tradeoff:** pretty URLs (`/news/hello-world/confirm/`), at the cost of the flush requirement and a
-site-wide rewrite-rule change.
+rewrite-rule change affecting every post type whose mask includes the bit(s) you registered with.
+
+### Restricting to a Specific Post Type
+
+Techniques 1 (query string) and 3 (`template_include`) are already scoped to wherever you call them
+— Technique 1 by which template calls `Form::setTemplate()`, Technique 3 by its `is_singular()`
+check. Technique 2 is the odd one out: `EP_PERMALINK` alone attaches to *every* post type that kept
+the default `ep_mask`, not just the one you have in mind.
+
+To scope the endpoint to a single custom post type (e.g. `news`) and nothing else, give that CPT its
+own mask bit and register the endpoint against only that bit:
+
+```php
+// WordPress core's built-in EP_* constants top out at EP_PAGES = 4096
+// (i.e. 1 << 12), so 1 << 13 and above are safe, unused bits.
+if (!defined('EP_TOFU_NEWS')) {
+    define('EP_TOFU_NEWS', 1 << 13); // 8192
+}
+
+add_action('init', function () {
+    // Give only the "news" CPT this bit. OR it with EP_PERMALINK if
+    // this post type still needs its normal permalink behavior too.
+    register_post_type('news', [
+        // ...
+        'rewrite' => ['slug' => 'news', 'ep_mask' => EP_PERMALINK | EP_TOFU_NEWS],
+    ]);
+
+    // Register the endpoint against ONLY the custom bit — not
+    // EP_PERMALINK — so it never attaches to `post` or any other CPT
+    // that kept the default mask.
+    add_rewrite_endpoint('confirm', EP_TOFU_NEWS);
+    add_rewrite_endpoint('thanks', EP_TOFU_NEWS);
+});
+```
+
+Notes:
+
+- If `news` is registered elsewhere (a theme or another plugin), OR your bit into its existing
+  `ep_mask` rather than replacing it, so you don't disturb whatever that registration already relies
+  on.
+- Changing `ep_mask` still requires a `flush_rewrite_rules()`, same as above.
+- A lighter-weight alternative that avoids touching `ep_mask`/`register_post_type()` at all: keep the
+  endpoint registered broadly with `EP_PERMALINK`, but gate the actual confirm/result *content* in
+  your template on `get_post_type() === 'news'`. This is simpler, but the URL itself still resolves
+  (200, showing the same content as the normal page) for every other post type that kept the default
+  mask — harmless in practice, but it does mean unintended URLs exist rather than 404ing.
 
 ## Technique 3 — Custom `template_include` Routing
 
