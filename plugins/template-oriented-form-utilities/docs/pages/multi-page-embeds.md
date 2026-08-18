@@ -85,9 +85,35 @@ add_action('init', function () {
 ```
 
 With this registered, `get_permalink() . 'confirm/'` becomes a real, routable URL, and
-`get_query_var('confirm')` is set (to an empty string, not `false` — check
-`get_query_var('confirm') !== ''` won't work for the default request; use
-`false !== get_query_var('confirm', false)` or a dedicated `global $wp_query; isset($wp_query->query_vars['confirm'])` check) whenever that endpoint segment is present in the request.
+`get_query_var('confirm')` is set whenever that endpoint segment is present in the request. Since a
+value-less endpoint segment (`/confirm/`) captures an empty string rather than being absent, a plain
+truthy check on the return value is unreliable — detect presence with a sentinel default instead:
+`get_query_var('confirm', null) !== null`.
+
+### Which Template File Actually Gets Selected
+
+Registering the endpoint does **not** add any new template-selection rule — verified against
+WordPress core (`wp-includes/class-wp-rewrite.php`, `wp-includes/class-wp.php`,
+`wp-includes/template-loader.php`, `wp-includes/template.php`). The endpoint's rewrite rule appends
+its capture group onto the *same* rule that already matches the base permalink
+(`class-wp-rewrite.php:1042-1050`), so `/news/hello-world/confirm/` resolves to
+`index.php?news=hello-world&confirm=` — the original post-identifying query vars are untouched, with
+`confirm` just carried alongside them into the same `WP_Query`. `is_single()`/`is_singular()`/
+`get_queried_object()` all resolve to the exact same post they would without the `/confirm/` suffix.
+
+`template-loader.php` picks a template purely by which conditional tag matches (`is_single`,
+`is_page`, `is_singular`, etc. — `template-loader.php:67-105`) and has no notion of endpoints at all
+(zero references to "endpoint" anywhere in that file or in `template.php`). So `get_single_template()`
+still walks `single-{post_type}-{slug}.php` → `single-{post_type}.php` → `single.php`
+(`template.php:553-576`), and `get_page_template()` still walks `page-{slug}.php` → `page-{id}.php` →
+`page.php` (`template.php:471-503`) — **exactly the same file** WordPress would have loaded for the
+plain permalink. There is no auto-selected "confirm template."
+
+In practice this means: whichever single template file the post normally uses is the one place you
+branch — the same way Technique 1's `switch ($step)` branches inside one `single.php`, just driven
+here by `get_query_var('confirm')` instead of a query string. If you'd rather swap in an entirely
+separate file instead of branching inline, that's exactly what the `template_include` filter
+(Technique 3, below) is for.
 
 ### Exactly What `EP_PERMALINK` Attaches To
 
