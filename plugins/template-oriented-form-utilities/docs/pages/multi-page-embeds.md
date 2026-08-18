@@ -165,15 +165,78 @@ add_action('init', function () {
 
 Notes:
 
-- If `news` is registered elsewhere (a theme or another plugin), OR your bit into its existing
-  `ep_mask` rather than replacing it, so you don't disturb whatever that registration already relies
-  on.
 - Changing `ep_mask` still requires a `flush_rewrite_rules()`, same as above.
 - A lighter-weight alternative that avoids touching `ep_mask`/`register_post_type()` at all: keep the
   endpoint registered broadly with `EP_PERMALINK`, but gate the actual confirm/result *content* in
   your template on `get_post_type() === 'news'`. This is simpler, but the URL itself still resolves
   (200, showing the same content as the normal page) for every other post type that kept the default
   mask — harmless in practice, but it does mean unintended URLs exist rather than 404ing.
+
+#### When the Post Type Is Registered by a Different Plugin
+
+The snippet above assumes you own the `register_post_type()` call. If the post type instead comes
+from another plugin — including UI-driven ones like [Custom Post Type UI](https://wordpress.org/plugins/custom-post-type-ui/)
+or ACF / [Secure Custom Fields](https://wordpress.org/plugins/secure-custom-fields/) — you can still
+inject your mask bit, without touching that plugin's code, via the `register_post_type_args` filter.
+It fires inside `WP_Post_Type::set_props()` *before* WordPress fills in the `ep_mask` default, so a
+value you set there wins over the default:
+
+```php
+if (!defined('EP_TOFU_NEWS')) {
+    define('EP_TOFU_NEWS', 1 << 13);
+}
+
+// Runs before any register_post_type() call as long as this add_filter()
+// executes first — which a top-level call in functions.php always does,
+// regardless of which action/priority the other plugin registers on.
+add_filter('register_post_type_args', function ($args, $post_type) {
+    if ($post_type !== 'some_plugins_cpt') {
+        return $args;
+    }
+
+    // Respect an explicit rewrite => false (rewrite intentionally
+    // disabled) instead of accidentally turning rewrites back on.
+    if ($args['rewrite'] === false) {
+        return $args;
+    }
+
+    if (!is_array($args['rewrite'])) {
+        $args['rewrite'] = [];
+    }
+
+    // Preserve whatever ep_mask the plugin already set (mirrors core's
+    // own fallback order) and just add our bit.
+    $existingMask = $args['rewrite']['ep_mask'] ?? $args['permalink_epmask'] ?? EP_PERMALINK;
+    $args['rewrite']['ep_mask'] = $existingMask | EP_TOFU_NEWS;
+
+    return $args;
+}, 10, 2);
+
+add_action('init', function () {
+    add_rewrite_endpoint('confirm', EP_TOFU_NEWS);
+    add_rewrite_endpoint('thanks', EP_TOFU_NEWS);
+});
+```
+
+WordPress 6.0+ also offers `register_{$post_type}_post_type_args` — the same filter, scoped to one
+post type by name, so you can skip the `if ($post_type !== ...)` check.
+
+**Custom Post Type UI** and **ACF / Secure Custom Fields** both register their post types through
+this same core `register_post_type()` path (verified against both plugins' source) and never set
+`ep_mask` themselves, so the filter above applies to them exactly as written — you only need the
+right `$post_type` string:
+
+- **Custom Post Type UI**: use the **Post Type Slug** field from *CPT UI → Add/Edit Post Types →
+  Basics*. (Don't confuse it with the separate "Rewrite Slug" field, which only affects the URL
+  base, not the registered post type name.) CPT UI registers on `init` at priority `10`.
+- **ACF / Secure Custom Fields**: use the **Post Type Key** field from *Custom Fields → Post Types →
+  [your post type] → Basic Settings*. (ACF's internal `$post_type['key']` is a different, internal
+  object key — not this value.) It registers via `acf/init` at priority `6`, itself fired from
+  `init` at priority `5`.
+
+Either way, if an admin disables rewrite entirely in that plugin's UI (CPT UI's "Rewrite" toggle, or
+ACF's "No Permalink" setting), `$args['rewrite']` comes through as `false` and the guard above leaves
+it alone.
 
 ## Technique 3 — Custom `template_include` Routing
 
