@@ -47,6 +47,7 @@ Form::register(new FormConfig(
 | `ajaxEnabled` | `bool` | No | `false` | Enable the WP REST API endpoint for this form. See [AJAX / Headless Mode](../ajax/index.md). |
 | `corsOrigins` | `string[]` | No | `[]` | Allowed CORS origins for the REST endpoint. Empty = same-origin only. |
 | `confirmStep` | `bool` | No | `false` | Enable the confirm step. For template-based forms, also set `template->confirmPath` so the redirect URL is available. |
+| `dynamicTemplate` | `bool` | No | `false` | Set to `true` when this form's paths are supplied per-request via `Form::setTemplate()` instead of a static `template`. Lets `confirmStep: true` be registered without a static `template->confirmPath`. See [Dynamic Overrides](./templateconfig.md#dynamic-overrides-per-page-embeds). |
 
 ## Methods
 

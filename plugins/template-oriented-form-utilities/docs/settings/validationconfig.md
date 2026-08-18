@@ -32,6 +32,9 @@ $validation = new ValidationConfig(
     after: function ($values, $errors) {
         // Custom validation logic
     },
+    // Only persist these fields when FormConfig::$saveToDatabase is true —
+    // 'message' is intentionally omitted from the saved database record.
+    records: ['name', 'email'],
 );
 ```
 
@@ -44,6 +47,7 @@ $validation = new ValidationConfig(
 | `names` | `array` | Yes | - | Human-readable field names used in error messages. |
 | `messages` | `array` | No | `[]` | Custom error messages per field and validation rule. |
 | `after` | `?Closure` | No | `null` | Custom callback function for additional validation logic. |
+| `records` | `string[]` | No | `[]` | Fields to persist when [`FormConfig::$saveToDatabase`](./formconfig.md) is `true`. Sits alongside `allows` for easy comparison — an empty array (default) persists every field in `allows`; a non-empty array is a further filter, so only the named fields end up in the encrypted `wp_tofu_records` payload. Fields absent from `allows` are silently skipped. Use this to exclude sensitive fields (passwords, tokens) from the saved record without touching validation rules. |
 
 ## File Upload Validation Rules
 

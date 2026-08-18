@@ -6,6 +6,7 @@ use TofuPlugin\Consts;
 use \TofuPlugin\Models\Form as FormModel;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Structure\ReCAPTCHAConfig;
+use TofuPlugin\Structure\TemplateConfig;
 use TofuPlugin\Structure\TurnstileConfig;
 use TofuPlugin\Structure\UploadedFile;
 
@@ -646,5 +647,30 @@ class Form
     {
         $form = self::get($key);
         $form->redirect($action);
+    }
+
+    /**
+     * Override the input/confirm/result URLs for this visitor's session.
+     *
+     * Call while rendering the input page, before Form::formOpen(), e.g.
+     * with paths derived from get_permalink() so the same registered form
+     * can be embedded on many pages:
+     *
+     * <code>
+     * Form::setTemplate('contact', new TemplateConfig(
+     *     inputPath: get_permalink(),
+     *     confirmPath: get_permalink() . 'confirm/',
+     *     resultPath: get_permalink() . 'thanks/',
+     * ));
+     * </code>
+     *
+     * @param string $key
+     * @param TemplateConfig $template
+     * @return void
+     */
+    public static function setTemplate(string $key, TemplateConfig $template): void
+    {
+        $form = self::get($key);
+        $form->setTemplate($template);
     }
 }

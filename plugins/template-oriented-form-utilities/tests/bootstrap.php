@@ -15,6 +15,22 @@ if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__DIR__, 4) . '/');
 }
 
+// Required so that files with the standard `if (!defined('WPINC')) { die; }`
+// direct-access guard (Init/Endpoint.php, Init/AdminPage.php,
+// Init/RestEndpoint.php, Init/Initializer.php) don't silently kill the PHP
+// process the moment PHPUnit's autoloader touches one of those classes.
+if (!defined('WPINC')) {
+    define('WPINC', 'wp-includes');
+}
+
+// Encryption salt constants required by Encryptor::getKey()
+if (!defined('AUTH_KEY')) {
+    define('AUTH_KEY', 'test-auth-key-for-phpunit-only');
+}
+if (!defined('SECURE_AUTH_KEY')) {
+    define('SECURE_AUTH_KEY', 'test-secure-auth-key-for-phpunit-only');
+}
+
 if (!defined('WP_CONTENT_DIR')) {
     define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
 }
@@ -184,6 +200,22 @@ if (!function_exists('wp_unslash')) {
 if (!function_exists('is_ssl')) {
     function is_ssl(): bool {
         return false;
+    }
+}
+
+if (!function_exists('home_url')) {
+    function home_url(string $path = '', $scheme = null): string {
+        $url = 'http://example.com';
+        if ($path !== '') {
+            $url .= '/' . ltrim($path, '/');
+        }
+        return $url;
+    }
+}
+
+if (!function_exists('wp_parse_url')) {
+    function wp_parse_url($url, $component = -1) {
+        return $component === -1 ? parse_url($url) : parse_url($url, $component);
     }
 }
 
