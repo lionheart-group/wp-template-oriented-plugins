@@ -26,6 +26,7 @@ TOFU uses separate templates for each step of the form process:
 - [Input Page Template](pages/input.md)
 - [Confirm Page Template](pages/confirm.md)
 - [Result Page Template](pages/result.md)
+- [Embedding One Form on Many Pages](pages/multi-page-embeds.md)
 
 ## AJAX / Headless Mode
 

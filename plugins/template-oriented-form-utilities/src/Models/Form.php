@@ -16,6 +16,7 @@ use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
 use TofuPlugin\Structure\ReCAPTCHAConfig;
+use TofuPlugin\Structure\TemplateConfig;
 use TofuPlugin\Structure\TurnstileConfig;
 use TofuPlugin\Structure\UploadedFile;
 
@@ -48,6 +49,17 @@ class Form
      * @var ?string
      */
     protected ?string $flushValue = null;
+
+    /**
+     * Per-session template override, set via setTemplate().
+     *
+     * Takes priority over $this->config->template when present. Persisted
+     * to the session so it survives the input POST -> confirm/result GET
+     * request chain, which the theme is not involved in.
+     *
+     * @var ?TemplateConfig
+     */
+    protected ?TemplateConfig $templateOverride = null;
 
     /**
      * Form constructor.
@@ -114,6 +126,14 @@ class Form
 
             if (isset($sessionValues['flushValue'])) {
                 $this->flushValue = $sessionValues['flushValue'];
+            }
+
+            if (isset($sessionValues['template']) && is_array($sessionValues['template'])) {
+                $this->templateOverride = new TemplateConfig(
+                    inputPath: $sessionValues['template']['inputPath'],
+                    resultPath: $sessionValues['template']['resultPath'],
+                    confirmPath: $sessionValues['template']['confirmPath'] ?? null,
+                );
             }
         }
 
@@ -243,7 +263,75 @@ class Form
             'errors' => $this->errors->toArray(),
             'files' => $this->files->toArray(),
             'flushValue' => $flushValue,
+            'template' => $this->templateOverride === null ? null : [
+                'inputPath' => $this->templateOverride->inputPath,
+                'resultPath' => $this->templateOverride->resultPath,
+                'confirmPath' => $this->templateOverride->confirmPath,
+            ],
         ]);
+    }
+
+    /**
+     * Resolve the effective template for this visitor: the per-session
+     * override set via setTemplate() when present, otherwise the static
+     * TemplateConfig supplied at registration.
+     *
+     * @return ?TemplateConfig
+     */
+    protected function getTemplate(): ?TemplateConfig
+    {
+        return $this->templateOverride ?? $this->config->template;
+    }
+
+    /**
+     * Override the input/confirm/result URLs for this visitor's session.
+     *
+     * Call from a theme template while rendering the input page, before
+     * Form::formOpen() — typically with paths derived from get_permalink()
+     * so the same registered form can be embedded on many pages. The
+     * override is persisted to the session and therefore survives the
+     * input POST, which is handled entirely inside the plugin and never
+     * re-runs theme code.
+     *
+     * Cross-host absolute URLs are rejected: the static TemplateConfig
+     * remains in effect and a warning is logged, since wp_safe_redirect()
+     * would otherwise silently send the visitor to the site's login/home
+     * URL instead of the intended page.
+     *
+     * @param TemplateConfig $template
+     * @return void
+     */
+    public function setTemplate(TemplateConfig $template): void
+    {
+        foreach ([$template->inputPath, $template->resultPath, $template->confirmPath] as $path) {
+            if ($path !== null && !$this->isSameHostOrRelative($path)) {
+                Logger::warning('Rejected cross-host template override', [
+                    'form_key' => $this->config->key,
+                    'path' => $path,
+                ]);
+                return;
+            }
+        }
+
+        $this->templateOverride = $template;
+        $this->storeSession($this->flushValue);
+    }
+
+    /**
+     * Check whether the given path is root-relative or points at the
+     * current site's host, so it is safe to hand to wp_safe_redirect().
+     *
+     * @param string $path
+     * @return bool
+     */
+    protected function isSameHostOrRelative(string $path): bool
+    {
+        if ($path === '' || $path[0] === '/') {
+            return true;
+        }
+
+        $host = wp_parse_url($path, PHP_URL_HOST);
+        return $host === null || $host === wp_parse_url(home_url(), PHP_URL_HOST);
     }
 
     /**
@@ -647,7 +735,9 @@ class Form
 
     public function redirect(string $action): void
     {
-        if ($this->config->template === null) {
+        $template = $this->getTemplate();
+
+        if ($template === null) {
             wp_die('Template is not configured for this form.', 'TOFU Form Config Error', ['response' => 500]);
         }
 
@@ -658,13 +748,13 @@ class Form
 
         switch ($action) {
             case 'input':
-                $redirectUrl = $this->config->template->inputPath;
+                $redirectUrl = $template->inputPath;
                 break;
             case 'confirm':
-                $redirectUrl = $this->config->template->confirmPath;
+                $redirectUrl = $template->confirmPath;
                 break;
             case 'result':
-                $redirectUrl = $this->config->template->resultPath;
+                $redirectUrl = $template->resultPath;
                 break;
             default:
                 $redirectUrl = null;

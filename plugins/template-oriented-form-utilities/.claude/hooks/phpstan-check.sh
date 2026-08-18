@@ -35,6 +35,7 @@ fi
 output="$("$phpstan_bin" analyse "$file_path" \
   --configuration="$project_dir/phpstan.neon" \
   --no-progress \
+  --memory-limit=512M \
   --error-format=raw 2>&1)" && exit 0
 
 echo "PHPStan found issues in $file_path:" >&2

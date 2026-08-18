@@ -121,12 +121,31 @@ class FormConfig
          * @var bool
          */
         public readonly bool $confirmStep = false,
+
+        /**
+         * Whether the template paths for this form are supplied dynamically,
+         * per request, via `Form::setTemplate()` rather than statically here.
+         *
+         * When true, `confirmStep: true` no longer requires a static
+         * `template->confirmPath` at registration time — the confirm path is
+         * expected to be supplied later via `Form::setTemplate()` before the
+         * input page is rendered.
+         *
+         * @var bool
+         */
+        public readonly bool $dynamicTemplate = false,
     )
     {
-        if ($this->confirmStep && !$this->ajaxEnabled && empty($this->template?->confirmPath)) {
+        if (
+            $this->confirmStep &&
+            !$this->ajaxEnabled &&
+            !$this->dynamicTemplate &&
+            empty($this->template?->confirmPath)
+        ) {
             throw new \InvalidArgumentException(
                 "FormConfig '{$this->key}': confirmStep is true but template->confirmPath is not set. " .
-                'For the redirect flow set template->confirmPath; for AJAX / headless set ajaxEnabled: true.'
+                'For the redirect flow set template->confirmPath (or dynamicTemplate: true if it is supplied ' .
+                'per-request via Form::setTemplate()); for AJAX / headless set ajaxEnabled: true.'
             );
         }
     }

@@ -528,6 +528,37 @@ get_header();
 3. **The field `name` attribute must match validation rules** - Field names in your HTML must match the keys defined in `ValidationConfig`.
 4. **Error handling is automatic** - If validation fails, users are redirected back to the input page with errors and their previously entered values preserved.
 
+## Embedding the Same Form on Multiple Pages
+
+If the same registered form is embedded on many pages whose URL isn't known until render time — for example, a contact form embedded inside every post at `/news/{slug}/` — set the destination pages dynamically with `Form::setTemplate()`, before `Form::formOpen()`:
+
+```php
+<?php
+use TofuPlugin\Helpers\Form;
+use TofuPlugin\Structure\TemplateConfig;
+
+$formKey = 'contact';
+$formAction = 'input';
+
+Form::setTemplate($formKey, new TemplateConfig(
+    inputPath: get_permalink(),
+    confirmPath: add_query_arg('tofu_step', 'confirm', get_permalink()),
+    resultPath: add_query_arg('tofu_step', 'result', get_permalink()),
+));
+
+Form::embedScript($formKey);
+get_header();
+?>
+
+<?php echo Form::formOpen($formKey, $formAction); ?>
+    <!-- Form fields go here -->
+<?php echo Form::formClose($formKey, $formAction); ?>
+```
+
+The override is scoped to the current visitor's session and carries through to the confirm and result pages automatically. See [TemplateConfig — Dynamic Overrides](../settings/templateconfig.md#dynamic-overrides-per-page-embeds) for details and edge cases.
+
+> **Note:** Setting `confirmPath`/`resultPath` only tells the plugin *where to redirect* — it doesn't make WordPress serve any content there. Since `/news/{slug}/` isn't a real page for `?tofu_step=confirm`, your template also needs to branch on that query var (or a rewrite endpoint) and render the confirm/result content itself. See [Embedding One Form on Many Pages](multi-page-embeds.md) for the routing techniques and their tradeoffs.
+
 ## Next Steps
 
 - [Confirm Page Template](confirm.md) - Create the confirmation page
