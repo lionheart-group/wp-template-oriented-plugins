@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.0.3
+Stable tag: 0.0.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -66,6 +66,12 @@ OR…
     - Implemented Ajax form submission and validation with reCAPTCHA and Turnstile support.
     - Fixed recaptcha issue when embedded multiple forms on the same page.
     - Replaced validation library from wixel/gump to somnambulist/validation.
+* v0.0.4
+    - Added optional database recording of form submissions (`saveToDatabase`), encrypted at
+      rest, with an admin screen to view recorded data.
+    - Added `Form::setTemplate()` to override a form's input/confirm/result URLs per visitor
+      session, so a single registered form can be embedded on multiple pages (e.g. post
+      templates); added `FormConfig::$dynamicTemplate` for forms configured this way.
 
 
 == Upgrade Notice ==
