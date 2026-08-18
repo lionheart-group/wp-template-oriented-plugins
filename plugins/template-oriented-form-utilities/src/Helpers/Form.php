@@ -5,6 +5,8 @@ namespace TofuPlugin\Helpers;
 use TofuPlugin\Consts;
 use \TofuPlugin\Models\Form as FormModel;
 use TofuPlugin\Structure\FormConfig;
+use TofuPlugin\Structure\ReCAPTCHAConfig;
+use TofuPlugin\Structure\TurnstileConfig;
 use TofuPlugin\Structure\UploadedFile;
 
 class Form
@@ -15,6 +17,68 @@ class Form
      * @var FormModel[]
      */
     protected static $forms = [];
+
+    /**
+     * Plugin-level reCAPTCHA configuration.
+     *
+     * @var ?ReCAPTCHAConfig
+     */
+    protected static ?ReCAPTCHAConfig $recaptchaConfig = null;
+
+    /**
+     * Plugin-level Turnstile configuration.
+     *
+     * @var ?TurnstileConfig
+     */
+    protected static ?TurnstileConfig $turnstileConfig = null;
+
+    /**
+     * Register the plugin-level reCAPTCHA configuration.
+     *
+     * Call once (e.g. in the `init` action) before registering forms.
+     * All forms with `recaptchaEnabled: true` will use this configuration.
+     *
+     * @param ReCAPTCHAConfig $config
+     * @return void
+     */
+    public static function setRecaptcha(ReCAPTCHAConfig $config): void
+    {
+        self::$recaptchaConfig = $config;
+    }
+
+    /**
+     * Register the plugin-level Turnstile configuration.
+     *
+     * Call once (e.g. in the `init` action) before registering forms.
+     * All forms with `turnstileEnabled: true` will use this configuration.
+     *
+     * @param TurnstileConfig $config
+     * @return void
+     */
+    public static function setTurnstile(TurnstileConfig $config): void
+    {
+        self::$turnstileConfig = $config;
+    }
+
+    /**
+     * Get the plugin-level reCAPTCHA configuration.
+     *
+     * @return ?ReCAPTCHAConfig
+     */
+    public static function getRecaptchaConfig(): ?ReCAPTCHAConfig
+    {
+        return self::$recaptchaConfig;
+    }
+
+    /**
+     * Get the plugin-level Turnstile configuration.
+     *
+     * @return ?TurnstileConfig
+     */
+    public static function getTurnstileConfig(): ?TurnstileConfig
+    {
+        return self::$turnstileConfig;
+    }
 
     /**
      * Register a new form
@@ -40,9 +104,12 @@ class Form
     /**
      * Get form by key
      *
+     * @param string $key      Form key.
+     * @param bool   $strict   When true, calls wp_die() if the form is not found.
+     *                         When false, returns false silently.
      * @return FormModel|false
      */
-    public static function get(string $key, bool $isStrict = true): FormModel|false
+    public static function get(string $key, bool $strict = true): FormModel|false
     {
         foreach (self::$forms as $form) {
             if ($form->getKey() === $key) {
@@ -50,7 +117,7 @@ class Form
             }
         }
 
-        if ($isStrict) {
+        if ($strict) {
             wp_die(
                 sprintf('Form with key "%s" is not registered.', esc_html($key)),
                 'TOFU Form Action Error',
@@ -58,6 +125,16 @@ class Form
             );
         }
         return false;
+    }
+
+    /**
+     * Get all registered forms.
+     *
+     * @return FormModel[]
+     */
+    public static function getAll(): array
+    {
+        return self::$forms;
     }
 
     /**
@@ -336,9 +413,9 @@ class Form
             false
         );
 
-        // Check if reCAPTCHA is configured for the form
-        $recaptchaConfig = $form->getRecaptchaConfig();
-        if ($recaptchaConfig !== null) {
+        // Enqueue reCAPTCHA scripts when this form has reCAPTCHA enabled
+        if ($form->hasRecaptcha()) {
+            $recaptchaConfig = self::$recaptchaConfig;
             wp_enqueue_script(
                 'tofu-google-recaptcha',
                 sprintf('https://www.google.com/recaptcha/api.js?render=%s', rawurlencode($recaptchaConfig->siteKey)),
@@ -353,20 +430,26 @@ class Form
                 filemtime(plugin_dir_path(TOFU_PLUGIN_FILE) . 'assets/js/recaptcha.js'),
                 false
             );
-            wp_localize_script(
-                'tofu-user-recaptcha',
-                'tofuRecaptchaConfig',
-                [
-                    'siteKey' => $recaptchaConfig->siteKey,
-                    'formId' => sprintf(Consts::FORM_ID_FORMAT, $key),
-                    'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $key),
-                ]
-            );
+
+            // Only include forms that have reCAPTCHA enabled
+            $forms = [];
+            foreach (self::$forms as $f) {
+                if ($f->hasRecaptcha()) {
+                    $forms[] = [
+                        'formId'  => sprintf(Consts::FORM_ID_FORMAT, $f->getKey()),
+                        'inputId' => sprintf(Consts::RECAPTCHA_TOKEN_INPUT_ID_FORMAT, $f->getKey()),
+                    ];
+                }
+            }
+
+            wp_localize_script('tofu-user-recaptcha', 'tofuRecaptchaConfig', [
+                'siteKey' => $recaptchaConfig->siteKey,
+                'forms'   => $forms,
+            ]);
         }
 
-        // Check if Turnstile is configured for the form
-        $turnstileConfig = $form->getTurnstileConfig();
-        if ($turnstileConfig !== null) {
+        // Enqueue Turnstile script when this form has Turnstile enabled
+        if ($form->hasTurnstile()) {
             wp_enqueue_script(
                 'tofu-cloudflare-turnstile',
                 'https://challenges.cloudflare.com/turnstile/v0/api.js',
@@ -386,8 +469,7 @@ class Form
     public static function recaptchaHidden(string $key): string
     {
         $form = self::get($key);
-        $recaptchaConfig = $form->getRecaptchaConfig();
-        if ($recaptchaConfig === null) {
+        if (!$form->hasRecaptcha()) {
             return '';
         }
 
@@ -440,8 +522,8 @@ class Form
     public static function turnstileWidget(string $key, array $attributes = []): string
     {
         $form = self::get($key);
-        $turnstileConfig = $form->getTurnstileConfig();
-        if ($turnstileConfig === null) {
+        $turnstileConfig = self::$turnstileConfig;
+        if (!$form->hasTurnstile() || $turnstileConfig === null) {
             return '';
         }
 

@@ -39,16 +39,10 @@ add_action('init', function () {
     $validation = new \TofuPlugin\Structure\ValidationConfig(
         allows: ['name', 'email', 'phone', 'message'],
         rules: [
-            'name' => 'required|max_len:200',
-            'email' => 'required|valid_email',
-            'phone' => 'max_len:20',
-            'message' => 'required|max_len:2000',
-        ],
-        filters: [
-            'name' => 'trim|sanitize_string',
-            'email' => 'trim|sanitize_email|lower_case',
-            'phone' => 'trim|sanitize_numbers',
-            'message' => 'trim|sanitize_string',
+            'name' => 'required|max:200',
+            'email' => 'required|email',
+            'phone' => 'max:20',
+            'message' => 'required|max:2000',
         ],
         names: [
             'name' => 'Full Name',
@@ -59,15 +53,15 @@ add_action('init', function () {
         messages: [
             'name' => [
                 'required' => 'Please enter your name.',
-                'max_len' => 'Name must be 200 characters or less.',
+                'max' => 'Name must be 200 characters or less.',
             ],
             'email' => [
                 'required' => 'Please enter your email address.',
-                'valid_email' => 'Please enter a valid email address.',
+                'email' => 'Please enter a valid email address.',
             ],
             'message' => [
                 'required' => 'Please enter your message.',
-                'max_len' => 'Message must be 2000 characters or less.',
+                'max' => 'Message must be 2000 characters or less.',
             ],
         ],
         after: function ($values, $errors) {
@@ -79,18 +73,19 @@ add_action('init', function () {
         },
     );
 
-    // reCAPTCHA configuration (optional)
-    $recaptcha = new \TofuPlugin\Structure\ReCAPTCHAConfig(
-        siteKey: 'your-site-key',
+    // reCAPTCHA configuration (optional) — register once, enable per form
+    \TofuPlugin\Helpers\Form::setRecaptcha(new \TofuPlugin\Structure\ReCAPTCHAConfig(
+        siteKey:   'your-site-key',
         secretKey: 'your-secret-key',
         threshold: 0.5,
-    );
+    ));
 
-    // Turnstile configuration (optional)
-    $turnstile = new \TofuPlugin\Structure\TurnstileConfig(
-        siteKey: 'your-site-key',
-        secretKey: 'your-secret-key',
-    );
+    // Turnstile configuration (optional) — register once, enable per form
+    // (use reCAPTCHA OR Turnstile, not both)
+    // \TofuPlugin\Helpers\Form::setTurnstile(new \TofuPlugin\Structure\TurnstileConfig(
+    //     siteKey:   'your-site-key',
+    //     secretKey: 'your-secret-key',
+    // ));
 
     // Register the form
     \TofuPlugin\Helpers\Form::register(new \TofuPlugin\Structure\FormConfig(
@@ -100,8 +95,8 @@ add_action('init', function () {
         mail: $mail,
         validation: $validation,
         saveToDatabase: false,
-        recaptcha: $recaptcha,
-        turnstile: $turnstile,
+        recaptchaEnabled: true,  // enable reCAPTCHA for this form
+        confirmStep: true,
     ));
 });
 ```

@@ -26,3 +26,15 @@ TOFU uses separate templates for each step of the form process:
 - [Input Page Template](pages/input.md)
 - [Confirm Page Template](pages/confirm.md)
 - [Result Page Template](pages/result.md)
+
+## AJAX / Headless Mode
+
+[AJAX / Headless Mode overview](ajax/index.md)
+
+TOFU includes an opt-in WP REST API layer for JavaScript-driven or headless frontends:
+
+- [Vanilla JavaScript](ajax/vanilla-js.md)
+- [React](ajax/react.md)
+- [Vue 3](ajax/vue.md)
+- [Headless / Cross-Origin Setup](ajax/headless.md)
+

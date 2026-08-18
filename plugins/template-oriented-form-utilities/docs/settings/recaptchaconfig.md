@@ -1,17 +1,28 @@
 # ReCAPTCHAConfig
 
-Configuration for Google reCAPTCHA v3 integration.
+Plugin-level configuration for Google reCAPTCHA v3.
+Set this once with `Form::setRecaptcha()`, then enable per form with `recaptchaEnabled: true`.
 
 ## Usage
 
 ```php
 use TofuPlugin\Structure\ReCAPTCHAConfig;
+use TofuPlugin\Helpers\Form;
 
-$recaptcha = new ReCAPTCHAConfig(
-    siteKey: 'your-recaptcha-site-key',
-    secretKey: 'your-recaptcha-secret-key',
-    threshold: 0.5,
-);
+add_action('init', function () {
+    // Register plugin-level reCAPTCHA config (call once, before Form::register())
+    Form::setRecaptcha(new ReCAPTCHAConfig(
+        siteKey:   'your-recaptcha-site-key',
+        secretKey: 'your-recaptcha-secret-key',
+        threshold: 0.5,
+    ));
+
+    // Enable reCAPTCHA per form
+    Form::register(new \TofuPlugin\Structure\FormConfig(
+        // …
+        recaptchaEnabled: true,
+    ));
+});
 ```
 
 ## Properties

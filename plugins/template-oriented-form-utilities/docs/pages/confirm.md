@@ -33,10 +33,6 @@ if (!Form::verifySession($formKey)) {
     exit;
 }
 
-// Embed necessary scripts
-// Must be called BEFORE get_header()
-Form::embedScript($formKey);
-
 get_header();
 ?>
 
@@ -178,9 +174,6 @@ if (!Form::verifySession($formKey)) {
     exit;
 }
 
-// Embed necessary scripts before get_header()
-Form::embedScript($formKey);
-
 get_header();
 ?>
 
@@ -259,7 +252,7 @@ get_header();
 ## Important Notes
 
 1. **Always verify the session before displaying content** - Use `Form::verifySession()` at the very beginning of your template.
-2. **Call verification and embedScript before get_header()** - These must be called before any output to work properly.
+2. **Call `Form::verifySession()` before get_header()** - This must be called before any output to work properly.
 3. **The form action must be 'confirm'** - This tells the plugin to process this as the confirmation step.
 4. **Provide a way to go back** - Always include a back link/button so users can edit their submission.
 

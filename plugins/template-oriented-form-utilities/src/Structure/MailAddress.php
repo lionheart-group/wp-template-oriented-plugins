@@ -2,8 +2,6 @@
 
 namespace TofuPlugin\Structure;
 
-use GUMP;
-
 class MailAddress
 {
     public function __construct(
@@ -22,13 +20,8 @@ class MailAddress
         public readonly string $name = '',
     )
     {
-        // Validate the email addresses.
-        if (
-            GUMP::is_valid(
-                ['email' => $email],
-                ['email' => 'required|valid_email']
-            ) !== true
-        ) {
+        // Validate the email address using WordPress's built-in function.
+        if (!is_email($email)) {
             throw new \InvalidArgumentException('Invalid email address.');
         }
     }

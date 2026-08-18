@@ -15,21 +15,17 @@ use TofuPlugin\Models\ValidationErrorCollection;
  *         'email',
  *     ],
  *     rules: [
- *         'name' => 'required|max_len:200',
- *         'email' => 'required|valid_email',
- *     ],
- *     filters: [
- *         'name' => 'trim|sanitize_string',
- *         'email' => 'trim|sanitize_email',
+ *         'name' => 'required|max:200',
+ *         'email' => 'required|email',
  *     ],
  *     messages: [
  *         'name' => [
  *             'required' => 'The name field is required.',
- *             'max_len' => 'The name must be maximum 200 characters.',
+ *             'max' => 'The name must be maximum 200 characters.',
  *         ],
  *         'email' => [
  *             'required' => 'The email field is required.',
- *             'valid_email' => 'The email must be a valid email address.',
+ *             'email' => 'The email must be a valid email address.',
  *         ],
  *     ],
  *     after: function ($values, $errors) {
@@ -71,30 +67,15 @@ class ValidationConfig
          *
          * ```php
          * rules: [
-         *     'name' => 'required|max_len:200',
-         *     'email' => 'required|valid_email',
+         *     'name' => 'required|max:200',
+         *     'email' => 'required|email',
          * ],
          * ```
          *
          * @var array
-         * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-validators
+         * @via https://github.com/somnambulist-tech/validation?tab=readme-ov-file#available-rules
          */
         public readonly array $rules,
-
-        /**
-         * Filtering rules.
-         *
-         * ```php
-         * filters: [
-         *     'name' => 'trim|sanitize_string',
-         *     'email' => 'trim|sanitize_email',
-         * ],
-         * ```
-         *
-         * @var array
-         * @via https://github.com/Wixel/GUMP?tab=readme-ov-file#available-filters
-         */
-        public readonly array $filters,
 
         /**
          * Field names for error messages.
@@ -115,11 +96,11 @@ class ValidationConfig
          * messages: [
          *     'name' => [
          *         'required' => 'The name field is required.',
-         *         'max_len' => 'The name must be maximum 200 characters.',
+         *         'max' => 'The name must be maximum 200 characters.',
          *     ],
          *     'email' => [
          *         'required' => 'The email field is required.',
-         *         'valid_email' => 'The email must be a valid email address.',
+         *         'email' => 'The email must be a valid email address.',
          *     ],
          * ],
          * ```

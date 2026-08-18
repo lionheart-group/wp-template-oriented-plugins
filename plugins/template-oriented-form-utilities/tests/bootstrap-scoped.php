@@ -43,7 +43,32 @@ if (!isset($GLOBALS['wpdb'])) {
         }
 
         public function prepare($query, ...$args) {
-            return vsprintf(str_replace(['%s', '%d', '%f'], ["'%s'", '%d', '%f'], $query), $args);
+            $arg_index = 0;
+
+            return preg_replace_callback(
+                '/%([sdif])/',
+                function ($matches) use (&$arg_index, $args) {
+                    if (!array_key_exists($arg_index, $args)) {
+                        return $matches[0];
+                    }
+
+                    $value = $args[$arg_index++];
+
+                    switch ($matches[1]) {
+                        case 'd':
+                            return (string) (int) $value;
+                        case 'f':
+                            return (string) (float) $value;
+                        case 'i':
+                            // Identifier: backtick-quoted, no surrounding single quotes.
+                            return '`' . str_replace('`', '``', (string) $value) . '`';
+                        case 's':
+                        default:
+                            return "'" . (string) $value . "'";
+                    }
+                },
+                $query
+            );
         }
 
         public function get_results($query, $output = OBJECT) {

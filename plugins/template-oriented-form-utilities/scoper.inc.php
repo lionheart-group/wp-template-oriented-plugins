@@ -45,7 +45,7 @@ return [
                 'tests',
                 'Tests',
             ])
-            ->in('vendor/wixel'),
+            ->in('vendor/somnambulist'),
         Finder::create()
             ->files()
             ->ignoreVCS(true)
@@ -111,6 +111,7 @@ return [
         'Walker_Nav_Menu',
         'WP_List_Table',
         'PHPMailer',
+        'WP_REST_Server',
     ],
 
     'exclude-functions' => [

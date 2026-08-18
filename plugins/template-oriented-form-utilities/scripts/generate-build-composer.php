@@ -26,10 +26,7 @@ $composerConfig = [
             // Vendor namespaces are prefixed with TofuVendor
             'TofuVendor\\Monolog\\' => 'vendor/monolog/monolog/src/Monolog/',
             'TofuVendor\\Psr\\Log\\' => 'vendor/psr/log/src/',
-            'TofuVendor\\GUMP\\' => 'vendor/wixel/gump/src/',
-        ],
-        'classmap' => [
-            'vendor/wixel/gump/gump.class.php',
+            'TofuVendor\\Somnambulist\\Components\\Validation\\' => 'vendor/somnambulist/validation/src/',
         ],
     ],
 ];

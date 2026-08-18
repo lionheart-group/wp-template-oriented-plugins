@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: TOFU (Template-Oriented Form Utilities) 0.0.1\n"
+"Project-Id-Version: TOFU (Template-Oriented Form Utilities) 0.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/template-oriented-form-utilities\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-22T09:05:14+00:00\n"
+"POT-Creation-Date: 2026-04-10T11:22:36+09:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: template-oriented-form-utilities\n"
@@ -39,90 +39,126 @@ msgstr ""
 msgid "https://www.lionheart.co.jp/"
 msgstr ""
 
-#: src/Helpers/Form.php:262
+#: build/src/Helpers/Form.php:225
+#: src/Helpers/Form.php:274
 msgid "Remove File"
 msgstr ""
 
+#: build/src/Helpers/ReCAPTCHA.php:27
+#: build/src/Helpers/ReCAPTCHA.php:33
 #: src/Helpers/ReCAPTCHA.php:41
 #: src/Helpers/ReCAPTCHA.php:48
 msgid "Failed to verify reCAPTCHA at this time. Please try again later."
 msgstr ""
 
+#: build/src/Helpers/ReCAPTCHA.php:43
 #: src/Helpers/ReCAPTCHA.php:59
 msgid "Unexpected response from the reCAPTCHA service. Please try again later."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:67
-#: src/Helpers/Turnstile.php:67
+#: build/src/Helpers/ReCAPTCHA.php:51
+#: build/src/Helpers/Turnstile.php:51
+#: src/Helpers/ReCAPTCHA.php:74
+#: src/Helpers/Turnstile.php:74
 msgid "The secret parameter is missing."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:70
-#: src/Helpers/Turnstile.php:70
+#: build/src/Helpers/ReCAPTCHA.php:54
+#: build/src/Helpers/Turnstile.php:54
+#: src/Helpers/ReCAPTCHA.php:77
+#: src/Helpers/Turnstile.php:77
 msgid "The secret parameter is invalid or malformed."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:73
-#: src/Helpers/Turnstile.php:73
+#: build/src/Helpers/ReCAPTCHA.php:57
+#: build/src/Helpers/Turnstile.php:57
+#: src/Helpers/ReCAPTCHA.php:80
+#: src/Helpers/Turnstile.php:80
 msgid "The response parameter is missing."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:76
-#: src/Helpers/Turnstile.php:76
+#: build/src/Helpers/ReCAPTCHA.php:60
+#: build/src/Helpers/Turnstile.php:60
+#: src/Helpers/ReCAPTCHA.php:83
+#: src/Helpers/Turnstile.php:83
 msgid "The response parameter is invalid or malformed."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:79
-#: src/Helpers/Turnstile.php:79
+#: build/src/Helpers/ReCAPTCHA.php:63
+#: build/src/Helpers/Turnstile.php:63
+#: src/Helpers/ReCAPTCHA.php:86
+#: src/Helpers/Turnstile.php:86
 msgid "The request is invalid or malformed."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:82
-#: src/Helpers/Turnstile.php:82
+#: build/src/Helpers/ReCAPTCHA.php:66
+#: build/src/Helpers/Turnstile.php:66
+#: src/Helpers/ReCAPTCHA.php:89
+#: src/Helpers/Turnstile.php:89
 msgid "The response is no longer valid: either is too old or has been used previously."
 msgstr ""
 
 #. translators: %s is the error code
-#: src/Helpers/ReCAPTCHA.php:87
+#: build/src/Helpers/ReCAPTCHA.php:72
+#: src/Helpers/ReCAPTCHA.php:94
 #, php-format
 msgid "An unknown reCAPTCHA error occurred (code: %s). Please try again later."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:98
+#: build/src/Helpers/ReCAPTCHA.php:82
+#: src/Helpers/ReCAPTCHA.php:105
 msgid "Failed to verify reCAPTCHA score. Please try again later."
 msgstr ""
 
-#: src/Helpers/ReCAPTCHA.php:101
+#: build/src/Helpers/ReCAPTCHA.php:85
+#: src/Helpers/ReCAPTCHA.php:108
 msgid "Verification failed. Please try again later."
 msgstr ""
 
+#: build/src/Helpers/Turnstile.php:27
+#: build/src/Helpers/Turnstile.php:33
 #: src/Helpers/Turnstile.php:41
 #: src/Helpers/Turnstile.php:48
 msgid "Failed to verify Turnstile at this time. Please try again later."
 msgstr ""
 
+#: build/src/Helpers/Turnstile.php:43
 #: src/Helpers/Turnstile.php:59
 msgid "Unexpected response from the Turnstile service. Please try again later."
 msgstr ""
 
-#: src/Helpers/Turnstile.php:85
+#: build/src/Helpers/Turnstile.php:69
+#: src/Helpers/Turnstile.php:92
 msgid "An internal error occurred while verifying the response."
 msgstr ""
 
 #. translators: %s is the error code
-#: src/Helpers/Turnstile.php:90
+#: build/src/Helpers/Turnstile.php:75
+#: src/Helpers/Turnstile.php:97
 #, php-format
 msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
 msgstr ""
 
-#: src/Models/Validation.php:134
+#: build/src/Models/Validation.php:120
 msgid "The {field} field is required."
 msgstr ""
 
-#: src/Models/Validation.php:155
+#: build/src/Models/Validation.php:134
 msgid "The {field} field must be less than {param[0]} MB in size."
 msgstr ""
 
-#: src/Models/Validation.php:176
+#: build/src/Models/Validation.php:147
 msgid "The {field} field must be a file of type: {param}."
+msgstr ""
+
+#: src/Models/Validation.php:75
+msgid "The :attribute field is required."
+msgstr ""
+
+#: src/Models/Validation.php:76
+msgid "The :attribute field must be less than :max_mb MB in size."
+msgstr ""
+
+#: src/Models/Validation.php:77
+msgid "The :attribute field must be a file of an allowed type."
 msgstr ""

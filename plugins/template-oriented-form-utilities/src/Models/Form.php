@@ -184,7 +184,7 @@ class Form
      */
     public function hasRecaptcha(): bool
     {
-        return $this->config->recaptcha !== null;
+        return $this->config->recaptchaEnabled && FormHelper::getRecaptchaConfig() !== null;
     }
 
     /**
@@ -194,7 +194,7 @@ class Form
      */
     public function getRecaptchaConfig(): ?ReCAPTCHAConfig
     {
-        return $this->config->recaptcha;
+        return $this->config->recaptchaEnabled ? FormHelper::getRecaptchaConfig() : null;
     }
 
     /**
@@ -204,7 +204,7 @@ class Form
      */
     public function hasTurnstile(): bool
     {
-        return $this->config->turnstile !== null;
+        return $this->config->turnstileEnabled && FormHelper::getTurnstileConfig() !== null;
     }
 
     /**
@@ -214,7 +214,7 @@ class Form
      */
     public function getTurnstileConfig(): ?TurnstileConfig
     {
-        return $this->config->turnstile;
+        return $this->config->turnstileEnabled ? FormHelper::getTurnstileConfig() : null;
     }
 
     /**
@@ -289,14 +289,21 @@ class Form
     }
 
     /**
-     * Verify nonce field
+     * Verify nonce field.
      *
+     * @param string $action The nonce action ('input' or 'confirm').
+     * @param array  $post   POST data to read the nonce from. Defaults to $_POST.
      * @return bool
      */
-    public function verifyNonceField(string $action): bool
+    public function verifyNonceField(string $action, array $post = []): bool
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
-        $nonce = $_POST[$nonceKey] ?? null;
+
+        if (empty($post)) {
+            $post = $_POST;
+        }
+
+        $nonce = $post[$nonceKey] ?? null;
 
         // If nonce is missing or not a string, return false
         if (empty($nonce) || !is_string($nonce)) {
@@ -312,60 +319,89 @@ class Form
      *
      * @return void
      */
-    public function actionInput()
+    public function actionInput(): void
     {
         if ($this->verifyNonceField('input') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
-        // Initialize values and errors
-        // File fields will be handled in the validation step
-        $this->values = new FieldValueCollection();
-        $this->errors = new ValidationErrorCollection();
+        $result = $this->processInput($_POST, $_FILES);
 
-        // Validate input field
-        $validation = new Validation();
-        $validation->validate($this, $_POST, $_FILES);
-
-        // reCAPTCHA validation
-        $this->verifyRecaptcha();
-
-        // Turnstile validation
-        $this->verifyTurnstile();
-
-        // Store the input values in the Session table
-        $this->storeSession();
-
-        // Redirect back for errors
-        if ($this->errors->hasErrors()) {
+        if (!$result['success']) {
+            if ($result['next'] === 'error') {
+                wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
+            }
             $this->redirect('input');
         }
 
-        // Redirect to the confirmation page
-        $url = $this->config->template->confirmPath;
-
-        // If the URL is not set, trigger the confirmation action
-        if (empty($url)) {
-            $this->actionConfirm(skipVerify: true);
-            return;
-        }
-
-        $this->redirect('confirm');
+        $this->redirect($result['next']);
     }
 
     /**
-     * Verify reCAPTCHA token
+     * Process the input step: validate, run bot-checks, store session.
      *
+     * Returns a result array instead of redirecting, making it usable from
+     * both the traditional redirect flow and the REST API endpoint.
+     *
+     * @param array $post  POST field values (typically $_POST).
+     * @param array $files Uploaded file data (typically $_FILES).
+     * @return array{
+     *   success: bool,
+     *   errors:  array<string, string[]>,
+     *   next:    'confirm'|'result'|'input'|'error'
+     * }
+     */
+    public function processInput(array $post, array $files): array
+    {
+        // Reset values and errors from any previous attempt
+        $this->values = new FieldValueCollection();
+        $this->errors = new ValidationErrorCollection();
+
+        // Validate fields
+        $validation = new Validation();
+        $validation->validate($this, $post, $files);
+
+        // Bot-protection checks
+        $this->verifyRecaptcha($post);
+        $this->verifyTurnstile($post);
+
+        // Persist values (and any errors) to session
+        $this->storeSession();
+
+        if ($this->errors->hasErrors()) {
+            return ['success' => false, 'errors' => $this->errors->toArray(), 'next' => 'input'];
+        }
+
+        // No confirmation step — run confirm processing inline
+        if (!$this->config->hasConfirmStep()) {
+            $confirmResult = $this->processConfirm(skipVerify: true);
+            if (!$confirmResult['success']) {
+                return $confirmResult;
+            }
+            return ['success' => true, 'errors' => [], 'next' => 'result'];
+        }
+
+        return ['success' => true, 'errors' => [], 'next' => 'confirm'];
+    }
+
+    /**
+     * Verify reCAPTCHA token.
+     *
+     * @param array $post POST data to read the token from. Defaults to $_POST.
      * @return bool
      */
-    public function verifyRecaptcha(): bool
+    public function verifyRecaptcha(array $post = []): bool
     {
-        if ($this->config->recaptcha === null) {
+        if (!$this->hasRecaptcha()) {
             return true;
         }
 
+        if (empty($post)) {
+            $post = $_POST;
+        }
+
         // Verification type and sanitize input
-        $token = $_POST[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '';
+        $token = $post[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '';
         if (empty($token) || !is_string($token)) {
             $this->errors->addError(Consts::RECAPTCHA_TOKEN_INPUT_NAME, 'reCAPTCHA token is missing.');
             return false;
@@ -373,7 +409,7 @@ class Form
         $token = sanitize_text_field(wp_unslash($token));
 
         // Verify the token
-        $isValidRecaptcha = ReCAPTCHA::verifyToken($this->config->recaptcha, $token);
+        $isValidRecaptcha = ReCAPTCHA::verifyToken($this->getRecaptchaConfig(), $token);
         if (!$isValidRecaptcha) {
             foreach (ReCAPTCHA::getErrors() as $errorMessage) {
                 $this->errors->addError(Consts::RECAPTCHA_TOKEN_INPUT_NAME, $errorMessage);
@@ -384,18 +420,23 @@ class Form
     }
 
     /**
-     * Verify Turnstile token
+     * Verify Turnstile token.
      *
+     * @param array $post POST data to read the token from. Defaults to $_POST.
      * @return bool
      */
-    public function verifyTurnstile(): bool
+    public function verifyTurnstile(array $post = []): bool
     {
-        if ($this->config->turnstile === null) {
+        if (!$this->hasTurnstile()) {
             return true;
         }
 
+        if (empty($post)) {
+            $post = $_POST;
+        }
+
         // Verification type and sanitize input
-        $token = $_POST[Consts::TURNSTILE_TOKEN_INPUT_NAME] ?? '';
+        $token = $post[Consts::TURNSTILE_TOKEN_INPUT_NAME] ?? '';
         if (empty($token) || !is_string($token)) {
             $this->errors->addError(Consts::TURNSTILE_TOKEN_INPUT_NAME, 'Turnstile token is missing.');
             return false;
@@ -403,7 +444,7 @@ class Form
         $token = sanitize_text_field(wp_unslash($token));
 
         // Verify the token
-        $isValidTurnstile = Turnstile::verifyToken($this->config->turnstile, $token);
+        $isValidTurnstile = Turnstile::verifyToken($this->getTurnstileConfig(), $token);
         if (!$isValidTurnstile) {
             foreach (Turnstile::getErrors() as $errorMessage) {
                 $this->errors->addError(Consts::TURNSTILE_TOKEN_INPUT_NAME, $errorMessage);
@@ -435,111 +476,114 @@ class Form
      * Confirm action.
      * Send emails and clear the session data.
      *
-     * @param bool $skipVerify Whether to skip verification steps.
+     * @param bool $skipVerify Whether to skip nonce/session/bot-check verification.
      * @return void
      */
-    public function actionConfirm(bool $skipVerify = false)
+    public function actionConfirm(bool $skipVerify = false): void
     {
-        if ($skipVerify === false) {
-            if ($this->verifyNonceField('confirm') === false) {
-                wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
-            }
+        if ($skipVerify === false && $this->verifyNonceField('confirm') === false) {
+            wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
+        }
 
-            // Verify session data
+        $result = $this->processConfirm($skipVerify);
+
+        if (!$result['success']) {
+            if ($result['next'] === 'error') {
+                wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
+            }
+            // Store errors and redirect back to input
+            $this->storeSession();
+            $this->redirect('input');
+        }
+
+        $this->redirect('result');
+    }
+
+    /**
+     * Process the confirm step: verify session, send emails, store flush value.
+     *
+     * Returns a result array instead of redirecting/dying, making it usable
+     * from both the traditional redirect flow and the REST API endpoint.
+     *
+     * @param bool  $skipVerify Skip session verification (used
+     *                          when confirm is called inline from processInput).
+     * @return array{
+     *   success: bool,
+     *   errors:  array<string, string[]>,
+     *   next:    'result'|'input'|'error'
+     * }
+     */
+    public function processConfirm(bool $skipVerify = false): array
+    {
+        // Already completed in this session — return success without re-sending emails.
+        // This makes confirm idempotent against double-submits and retries.
+        if (!empty($this->flushValue)) {
+            return ['success' => true, 'errors' => [], 'next' => 'result'];
+        }
+
+        if (!$skipVerify) {
+            // Validate session-stored values
             $this->verifySession();
 
-            // Verify reCAPTCHA
-            $this->verifyRecaptcha();
-
-            // Turnstile validation
-            $this->verifyTurnstile();
-
-            // Redirect back for errors
             if ($this->errors->hasErrors()) {
-                // Store the input values in the Session table
-                $this->storeSession();
-
-                // Redirect back for errors
-                $this->redirect('input');
+                return ['success' => false, 'errors' => $this->errors->toArray(), 'next' => 'input'];
             }
         }
 
         $values = $this->values->toArray();
 
-        // Send email function
-        foreach ( $this->config->mail->recipients->recipients as $recipient) {
+        // Send email to every configured recipient
+        foreach ($this->config->mail->recipients->recipients as $recipient) {
             $mail = new Mail();
 
-            // Set mail from
             $mail->setFrom(new MailAddress(
                 email: $this->config->mail->fromEmail,
                 name: $this->config->mail->fromName,
             ));
 
-            // Set mail to
             $mail->addTo(
-                Template::replaceBracesValues(
-                    $recipient->recipientEmail,
-                    $values
-                )
+                Template::replaceBracesValues($recipient->recipientEmail, $values)
             );
 
-            // Set subject
             if ($recipient->subject !== null) {
                 $mail->setSubject(
-                    Template::replaceBracesValues(
-                        $recipient->subject,
-                        $values
-                    )
+                    Template::replaceBracesValues($recipient->subject, $values)
                 );
             } else {
                 $mail->setSubjectFromTemplate($recipient->subjectPath);
             }
 
-            // Set body
             if ($recipient->mailBody !== null) {
                 $mail->setBody(
-                    Template::replaceBracesValues(
-                        $recipient->mailBody,
-                        $values
-                    )
+                    Template::replaceBracesValues($recipient->mailBody, $values)
                 );
             } else {
                 $mail->setBodyFromTemplate($recipient->mailBodyPath);
             }
 
-            // Set CC
             if ($recipient->recipientCcEmail !== null) {
                 $mail->addCc(
-                    Template::replaceBracesValues(
-                        $recipient->recipientCcEmail,
-                        $values
-                    )
+                    Template::replaceBracesValues($recipient->recipientCcEmail, $values)
                 );
             }
 
-            // Set BCC
             if ($recipient->recipientBccEmail !== null) {
                 $mail->addBcc(
-                    Template::replaceBracesValues(
-                        $recipient->recipientBccEmail,
-                        $values
-                    )
+                    Template::replaceBracesValues($recipient->recipientBccEmail, $values)
                 );
             }
 
-            // Attach uploaded files
             foreach ($this->files->getAllFiles() as $uploadedFile) {
                 $mail->addAttachment($uploadedFile->fileName, $uploadedFile->tempName);
             }
 
             if (!$mail->send()) {
                 Logger::error('Failed to send email', $mail->toArray());
-                wp_die('Failed to send email.', 'TOFU Mail Error', ['response' => 500]);
+                return ['success' => false, 'errors' => [], 'next' => 'error'];
             }
         }
 
-        // Delete uploaded files
+        // Delete temporary uploaded files
         foreach ($this->files->getAllFiles() as $uploadedFile) {
             $tempPath = $uploadedFile->tempName;
             if (file_exists($tempPath)) {
@@ -547,14 +591,13 @@ class Form
             }
         }
 
-        // Save flush value for verification in result page
+        // Store flush value so the result page can verify the submission completed
         $this->storeSession(Encryptor::encrypt([
-            'form_key' => $this->config->key,
+            'form_key'  => $this->config->key,
             'timestamp' => time(),
         ]));
 
-        // Redirect to the result page
-        $this->redirect('result');
+        return ['success' => true, 'errors' => [], 'next' => 'result'];
     }
 
     public function verifySubmit(): bool
@@ -584,6 +627,10 @@ class Form
 
     public function redirect(string $action): void
     {
+        if ($this->config->template === null) {
+            wp_die('Template is not configured for this form.', 'TOFU Form Config Error', ['response' => 500]);
+        }
+
         // Check if the action is valid
         if (!in_array($action, ['input', 'confirm', 'result'])) {
             wp_die('Invalid action.', 'TOFU Form Action Error', ['response' => 400]);

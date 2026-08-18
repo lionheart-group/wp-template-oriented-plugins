@@ -3,11 +3,11 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.0.2
+Stable tag: 0.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
-Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing through template-based rendering and data management.
+Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing via template-based data management.
 
 == Description ==
 
@@ -62,6 +62,32 @@ OR…
 
 * v0.0.1 - Initial release.
 * v0.0.2 - Arranged required PHP version to 8.1, added external services section to the readme.
+* v0.0.3
+    - Implemented Ajax form submission and validation with reCAPTCHA and Turnstile support.
+    - Fixed recaptcha issue when embedded multiple forms on the same page.
+    - Replaced validation library from wixel/gump to somnambulist/validation.
 
 
 == Upgrade Notice ==
+
+= 0.0.3 =
+**Breaking changes from v0.0.2:**
+
+1. **Validation rules renamed** (somnambulist/validation replaces wixel/gump):
+   - `required_file` → `custom_required_file`
+   - `max_len` → `max`
+   - `min_len` → `min`
+   - `valid_email` → `email`
+   - `numeric` stays the same
+   - `filters` parameter has been removed from `ValidationConfig` — sanitize input in the `after` hook if needed.
+
+2. **reCAPTCHA / Turnstile configuration moved to plugin level:**
+   - Remove `recaptcha: new ReCAPTCHAConfig(...)` and `turnstile: new TurnstileConfig(...)` from `FormConfig`.
+   - Call `Form::setRecaptcha(new ReCAPTCHAConfig(...))` once before registering forms.
+   - Call `Form::setTurnstile(new TurnstileConfig(...))` once before registering forms.
+   - Replace with `recaptchaEnabled: true` or `turnstileEnabled: true` in each `FormConfig`.
+
+3. **Confirm step requires explicit opt-in:**
+   - `confirmStep: true` must now be set explicitly in `FormConfig` to enable the confirm step.
+   - For the traditional redirect flow, also set `template->confirmPath`.
+   - `Form::embedScript()` is no longer needed on the confirm page template.
