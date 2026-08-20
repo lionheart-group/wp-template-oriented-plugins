@@ -62,6 +62,11 @@ enabled for the form, or `null` otherwise. This lets a client fetch the site key
 it already fetches the nonce, instead of hardcoding it separately per environment — see
 [Vanilla JavaScript](./vanilla-js.md) for the integration pattern.
 
+The `nonce` itself expires on WordPress core's usual schedule (12–24 hours by default, unchanged by
+this plugin) and is invalidated immediately if the visitor's login state changes — fetch it fresh
+right before submitting rather than caching it. See
+[Headless — `403 Forbidden`](./headless.md#403-forbidden--nonce-verification-failed) for details.
+
 ## PHP Setup
 
 Enable AJAX mode in `functions.php`. `template` is not required for AJAX-only forms:

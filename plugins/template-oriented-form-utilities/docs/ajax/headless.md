@@ -238,6 +238,14 @@ export default defineNuxtConfig({
 - The nonce must be fetched fresh for each submission — do not cache or reuse nonces
 - Ensure the nonce is appended to the `FormData` with the correct `field_name` returned
   by the `/nonce` endpoint
+- WordPress nonces are valid for **12–24 hours** by default (WordPress core's `nonce_life`
+  filter — this plugin doesn't change it), which is *shorter* than this plugin's 24-hour
+  session (see "Sessions last 24 hours" below). A form left open longer than that will fail
+  nonce verification even though the session itself is still valid — re-fetch the nonce
+  right before submitting if the user may have left the page open for a long time
+- The nonce is also tied to the visitor's login state at the moment it was issued —
+  logging in or out while the form is open invalidates any nonce fetched before that,
+  regardless of elapsed time
 
 ### Session expired on the confirm page
 
