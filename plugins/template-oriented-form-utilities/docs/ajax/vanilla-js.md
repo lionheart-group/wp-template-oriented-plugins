@@ -87,7 +87,7 @@ async function fetchNonce(action = 'input') {
         credentials: 'same-origin',
     });
     if (!res.ok) throw new Error('Failed to fetch nonce');
-    return res.json(); // { nonce, field_name, action }
+    return res.json(); // { nonce, field_name, action, recaptcha, turnstile }
 }
 
 /**
@@ -245,10 +245,11 @@ rules: [
 ### 1. Register reCAPTCHA config and enable on `FormConfig`
 
 ```php
-// In functions.php — register plugin-level config once
+// In functions.php — register plugin-level config once. siteKey/secretKey
+// typically come from wp-config.php or env vars so they differ per environment.
 \TofuPlugin\Helpers\Form::setRecaptcha(new \TofuPlugin\Structure\ReCAPTCHAConfig(
-    siteKey:   'YOUR_SITE_KEY',
-    secretKey: 'YOUR_SECRET_KEY',
+    siteKey:   getenv('RECAPTCHA_SITE_KEY'),
+    secretKey: getenv('RECAPTCHA_SECRET_KEY'),
     threshold: 0.5,
 ));
 
@@ -259,20 +260,41 @@ new \TofuPlugin\Structure\FormConfig(
 )
 ```
 
-### 2. Load the reCAPTCHA script and generate a token
+### 2. Fetch the site key from the nonce endpoint and load the script dynamically
 
-```html
-<!-- In your <head> -->
-<script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY" async defer></script>
-```
+The `/nonce` response already carries the site key (see [Response format](./index.md#response-format)),
+so the client never has to hardcode it — no separate value to keep in sync when your frontend and
+backend are promoted through staging/production independently. Since the site key is only known
+after that fetch resolves, load `api.js` dynamically instead of a static `<script src="...">` tag:
 
 ```javascript
-const RECAPTCHA_SITE_KEY = 'YOUR_SITE_KEY';
+let recaptchaScriptPromise = null;
 
-async function getRecaptchaToken(action = 'submit') {
+/** Load the reCAPTCHA script for a given site key, once. */
+function loadRecaptchaScript(siteKey) {
+    if (!recaptchaScriptPromise) {
+        recaptchaScriptPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
+            script.async = true;
+            script.defer = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load reCAPTCHA script'));
+            document.head.appendChild(script);
+        });
+    }
+    return recaptchaScriptPromise;
+}
+
+/**
+ * siteKey comes from the /nonce response's `recaptcha.site_key` —
+ * fetch a nonce first (see fetchNonce() above) and pass it in here.
+ */
+async function getRecaptchaToken(siteKey, action = 'submit') {
+    await loadRecaptchaScript(siteKey);
     return new Promise((resolve, reject) => {
         grecaptcha.ready(() => {
-            grecaptcha.execute(RECAPTCHA_SITE_KEY, { action })
+            grecaptcha.execute(siteKey, { action })
                 .then(resolve)
                 .catch(reject);
         });
@@ -280,13 +302,17 @@ async function getRecaptchaToken(action = 'submit') {
 }
 
 // In your submit handler:
-const token = await getRecaptchaToken('submit');
-body.append('_tofu_recaptcha_token', token);
+const { recaptcha } = await fetchNonce('input');
+if (recaptcha) {
+    const token = await getRecaptchaToken(recaptcha.site_key, 'submit');
+    body.append(recaptcha.token_field_name, token); // '_tofu_recaptcha_token'
+}
 ```
 
 ### 3. Display reCAPTCHA errors
 
-The error field name is `_tofu_recaptcha_token`. Add a container for it:
+The error field name is also returned as `recaptcha.token_field_name` (`_tofu_recaptcha_token`).
+Add a container for it:
 
 ```html
 <ul class="errors" data-field="_tofu_recaptcha_token"></ul>
@@ -299,10 +325,11 @@ The error field name is `_tofu_recaptcha_token`. Add a container for it:
 ### 1. Register Turnstile config and enable on `FormConfig`
 
 ```php
-// In functions.php — register plugin-level config once
+// In functions.php — register plugin-level config once. siteKey/secretKey
+// typically come from wp-config.php or env vars so they differ per environment.
 \TofuPlugin\Helpers\Form::setTurnstile(new \TofuPlugin\Structure\TurnstileConfig(
-    siteKey:   'YOUR_SITE_KEY',
-    secretKey: 'YOUR_SECRET_KEY',
+    siteKey:   getenv('TURNSTILE_SITE_KEY'),
+    secretKey: getenv('TURNSTILE_SECRET_KEY'),
 ));
 
 // Then enable per form
@@ -312,22 +339,48 @@ new \TofuPlugin\Structure\FormConfig(
 )
 ```
 
-### 2. Add the Turnstile widget
+### 2. Fetch the site key from the nonce endpoint and render the widget explicitly
+
+The same duplication problem applies to Turnstile: the site key is already configured server-side,
+so fetch it from `/nonce`'s `turnstile.site_key` instead of hardcoding a `data-sitekey` attribute.
+Because the value is only known after that fetch resolves, use Turnstile's
+[Explicit Rendering](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#explicitly-render-the-turnstile-widget)
+API instead of the implicit auto-render:
 
 ```html
-<!-- In your <head> -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<!-- In your <head> — render=explicit so it doesn't auto-render before the site key is known -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
-<!-- In your form -->
-<div class="cf-turnstile"
-     data-sitekey="YOUR_SITE_KEY"
-     data-response-field-name="_tofu_turnstile_token">
-</div>
+<!-- In your form — no data-sitekey here; it's set via turnstile.render() below -->
+<div id="turnstile-container"></div>
 <ul class="errors" data-field="_tofu_turnstile_token"></ul>
 ```
 
-Turnstile automatically populates a hidden input named `_tofu_turnstile_token`,
-which `FormData` picks up automatically.
+```javascript
+let turnstileWidgetId = null;
+
+/**
+ * siteKey comes from the /nonce response's `turnstile.site_key`.
+ * Call once the Turnstile script (`window.turnstile`) has loaded.
+ */
+function renderTurnstile(siteKey) {
+    if (turnstileWidgetId !== null) return; // already rendered
+    turnstileWidgetId = turnstile.render('#turnstile-container', {
+        sitekey: siteKey,
+        'response-field-name': '_tofu_turnstile_token',
+    });
+}
+
+// Once you have the nonce response:
+const { turnstile: turnstileConfig } = await fetchNonce('input');
+if (turnstileConfig) {
+    renderTurnstile(turnstileConfig.site_key);
+}
+```
+
+Turnstile automatically populates a hidden input named `_tofu_turnstile_token` (set via the
+`response-field-name` option above), which `FormData` picks up automatically once the widget
+completes its challenge.
 
 ---
 
@@ -362,16 +415,15 @@ A full working example with error handling, loading state, and reCAPTCHA.
 ```
 
 ```javascript
-const FORM_KEY        = 'contact';
-const BASE_URL        = '/wp-json/tofu/v1/forms/' + FORM_KEY;
-const RECAPTCHA_KEY   = 'YOUR_SITE_KEY'; // set '' to disable
+const FORM_KEY = 'contact';
+const BASE_URL = '/wp-json/tofu/v1/forms/' + FORM_KEY;
 
 async function fetchNonce(action = 'input') {
     const res = await fetch(`${BASE_URL}/nonce?action=${action}`, {
         credentials: 'same-origin',
     });
     if (!res.ok) throw new Error('Could not load form security token. Please reload the page.');
-    return res.json();
+    return res.json(); // { nonce, field_name, action, recaptcha, turnstile }
 }
 
 function showErrors(errors) {
@@ -388,11 +440,31 @@ function showErrors(errors) {
     }
 }
 
-async function getRecaptchaToken() {
-    if (!RECAPTCHA_KEY || typeof grecaptcha === 'undefined') return null;
+// See "reCAPTCHA Integration" above — the site key comes from the nonce
+// response, not a hardcoded constant, so there's nothing to keep in sync
+// between environments.
+let recaptchaScriptPromise = null;
+function loadRecaptchaScript(siteKey) {
+    if (!recaptchaScriptPromise) {
+        recaptchaScriptPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
+            script.async = true;
+            script.defer = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load reCAPTCHA script'));
+            document.head.appendChild(script);
+        });
+    }
+    return recaptchaScriptPromise;
+}
+
+async function getRecaptchaToken(recaptcha) {
+    if (!recaptcha) return null; // not enabled for this form
+    await loadRecaptchaScript(recaptcha.site_key);
     return new Promise((resolve) => {
         grecaptcha.ready(() => {
-            grecaptcha.execute(RECAPTCHA_KEY, { action: 'submit' }).then(resolve);
+            grecaptcha.execute(recaptcha.site_key, { action: 'submit' }).then(resolve);
         });
     });
 }
@@ -406,14 +478,12 @@ form.addEventListener('submit', async (e) => {
     submitBtn.textContent = 'Sending…';
 
     try {
-        const [{ nonce, field_name }, recaptchaToken] = await Promise.all([
-            fetchNonce('input'),
-            getRecaptchaToken(),
-        ]);
+        const { nonce, field_name, recaptcha } = await fetchNonce('input');
+        const recaptchaToken = await getRecaptchaToken(recaptcha);
 
         const body = new FormData(form);
         body.append(field_name, nonce);
-        if (recaptchaToken) body.append('_tofu_recaptcha_token', recaptchaToken);
+        if (recaptchaToken) body.append(recaptcha.token_field_name, recaptchaToken);
 
         const res  = await fetch(`${BASE_URL}/input`, {
             method: 'POST',

@@ -285,6 +285,14 @@ npm install vue-recaptcha-v3
 
 Register the plugin in `main.js` (or `plugins/recaptcha.client.js` for Nuxt):
 
+> **Avoiding a hardcoded site key:** `siteKey` below is shown as a literal string for brevity, but
+> the `/nonce` response already returns it as `recaptcha.site_key` (see
+> [Response format](./index.md#response-format)) — the same value already configured server-side via
+> `Form::setRecaptcha()`. Fetching it at runtime before calling `app.use(VueReCaptcha, ...)` means
+> your frontend build doesn't need its own per-environment copy of the key. See
+> [Vanilla JavaScript — reCAPTCHA Integration](./vanilla-js.md#recaptcha-integration) for the fetch
+> pattern.
+
 ```js
 // main.js
 import { VueReCaptcha } from 'vue-recaptcha-v3';

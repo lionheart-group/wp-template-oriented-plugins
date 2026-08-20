@@ -293,6 +293,14 @@ npm install react-google-recaptcha-v3
 
 Wrap your app with the provider and execute the token before submission:
 
+> **Avoiding a hardcoded site key:** `reCaptchaKey` below is shown as a literal string for brevity,
+> but the `/nonce` response already returns the site key as `recaptcha.site_key` (see
+> [Response format](./index.md#response-format)) — the same value already configured server-side via
+> `Form::setRecaptcha()`. Fetching it at runtime (e.g. into state before rendering
+> `GoogleReCaptchaProvider`) means your frontend build doesn't need its own per-environment copy of
+> the key. See [Vanilla JavaScript — reCAPTCHA Integration](./vanilla-js.md#recaptcha-integration)
+> for the fetch pattern.
+
 ```jsx
 // app.jsx (or _app.jsx in Next.js)
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
