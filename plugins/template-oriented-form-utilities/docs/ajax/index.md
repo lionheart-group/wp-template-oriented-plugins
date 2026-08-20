@@ -47,8 +47,20 @@ without full-page reloads, or from a completely separate frontend application.
 
 **Nonce (GET):**
 ```json
-{ "nonce": "abc123…", "field_name": "_tofu_contact_nonce", "action": "input" }
+{
+  "nonce": "abc123…",
+  "field_name": "_tofu_contact_nonce",
+  "action": "input",
+  "recaptcha": { "site_key": "...", "token_field_name": "_tofu_recaptcha_token" },
+  "turnstile": null
+}
 ```
+
+`recaptcha`/`turnstile` carry the **site key** (safe to expose publicly — it's the same value that
+already appears in every reCAPTCHA/Turnstile widget's HTML/script URL) whenever that protection is
+enabled for the form, or `null` otherwise. This lets a client fetch the site key from the same place
+it already fetches the nonce, instead of hardcoding it separately per environment — see
+[Vanilla JavaScript](./vanilla-js.md) for the integration pattern.
 
 ## PHP Setup
 

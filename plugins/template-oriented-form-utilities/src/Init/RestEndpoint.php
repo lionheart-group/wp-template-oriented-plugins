@@ -194,9 +194,22 @@ class RestEndpoint
      * form submission. The `action` query parameter determines which step
      * the nonce is for (`input` or `confirm`).
      *
+     * Also returns the reCAPTCHA/Turnstile **site key** (never the secret
+     * key) when configured for this form, so cross-origin/headless clients
+     * don't have to separately hardcode a value that's already registered
+     * server-side via `Form::setRecaptcha()`/`Form::setTurnstile()` — one
+     * less place for staging/production values to drift out of sync.
+     * `recaptcha`/`turnstile` are `null` when not enabled for this form.
+     *
      * Response:
      * ```json
-     * { "nonce": "abc123…", "field_name": "_tofu_contact_nonce", "action": "input" }
+     * {
+     *   "nonce": "abc123…",
+     *   "field_name": "_tofu_contact_nonce",
+     *   "action": "input",
+     *   "recaptcha": { "site_key": "...", "token_field_name": "_tofu_recaptcha_token" },
+     *   "turnstile": null
+     * }
      * ```
      *
      * @param \WP_REST_Request $request
@@ -218,10 +231,23 @@ class RestEndpoint
         $nonce = wp_create_nonce($nonceAction);
         $fieldName = sprintf(Consts::NONCE_FORMAT, $key);
 
+        // Only the site key is ever exposed here — ReCAPTCHAConfig/TurnstileConfig
+        // also carry secretKey (and threshold), which must never reach the client.
+        $recaptchaConfig = $form->hasRecaptcha() ? $form->getRecaptchaConfig() : null;
+        $turnstileConfig = $form->hasTurnstile() ? $form->getTurnstileConfig() : null;
+
         return new \WP_REST_Response([
             'nonce'      => $nonce,
             'field_name' => $fieldName,
             'action'     => $action,
+            'recaptcha'  => $recaptchaConfig !== null ? [
+                'site_key'         => $recaptchaConfig->siteKey,
+                'token_field_name' => Consts::RECAPTCHA_TOKEN_INPUT_NAME,
+            ] : null,
+            'turnstile'  => $turnstileConfig !== null ? [
+                'site_key'         => $turnstileConfig->siteKey,
+                'token_field_name' => Consts::TURNSTILE_TOKEN_INPUT_NAME,
+            ] : null,
         ], 200);
     }
 

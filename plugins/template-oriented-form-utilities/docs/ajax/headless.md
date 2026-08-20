@@ -31,8 +31,11 @@ Frontend (https://frontend.example.com)
     ├─ GET /wp-json/tofu/v1/forms/contact/nonce
     │   ← Access-Control-Allow-Origin: https://frontend.example.com
     │   ← Access-Control-Allow-Credentials: true
-    │   ← { "nonce": "…", "field_name": "…", "action": "input" }
+    │   ← { "nonce": "…", "field_name": "…", "action": "input", "recaptcha": null, "turnstile": null }
     │   (no Set-Cookie yet — session is not started by the nonce endpoint)
+    │   (recaptcha/turnstile carry the site key when enabled for this form — see
+    │    Response format in ajax/index.md — so the frontend build doesn't need its own
+    │    per-environment copy of the key)
     │
     ├─ POST /wp-json/tofu/v1/forms/contact/input
     │   → Cookie: (none on first request)

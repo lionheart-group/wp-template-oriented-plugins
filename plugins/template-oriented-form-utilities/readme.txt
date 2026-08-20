@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.0.4
+Stable tag: 0.0.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -72,6 +72,10 @@ OR…
     - Added `Form::setTemplate()` to override a form's input/confirm/result URLs per visitor
       session, so a single registered form can be embedded on multiple pages (e.g. post
       templates); added `FormConfig::$dynamicTemplate` for forms configured this way.
+* v0.0.5
+    - The AJAX nonce endpoint (`GET /wp-json/tofu/v1/forms/{key}/nonce`) now also returns the
+      reCAPTCHA/Turnstile site key when enabled, so cross-origin/headless clients no longer need
+      to hardcode it separately from the server-side configuration.
 
 
 == Upgrade Notice ==
