@@ -79,3 +79,15 @@ after: function (
     $values->addValue('submitted_at', date('Y-m-d H:i:s'));
 }
 ```
+
+> **Note on `confirmStep`:** a field added via `addValue()` inside `after` is *not* filtered by
+> `allows` on the request where it's added — it will appear in the mail body immediately if the
+> form has no confirm step (`confirmStep: false`), since input validation and mail-sending happen
+> in the same request.
+>
+> If the form *does* have a confirm step, the added field is persisted to the session at the end
+> of the input step, but is silently dropped when the session is restored for the confirm-page
+> request — because that restore step filters by `allows`. The field will then be missing from
+> the mail body, which is sent during the confirm step. **Add the field name to `allows` if your
+> form uses `confirmStep: true` and you want a computed field from `after` to reach the mail
+> body** (e.g. `submitted_at` in the example above).
