@@ -217,7 +217,7 @@ class RestEndpoint
      */
     public static function handleNonce(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
     {
-        $key = $request->get_param('key');
+        $key = static::getKeyFromUrl($request);
 
         $form = FormHelper::get($key, strict: false);
         if ($form === false || !$form->config->ajaxEnabled) {
@@ -277,7 +277,7 @@ class RestEndpoint
      */
     public static function handleInput(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
     {
-        $key = $request->get_param('key');
+        $key = static::getKeyFromUrl($request);
 
         $form = FormHelper::get($key, strict: false);
         if ($form === false || !$form->config->ajaxEnabled) {
@@ -328,7 +328,7 @@ class RestEndpoint
      */
     public static function handleConfirm(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
     {
-        $key = $request->get_param('key');
+        $key = static::getKeyFromUrl($request);
 
         $form = FormHelper::get($key, strict: false);
         if ($form === false || !$form->config->ajaxEnabled) {
@@ -359,6 +359,29 @@ class RestEndpoint
             'success' => true,
             'next'    => 'result',
         ], 200);
+    }
+
+    /**
+     * Get the {key} route parameter from the URL — never from the merged
+     * request params.
+     *
+     * WP_REST_Request::get_param()/get_params() merge URL route params with
+     * body/query params, and body/query params take priority over URL params
+     * of the same name (WP_REST_Request::get_parameter_order(): POST > GET >
+     * URL > defaults). Since a submitted form can legitimately have a field
+     * named "key", using get_param('key') here would let that field's value
+     * silently override the actual form key from the URL — causing a
+     * "form not found" error whenever a form has a field named "key".
+     * get_url_params() reads only the regex-matched URL segment, unaffected
+     * by anything in the request body or query string.
+     *
+     * @param \WP_REST_Request $request
+     * @return string
+     */
+    protected static function getKeyFromUrl(\WP_REST_Request $request): string
+    {
+        $urlParams = $request->get_url_params();
+        return (string) ($urlParams['key'] ?? '');
     }
 
     /**
