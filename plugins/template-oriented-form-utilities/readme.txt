@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.0.5
+Stable tag: 0.0.6
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -76,6 +76,10 @@ OR…
     - The AJAX nonce endpoint (`GET /wp-json/tofu/v1/forms/{key}/nonce`) now also returns the
       reCAPTCHA/Turnstile site key when enabled, so cross-origin/headless clients no longer need
       to hardcode it separately from the server-side configuration.
+* v0.0.6
+    - Fixed: AJAX form submissions with a field literally named `key` could fail with a
+      "form not found" error, because the REST handlers read the form key from the merged
+      request parameters instead of strictly from the URL route.
 
 
 == Upgrade Notice ==
