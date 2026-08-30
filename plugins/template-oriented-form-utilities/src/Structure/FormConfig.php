@@ -140,7 +140,7 @@ class FormConfig
             $this->confirmStep &&
             !$this->ajaxEnabled &&
             !$this->dynamicTemplate &&
-            empty($this->template?->confirmPath)
+            ($this->template === null || empty($this->template->confirmPath))
         ) {
             throw new \InvalidArgumentException(
                 "FormConfig '{$this->key}': confirmStep is true but template->confirmPath is not set. " .

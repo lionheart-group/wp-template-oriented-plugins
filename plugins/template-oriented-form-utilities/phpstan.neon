@@ -16,4 +16,3 @@ parameters:
         - '#Constant TOFU_PLUGIN_FILE not found\.#'
         - '#Constant TOFU_PLUGIN_DIR not found\.#'
         - '#Constant COOKIEPATH not found\.#'
-        - '#Constant COOKIE_DOMAIN not found\.#'
