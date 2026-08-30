@@ -80,7 +80,7 @@ class LocaleMessagesTest extends BaseTestCase
 
         $this->assertTrue($result['fails']);
         $this->assertStringNotContainsString('rule.', $result['errors']['field']);
-        $this->assertSame('fieldは"other"がある場合は使用できません', $result['errors']['field']);
+        $this->assertSame('fieldは"other"と同時には使用できません', $result['errors']['field']);
     }
 
     /**
@@ -93,6 +93,6 @@ class LocaleMessagesTest extends BaseTestCase
         $result = EngineProbe::run([], ['attachment' => 'custom_required_file'], [], [], 'ja_JP');
 
         $this->assertTrue($result['fails']);
-        $this->assertSame('attachmentを選択してください', $result['errors']['attachment']);
+        $this->assertSame('attachmentのファイルを選択してください', $result['errors']['attachment']);
     }
 }

@@ -53,7 +53,7 @@ class MessageResolutionTest extends BaseTestCase
 
         $this->assertTrue($result['fails']);
         $this->assertStringNotContainsString('rule.', $result['errors']['field']);
-        $this->assertSame('field must be a valid IP address', $result['errors']['field']);
+        $this->assertSame('Enter field as a valid IP address', $result['errors']['field']);
     }
 
     public function testAttributeWithNoAliasRendersTheRawFieldKeyVerbatim(): void

@@ -84,6 +84,36 @@ OR…
 
 == Upgrade Notice ==
 
+= Unreleased =
+**The validation library has been replaced with an in-house engine. No rule name was
+removed, so existing `rules:` configuration keeps working unchanged.**
+
+1. **English validation messages have been rewritten.** They previously came from the
+   bundled library; they are now TOFU's own text, in one consistent voice. Verdicts are
+   unaffected — a submission that passed before still passes — but any English wording
+   your site displays, or that your tests assert on, will differ. Japanese messages have
+   been rewritten to match.
+   - `required_file` returns as the name for the required-file rule.
+     `custom_required_file`, its name since 0.0.3, still works and behaves identically.
+
+2. **Translations now load properly.** The plugin never called
+   `load_plugin_textdomain()`, so its Japanese `.mo` was almost certainly never used —
+   validation, reCAPTCHA and Turnstile messages rendered in English on Japanese sites.
+   That call has been added, so those strings appear translated for the first time.
+   - German, French, Turkish and Chinese messages, which the old library bundled, now
+     fall back to English until a `.po` is contributed for them.
+
+3. **Behaviour fixes that may change what a form accepts:**
+   - `required` now understands file fields. It previously accepted a file input that
+     the visitor left empty, because the `$_FILES` entry is a non-empty array.
+   - Invalid input no longer raises a fatal error. `after`, `before`, `extension` and
+     `uuid` could return a 500 for ordinary input — a blank date field was enough. They
+     now fail validation and show a message.
+   - `uploaded_file`, `mimes` and `extension` work at all now; they previously depended
+     on a check that is never true in this plugin's request flow.
+   - A file carried over to the confirm page is verified against the server's own
+     session record, so a tampered form can no longer claim an upload that is not there.
+
 = 0.0.3 =
 **Breaking changes from v0.0.2:**
 

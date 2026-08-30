@@ -71,11 +71,15 @@ class ErrorHarvestingTest extends BaseTestCase
         $maxFirst = EngineProbe::run(['field' => 'abcdef'], ['field' => 'required|max:2|min:100']);
         $minFirst = EngineProbe::run(['field' => 'abcdef'], ['field' => 'required|min:100|max:2']);
 
+        // Identify which rule spoke by its parameter, which is stable,
+        // rather than by wording.
         $this->assertCount(1, $maxFirst['errors']);
-        $this->assertStringContainsString('maximum', $maxFirst['errors']['field']);
+        $this->assertStringContainsString('2', $maxFirst['errors']['field']);
+        $this->assertStringNotContainsString('100', $maxFirst['errors']['field']);
 
         $this->assertCount(1, $minFirst['errors']);
-        $this->assertStringContainsString('minimum', $minFirst['errors']['field']);
+        $this->assertStringContainsString('100', $minFirst['errors']['field']);
+        $this->assertStringNotContainsString('2', $minFirst['errors']['field']);
     }
 
     /**

@@ -273,11 +273,11 @@ class CustomFileRulesTest extends BaseTestCase
         );
 
         $this->assertTrue($result['fails']);
-        $this->assertStringContainsString(
-            'required',
-            $result['errors']['attachment'],
-            'KNOWN WART: the surfaced message is the required-field one, never a size message.'
-        );
+        // The surfaced message is the "choose a file" one, never a size
+        // message — asserted by its distinguishing word rather than the full
+        // sentence, which is free to be reworded.
+        $this->assertStringNotContainsString('MB', $result['errors']['attachment']);
+        $this->assertStringNotContainsString('large', $result['errors']['attachment']);
     }
 
     /**
