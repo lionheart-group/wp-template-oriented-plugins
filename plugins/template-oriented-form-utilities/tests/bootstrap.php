@@ -7,9 +7,6 @@
 // Composer autoloader must be loaded before anything else
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-// Load Yoast PHPUnit Polyfills
-require_once dirname(__DIR__) . '/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php';
-
 // Define WordPress constants for testing
 if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__DIR__, 4) . '/');

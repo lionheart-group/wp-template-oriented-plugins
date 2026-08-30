@@ -175,6 +175,17 @@ final class Corpus
     ];
 
     /**
+     * @var array<string, array{
+     *   data: array<string, mixed>,
+     *   rules: array<string, mixed>,
+     *   aliases: array<string, string>,
+     *   messages: array<string, array<string, string>>,
+     *   locale: string,
+     * }>|null
+     */
+    private static ?array $cases = null;
+
+    /**
      * @return array<string, array{
      *   data: array<string, mixed>,
      *   rules: array<string, mixed>,
@@ -185,6 +196,15 @@ final class Corpus
      */
     public static function cases(): array
     {
+        // Built once per process. Every golden test asks for the corpus, so
+        // rebuilding it per case meant assembling ~3,500 nested arrays close
+        // to 5,000 times — most of the suite's runtime, for a value that is
+        // the same every time. Callers get a copy, so nothing they do to the
+        // returned array can reach this one.
+        if (self::$cases !== null) {
+            return self::$cases;
+        }
+
         $cases = [];
 
         self::addParamlessValueSweep($cases);
@@ -199,7 +219,7 @@ final class Corpus
 
         ksort($cases);
 
-        return $cases;
+        return self::$cases = $cases;
     }
 
     private static function make(
