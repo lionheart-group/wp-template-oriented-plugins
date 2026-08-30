@@ -192,8 +192,16 @@ if (!function_exists('wp_generate_password')) {
 }
 
 if (!function_exists('wp_unslash')) {
+    // Mirrors WordPress's stripslashes_from_strings_only() behaviour: recurses
+    // into arrays but leaves non-string scalars (int/float/bool/null) untouched
+    // instead of coercing them to strings. This distinction matters for
+    // validation rules whose behaviour depends on the value's PHP type
+    // (e.g. numeric-string vs int) — see tests/Unit/Validation/.
     function wp_unslash($value) {
-        return is_array($value) ? array_map('wp_unslash', $value) : stripslashes($value);
+        if (is_array($value)) {
+            return array_map('wp_unslash', $value);
+        }
+        return is_string($value) ? stripslashes($value) : $value;
     }
 }
 
@@ -231,6 +239,37 @@ if (!function_exists('current_time')) {
 if (!function_exists('wp_timezone')) {
     function wp_timezone(): \DateTimeZone {
         return new \DateTimeZone('UTC');
+    }
+}
+
+if (!function_exists('get_locale')) {
+    // Tests can steer the resolved locale by setting this global directly,
+    // e.g. $GLOBALS['__tofu_test_locale'] = 'ja_JP';
+    function get_locale(): string {
+        return $GLOBALS['__tofu_test_locale'] ?? 'en_US';
+    }
+}
+
+if (!function_exists('apply_filters')) {
+    function apply_filters(string $tag, $value, ...$args) {
+        return $value;
+    }
+}
+
+if (!function_exists('do_action')) {
+    function do_action(string $tag, ...$args): void {
+    }
+}
+
+if (!function_exists('add_filter')) {
+    function add_filter(string $tag, callable $callback, int $priority = 10, int $accepted_args = 1): bool {
+        return true;
+    }
+}
+
+if (!function_exists('add_action')) {
+    function add_action(string $tag, callable $callback, int $priority = 10, int $accepted_args = 1): bool {
+        return true;
     }
 }
 

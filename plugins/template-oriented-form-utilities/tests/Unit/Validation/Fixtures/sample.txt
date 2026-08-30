@@ -1,0 +1,3 @@
+TOFU validation golden-corpus fixture file. Used by mime_type/max_mb probes
+via finfo() sniffing, so its content and size must stay stable — do not
+"clean up" or reformat this file without regenerating expected.json.
