@@ -43,7 +43,7 @@ AJAX/headless forms via `TofuPlugin\Init\RestEndpoint` — see `docs/ajax/`.
 | `Validation/Rules/` | Every rule class, including TOFU's own `RequiredFileRule` (`required_file`, plus its legacy alias `custom_required_file`), `MaxMbRule` (`max_mb`) and `MimeTypeRule` (`mime_type`). Several labels deliberately share one class (`regex`/`matches`, `integer`/`number`, `default`/`defaults`) — **labels are never removed**, since an unknown rule name throws at parse time and would white-screen a live form. `required`, the `required_*`/`prohibited_*` families and `required_file` all share `Support\Presence` so they agree about what counts as an answer, files included |
 | `Shortcodes/` | **Empty** — no shortcodes are provided by this plugin |
 | `Consts.php` | Plugin-wide constants (query/cookie/nonce keys, `SESSION_EXPIRY`, `REST_NAMESPACE=tofu/v1`, upload/log subfolders) |
-| `Logger.php` | Monolog wrapper, active only when `WP_DEBUG === true`, logs to `wp-content/uploads/tofu-logs/` |
+| `Logger.php` | Debug log, active only when `WP_DEBUG === true`, appended to `wp-content/uploads/tofu-logs/`. Line format is byte-compatible with the Monolog output it replaced, so files spanning the change stay greppable; write failures are swallowed so logging can never take a submission down |
 
 ### DB tables (created on activation via `migrations/`)
 
@@ -58,19 +58,25 @@ AJAX/headless forms via `TofuPlugin\Init\RestEndpoint` — see `docs/ajax/`.
 ## Development
 
 ```bash
-composer install    # install dependencies
-composer phpstan     # PHPStan level 5 static analysis (src/, bootstrap: tests/bootstrap-phpstan.php)
-composer test        # PHPUnit (tests/Unit, bootstrap: tests/bootstrap.php)
-composer check        # phpstan + test (NOT test:scoped — see note below)
-composer build         # PHP Scoper production build → build/ (vendor namespaced under TofuVendor\)
-./install-tools.sh      # fetches tools/php-scoper.phar (gitignored), required before `composer build`
+composer install   # dev tooling only — there are no runtime dependencies
+composer phpstan    # PHPStan level 5 (src/, bootstrap: tests/bootstrap-phpstan.php)
+composer test       # PHPUnit (tests/Unit, bootstrap: tests/bootstrap.php)
+composer check       # phpstan + test
+composer build        # check, then assemble build/ via scripts/build-release.php
+php scripts/build-release.php --zip   # build and also produce build/<slug>-<version>.zip
 ```
 
-**Known issue — do not "fix" without discussing first:** `phpunit.scoped.xml` is currently
-byte-identical to `phpunit.xml` (`bootstrap="tests/bootstrap.php"`), so `composer test:scoped`
-does not actually exercise the scoped build in `build/` despite `tests/bootstrap-scoped.php`
-existing for that purpose. There is no PHP CI (`.github/workflows/` only deploys the Astro docs
-site in `page/`) — `composer check` must be run locally before pushing.
+**There is no PHP CI** — `.github/workflows/` only deploys the Astro docs site in `page/`, so
+`composer check` has to be run locally before pushing.
+
+`build-release.php` copies an **allow-list** (`src/`, `assets/`, `languages/`, `migrations/`
+plus the three root files) and regenerates a classmap autoloader, rather than excluding what we
+remember to exclude. The plugin ships with zero runtime dependencies, so `vendor/` in the build
+holds nothing but Composer's autoloader.
+
+> There used to be a PHP-Scoper step here, prefixing bundled libraries to `TofuVendor\` so they
+> could not collide with another plugin's copy. Nothing is bundled any more, so it was removed
+> along with `install-tools.sh`, `phpunit.scoped.xml` and `tests/bootstrap-scoped.php`.
 
 ## Coding conventions
 
