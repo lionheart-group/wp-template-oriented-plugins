@@ -10,7 +10,7 @@
  * Plugin Name: TOFU (Template-Oriented Form Utilities)
  * Plugin URI: https://lionheart-group.github.io/template-oriented-form-utilities/
  * Description: Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner.
- * Version: 0.0.6
+ * Version: 0.0.7
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('TOFU_VERSION', '0.0.6');
+define('TOFU_VERSION', '0.0.7');
 define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TOFU_PLUGIN_FILE', __FILE__);
 
@@ -46,6 +46,23 @@ use TofuPlugin\Logger;
 
 // Prepare Logger
 Logger::init('tofu');
+
+/**
+ * Load translations from the bundled languages/ directory.
+ *
+ * Without this the plugin's own .mo files are never registered, so every
+ * __() call — validation messages, reCAPTCHA and Turnstile errors, the
+ * "Remove File" label — renders untranslated English no matter the site
+ * locale. Runs on `init` because that is the earliest point translations
+ * are allowed to load.
+ */
+add_action('init', function () {
+    load_plugin_textdomain(
+        'template-oriented-form-utilities',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
+});
 
 // Register hooks that are fired when the plugin is activated or deactivated.
 register_activation_hook(__FILE__, function () {

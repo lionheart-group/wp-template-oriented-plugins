@@ -12,11 +12,18 @@
 namespace TofuPlugin\Helpers;
 
 /**
- * Suppress setcookie() calls during unit tests.
- * Session::getSessionId() calls setcookie() which would trigger
- * "Cannot modify header information" errors since PHPUnit has already
- * produced output by the time tests run.
+ * Intercept setcookie() during unit tests.
+ *
+ * Calling the real one would emit "Cannot modify header information",
+ * because PHPUnit has already written output by the time tests run. Each
+ * call is also recorded, so tests can assert on WHETHER a cookie was issued
+ * — the point of Session's read/issue split is that merely reading a
+ * session must not send one, and that is only observable from here.
+ *
+ * @var array<int, array{name: string, value: string, options: array<string, mixed>|int}>
  */
+$GLOBALS['__tofu_setcookie_calls'] = [];
+
 function setcookie(
     string $name,
     string $value = '',
@@ -26,5 +33,11 @@ function setcookie(
     bool $secure = false,
     bool $httponly = false
 ): bool {
+    $GLOBALS['__tofu_setcookie_calls'][] = [
+        'name'    => $name,
+        'value'   => $value,
+        'options' => $expires_or_options,
+    ];
+
     return true;
 }

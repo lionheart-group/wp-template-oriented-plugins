@@ -31,18 +31,41 @@ class Session
     }
 
     /**
-     * Get unique cookie name for identifying the session
+     * The session key this browser already carries, if any.
+     *
+     * Read-only on purpose. Reading a session must never hand out a cookie:
+     * Form::register() runs on `init` for every request, so issuing one here
+     * would put a Set-Cookie on every page of the site — including pages
+     * with no form and the admin — which is enough to make most full-page
+     * caches (Varnish, nginx fastcgi_cache, WP Rocket) stop serving cached
+     * responses altogether.
+     *
+     * @return ?string Null when the browser has no session cookie.
+     */
+    protected static function readSessionId(): ?string
+    {
+        if (!isset($_COOKIE[Consts::SESSION_COOKIE_KEY])) {
+            return null;
+        }
+
+        $value = \sanitize_text_field(\wp_unslash($_COOKIE[Consts::SESSION_COOKIE_KEY]));
+
+        return $value === '' ? null : $value;
+    }
+
+    /**
+     * The session key to store data under, minting and sending one if the
+     * browser does not have it yet.
+     *
+     * The only place a session cookie is issued. It is called when session
+     * data is actually being persisted, which is the first moment there is
+     * anything for the key to point at.
      *
      * @return string
      */
-    protected static function getSessionId(): string
+    protected static function issueSessionId(): string
     {
-        if (isset($_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY])) {
-            $value = $_COOKIE[\TofuPlugin\Consts::SESSION_COOKIE_KEY];
-        } else {
-            $value = \wp_generate_password( 32, false, false );
-        }
-        $value = \sanitize_text_field(\wp_unslash($value));
+        $value = self::readSessionId() ?? \wp_generate_password(32, false, false);
 
         setcookie(
             Consts::SESSION_COOKIE_KEY,
@@ -69,8 +92,9 @@ class Session
      */
     public static function save(string $form_id, $data): void
     {
-        // Session ID
-        $key = self::getSessionId();
+        // Storing data is the point at which a key becomes worth handing
+        // out, so this is the one path that issues the cookie.
+        $key = self::issueSessionId();
 
         // Expiration time
         $expiration = new \DateTime('now', \wp_timezone());
@@ -112,8 +136,14 @@ class Session
      */
     public static function get(string $form_id): mixed
     {
-        // Session ID
-        $key = self::getSessionId();
+        $key = self::readSessionId();
+
+        // No cookie means no session can belong to this browser, so there is
+        // nothing to look up — the old code minted a fresh key here and then
+        // queried for a row it could never match.
+        if ($key === null) {
+            return null;
+        }
 
         // Retrieve session record from the database
         $row = SessionModel::get($form_id, $key);
@@ -134,8 +164,12 @@ class Session
      */
     public static function clear(string $form_id): void
     {
-        // Session ID
-        $key = self::getSessionId();
+        $key = self::readSessionId();
+
+        // Nothing to clear, and no reason to hand out a cookie on the way out.
+        if ($key === null) {
+            return;
+        }
 
         // Delete session record from the database
         SessionModel::delete([

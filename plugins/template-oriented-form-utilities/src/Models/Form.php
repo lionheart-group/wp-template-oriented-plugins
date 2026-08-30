@@ -246,7 +246,7 @@ class Form
      */
     public function isFieldAllowed(string $field, array $allowsList = []): bool
     {
-        if (is_array($allowsList) && !empty($allowsList) && in_array($field, $allowsList, true)) {
+        if (!empty($allowsList) && in_array($field, $allowsList, true)) {
             return true;
         }
 
@@ -492,7 +492,10 @@ class Form
         // Verification type and sanitize input
         $token = $post[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '';
         if (empty($token) || !is_string($token)) {
-            $this->errors->addError(Consts::RECAPTCHA_TOKEN_INPUT_NAME, 'reCAPTCHA token is missing.');
+            $this->errors->addError(
+                Consts::RECAPTCHA_TOKEN_INPUT_NAME,
+                __('reCAPTCHA token is missing.', 'template-oriented-form-utilities')
+            );
             return false;
         }
         $token = sanitize_text_field(wp_unslash($token));
@@ -527,7 +530,10 @@ class Form
         // Verification type and sanitize input
         $token = $post[Consts::TURNSTILE_TOKEN_INPUT_NAME] ?? '';
         if (empty($token) || !is_string($token)) {
-            $this->errors->addError(Consts::TURNSTILE_TOKEN_INPUT_NAME, 'Turnstile token is missing.');
+            $this->errors->addError(
+                Consts::TURNSTILE_TOKEN_INPUT_NAME,
+                __('Turnstile token is missing.', 'template-oriented-form-utilities')
+            );
             return false;
         }
         $token = sanitize_text_field(wp_unslash($token));

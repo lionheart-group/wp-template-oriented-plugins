@@ -44,6 +44,14 @@ msgstr ""
 msgid "Remove File"
 msgstr ""
 
+#: src/Models/Form.php:497
+msgid "reCAPTCHA token is missing."
+msgstr ""
+
+#: src/Models/Form.php:535
+msgid "Turnstile token is missing."
+msgstr ""
+
 #: build/src/Helpers/ReCAPTCHA.php:27
 #: build/src/Helpers/ReCAPTCHA.php:33
 #: src/Helpers/ReCAPTCHA.php:41
@@ -139,26 +147,435 @@ msgstr ""
 msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
 msgstr ""
 
-#: build/src/Models/Validation.php:120
-msgid "The {field} field is required."
+#: src/Init/AdminPage.php:29
+#: src/Init/AdminPage.php:78
+#: src/Init/AdminPage.php:198
+msgid "TOFU Records"
 msgstr ""
 
-#: build/src/Models/Validation.php:134
-msgid "The {field} field must be less than {param[0]} MB in size."
+#: src/Init/AdminPage.php:30
+msgid "TOFU"
 msgstr ""
 
-#: build/src/Models/Validation.php:147
-msgid "The {field} field must be a file of type: {param}."
+#: src/Init/AdminPage.php:45
+msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: src/Models/Validation.php:75
-msgid "The :attribute field is required."
+#: src/Init/AdminPage.php:85
+msgid "Filter by form"
 msgstr ""
 
-#: src/Models/Validation.php:76
-msgid "The :attribute field must be less than :max_mb MB in size."
+#: src/Init/AdminPage.php:88
+msgid "All forms"
 msgstr ""
 
-#: src/Models/Validation.php:77
-msgid "The :attribute field must be a file of an allowed type."
+#: src/Init/AdminPage.php:95
+msgid "Filter"
+msgstr ""
+
+#: src/Init/AdminPage.php:118
+#: src/Init/AdminPage.php:155
+#: src/Init/AdminPage.php:231
+msgid "ID"
+msgstr ""
+
+#: src/Init/AdminPage.php:119
+#: src/Init/AdminPage.php:156
+#: src/Init/AdminPage.php:235
+msgid "Form"
+msgstr ""
+
+#: src/Init/AdminPage.php:120
+#: src/Init/AdminPage.php:157
+#: src/Init/AdminPage.php:239
+msgid "Submitted"
+msgstr ""
+
+#: src/Init/AdminPage.php:121
+#: src/Init/AdminPage.php:158
+msgid "Fields"
+msgstr ""
+
+#: src/Init/AdminPage.php:127
+msgid "No records found."
+msgstr ""
+
+#: src/Init/AdminPage.php:199
+msgid "Record not found."
+msgstr ""
+
+#: src/Init/AdminPage.php:201
+#: src/Init/AdminPage.php:225
+msgid "Back to list"
+msgstr ""
+
+#. translators: %d = record ID
+#: src/Init/AdminPage.php:218
+msgid "TOFU Record #%d"
+msgstr ""
+
+#: src/Init/AdminPage.php:245
+msgid "Submitted Fields"
+msgstr ""
+
+#: src/Init/AdminPage.php:248
+msgid "Field data could not be decrypted or is unavailable."
+msgstr ""
+
+#: src/Init/AdminPage.php:253
+msgid "Field"
+msgstr ""
+
+#: src/Init/AdminPage.php:254
+msgid "Value"
+msgstr ""
+
+#. Validation message: rule.accepted
+#: src/Validation/Messages.php
+msgid "Please confirm :attribute"
+msgstr ""
+
+#. Validation message: rule.after
+#: src/Validation/Messages.php
+msgid ":attribute must be later than :time"
+msgstr ""
+
+#. Validation message: rule.alpha
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters only"
+msgstr ""
+
+#. Validation message: rule.alpha_dash
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters, numbers, hyphens and underscores only"
+msgstr ""
+
+#. Validation message: rule.alpha_num
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters and numbers only"
+msgstr ""
+
+#. Validation message: rule.alpha_spaces
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters and spaces only"
+msgstr ""
+
+#. Validation message: rule.any_of
+#: src/Validation/Messages.php
+msgid "Every entry in :attribute must be one of :allowed_values"
+msgstr ""
+
+#. Validation message: rule.array
+#: src/Validation/Messages.php
+msgid ":attribute must be a list of values"
+msgstr ""
+
+#. Validation message: rule.array_can_only_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute accepts only these keys: :keys"
+msgstr ""
+
+#. Validation message: rule.array_must_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute is missing one or more required keys: :keys"
+msgstr ""
+
+#. Validation message: rule.before
+#: src/Validation/Messages.php
+msgid ":attribute must be earlier than :time"
+msgstr ""
+
+#. Validation message: rule.between
+#: src/Validation/Messages.php
+msgid ":attribute must be between :min and :max"
+msgstr ""
+
+#. Validation message: rule.boolean
+#: src/Validation/Messages.php
+msgid ":attribute must be either true or false"
+msgstr ""
+
+#. Validation message: rule.date
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid date"
+msgstr ""
+
+#. Validation message: rule.default
+#: src/Validation/Messages.php
+msgid ":attribute is not valid"
+msgstr ""
+
+#. Validation message: rule.default_value
+#: src/Validation/Messages.php
+msgid ":attribute falls back to :default"
+msgstr ""
+
+#. Validation message: rule.different
+#: src/Validation/Messages.php
+msgid ":attribute must not match :field"
+msgstr ""
+
+#. Validation message: rule.digits
+#: src/Validation/Messages.php
+msgid ":attribute must be exactly :length digits"
+msgstr ""
+
+#. Validation message: rule.digits_between
+#: src/Validation/Messages.php
+msgid ":attribute must be between :min and :max digits"
+msgstr ""
+
+#. Validation message: rule.email
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid email address"
+msgstr ""
+
+#. Validation message: rule.ends_with
+#: src/Validation/Messages.php
+msgid ":attribute must end with :compare_with"
+msgstr ""
+
+#. Validation message: rule.exists
+#: src/Validation/Messages.php
+msgid ":attribute does not match any existing record"
+msgstr ""
+
+#. Validation message: rule.extension
+#: src/Validation/Messages.php
+msgid ":attribute must be one of these file types: :allowed_extensions"
+msgstr ""
+
+#. Validation message: rule.float
+#: src/Validation/Messages.php
+msgid ":attribute must be a decimal number"
+msgstr ""
+
+#. Validation message: rule.in
+#: src/Validation/Messages.php
+msgid ":attribute must be one of :allowed_values"
+msgstr ""
+
+#. Validation message: rule.integer
+#: src/Validation/Messages.php
+msgid ":attribute must be a whole number"
+msgstr ""
+
+#. Validation message: rule.ip
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid IP address"
+msgstr ""
+
+#. Validation message: rule.ipv4
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid IPv4 address"
+msgstr ""
+
+#. Validation message: rule.ipv6
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid IPv6 address"
+msgstr ""
+
+#. Validation message: rule.json
+#: src/Validation/Messages.php
+msgid ":attribute must be valid JSON"
+msgstr ""
+
+#. Validation message: rule.length
+#: src/Validation/Messages.php
+msgid ":attribute must be exactly :length characters"
+msgstr ""
+
+#. Validation message: rule.lowercase
+#: src/Validation/Messages.php
+msgid ":attribute must be lowercase"
+msgstr ""
+
+#. Validation message: rule.max
+#: src/Validation/Messages.php
+msgid ":attribute may not be greater than :max"
+msgstr ""
+
+#. Validation message: rule.mimes
+#: src/Validation/Messages.php
+msgid ":attribute must be one of these file types: :allowed_types"
+msgstr ""
+
+#. Validation message: rule.min
+#: src/Validation/Messages.php
+msgid ":attribute may not be less than :min"
+msgstr ""
+
+#. Validation message: rule.not_in
+#: src/Validation/Messages.php
+msgid ":attribute may not be any of :disallowed_values"
+msgstr ""
+
+#. Validation message: rule.numeric
+#: src/Validation/Messages.php
+msgid ":attribute must be a number"
+msgstr ""
+
+#. Validation message: rule.phone_number
+#: src/Validation/Messages.php
+msgid "Enter :attribute in international format, such as +81312345678"
+msgstr ""
+
+#. Validation message: rule.present
+#: src/Validation/Messages.php
+msgid ":attribute is missing from the submission"
+msgstr ""
+
+#. Validation message: rule.prohibited
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used here"
+msgstr ""
+
+#. Validation message: rule.prohibited_if
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used when :field is :values"
+msgstr ""
+
+#. Validation message: rule.prohibited_unless
+#: src/Validation/Messages.php
+msgid ":attribute can only be used when :field is :values"
+msgstr ""
+
+#. Validation message: rule.prohibited_with
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used together with :fields"
+msgstr ""
+
+#. Validation message: rule.prohibited_with_all
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used when all of :fields are filled in"
+msgstr ""
+
+#. Validation message: rule.prohibited_without
+#: src/Validation/Messages.php
+msgid ":attribute can only be used once :fields are filled in"
+msgstr ""
+
+#. Validation message: rule.prohibited_without_all
+#: src/Validation/Messages.php
+msgid ":attribute can only be used once all of :fields are filled in"
+msgstr ""
+
+#. Validation message: rule.regex
+#: src/Validation/Messages.php
+msgid ":attribute is not in the expected format"
+msgstr ""
+
+#. Validation message: rule.rejected
+#: src/Validation/Messages.php
+msgid ":attribute must be declined"
+msgstr ""
+
+#. Validation message: rule.required
+#: src/Validation/Messages.php
+msgid ":attribute is required"
+msgstr ""
+
+#. Validation message: rule.required_if
+#: src/Validation/Messages.php
+msgid ":attribute is required when :field is :values"
+msgstr ""
+
+#. Validation message: rule.required_unless
+#: src/Validation/Messages.php
+msgid ":attribute is required unless :field is :values"
+msgstr ""
+
+#. Validation message: rule.required_with
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields is filled in"
+msgstr ""
+
+#. Validation message: rule.required_with_all
+#: src/Validation/Messages.php
+msgid ":attribute is required when all of :fields are filled in"
+msgstr ""
+
+#. Validation message: rule.required_without
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields is left blank"
+msgstr ""
+
+#. Validation message: rule.required_without_all
+#: src/Validation/Messages.php
+msgid ":attribute is required when all of :fields are left blank"
+msgstr ""
+
+#. Validation message: rule.requires
+#: src/Validation/Messages.php
+msgid ":attribute also needs :fields to be filled in"
+msgstr ""
+
+#. Validation message: rule.same
+#: src/Validation/Messages.php
+msgid ":attribute must match :field"
+msgstr ""
+
+#. Validation message: rule.starts_with
+#: src/Validation/Messages.php
+msgid ":attribute must start with :compare_with"
+msgstr ""
+
+#. Validation message: rule.string
+#: src/Validation/Messages.php
+msgid ":attribute must be text"
+msgstr ""
+
+#. Validation message: rule.unique
+#: src/Validation/Messages.php
+msgid ":attribute must be unique — :value is already in use"
+msgstr ""
+
+#. Validation message: rule.uppercase
+#: src/Validation/Messages.php
+msgid ":attribute must be uppercase"
+msgstr ""
+
+#. Validation message: rule.url
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid URL"
+msgstr ""
+
+#. Validation message: rule.uuid
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid UUID"
+msgstr ""
+
+#. Validation message: rule.required_file
+#: src/Validation/Messages.php
+msgid "Please choose a file for :attribute"
+msgstr ""
+
+#. Validation message: rule.max_mb
+#: src/Validation/Messages.php
+msgid ":attribute must be no larger than :max_mb MB"
+msgstr ""
+
+#. Validation message: rule.mime_type
+#: src/Validation/Messages.php
+msgid ":attribute is not an accepted file type"
+msgstr ""
+
+#. Validation message: rule.uploaded_file
+#: src/Validation/Messages.php
+msgid ":attribute was not uploaded successfully"
+msgstr ""
+
+#. Validation message: rule.uploaded_file.min_size
+#: src/Validation/Messages.php
+msgid ":attribute is too small; the minimum is :min_size"
+msgstr ""
+
+#. Validation message: rule.uploaded_file.max_size
+#: src/Validation/Messages.php
+msgid ":attribute is too large; the maximum is :max_size"
+msgstr ""
+
+#. Validation message: rule.uploaded_file.type
+#: src/Validation/Messages.php
+msgid ":attribute is not one of the accepted file types: :allowed_types"
 msgstr ""

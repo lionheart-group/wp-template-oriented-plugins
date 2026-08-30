@@ -1,9 +1,9 @@
 === TOFU (Template-Oriented Form Utilities) ===
 Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.0.6
+Stable tag: 0.0.7
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -80,9 +80,70 @@ OR…
     - Fixed: AJAX form submissions with a field literally named `key` could fail with a
       "form not found" error, because the REST handlers read the form key from the merged
       request parameters instead of strictly from the URL route.
+* v0.0.7
+    - Replaced the bundled validation library with an in-house engine. The plugin now has no
+      runtime dependencies at all. Every rule name still resolves, so existing `rules:`
+      configuration keeps working — see the upgrade notice for the behavioural differences.
+    - Added: `required_file` as the name of the required-file rule. `custom_required_file`,
+      its name since 0.0.3, still works and runs the same code.
+    - Fixed: a full-width space (U+3000) no longer satisfies `required`. It is what a Japanese
+      IME emits for the space bar, so a field the visitor sees as empty could pass.
+    - Fixed: `required` now recognises an empty file input as empty.
+    - Fixed: `after`, `before`, `extension` and `uuid` no longer raise a fatal error on
+      ordinary input — a blank date field was enough to return a 500.
+    - Fixed: `uploaded_file`, `mimes` and `extension` now work. They depended on a check that
+      is never true in this plugin's request flow.
+    - Fixed: a file carried over to the confirm page is verified against the server's own
+      session record, so a tampered form cannot claim an upload that is not there.
+    - Fixed: the session cookie is issued only when a session is actually saved. It was
+      previously sent on every request, including pages with no form and the admin screens,
+      which is enough to stop most full-page caches serving anything cached.
+    - Fixed: the plugin never called `load_plugin_textdomain()`, so its bundled Japanese
+      translations were not loaded and validation, reCAPTCHA and Turnstile messages rendered
+      in English on Japanese sites.
+    - Fixed: "reCAPTCHA token is missing." and "Turnstile token is missing." were the only
+      bot-protection messages not passed through `__()`, so they stayed English even on a
+      translated site.
+    - Fixed: none of the recorded-submissions admin screen's text had been extracted for
+      translation since it was added in 0.0.4, so translators never received it. It is in the
+      .pot now, with Japanese supplied.
+    - Tested against WordPress 7.1.
 
 
 == Upgrade Notice ==
+
+= 0.0.7 =
+**The validation library has been replaced with an in-house engine. No rule name was
+removed, so existing `rules:` configuration keeps working unchanged.**
+
+1. **English validation messages have been rewritten.** They previously came from the
+   bundled library; they are now TOFU's own text, in one consistent voice. Verdicts are
+   unaffected — a submission that passed before still passes — but any English wording
+   your site displays, or that your tests assert on, will differ. Japanese messages have
+   been rewritten to match.
+   - `required_file` returns as the name for the required-file rule.
+     `custom_required_file`, its name since 0.0.3, still works and behaves identically.
+
+2. **Translations now load properly.** The plugin never called
+   `load_plugin_textdomain()`, so its Japanese `.mo` was almost certainly never used —
+   validation, reCAPTCHA and Turnstile messages rendered in English on Japanese sites.
+   That call has been added, so those strings appear translated for the first time.
+   - German, French, Turkish and Chinese messages, which the old library bundled, now
+     fall back to English until a `.po` is contributed for them.
+
+3. **Behaviour fixes that may change what a form accepts:**
+   - A full-width space (U+3000) now counts as blank. It is what a Japanese IME emits
+     for the space bar in full-width mode, and it previously passed `required` — a field
+     the visitor believes is empty could satisfy a required check.
+   - `required` now understands file fields. It previously accepted a file input that
+     the visitor left empty, because the `$_FILES` entry is a non-empty array.
+   - Invalid input no longer raises a fatal error. `after`, `before`, `extension` and
+     `uuid` could return a 500 for ordinary input — a blank date field was enough. They
+     now fail validation and show a message.
+   - `uploaded_file`, `mimes` and `extension` work at all now; they previously depended
+     on a check that is never true in this plugin's request flow.
+   - A file carried over to the confirm page is verified against the server's own
+     session record, so a tampered form can no longer claim an upload that is not there.
 
 = 0.0.3 =
 **Breaking changes from v0.0.2:**
