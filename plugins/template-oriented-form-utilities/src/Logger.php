@@ -2,17 +2,36 @@
 
 namespace TofuPlugin;
 
-use Monolog\Logger as MonologLogger;
-use Monolog\Handler\StreamHandler;
 use TofuPlugin\Helpers\Directory;
 
+/**
+ * Debug logging, active only while WP_DEBUG is on.
+ *
+ * Writes to wp-content/uploads/tofu-logs/. Line format is kept
+ * byte-compatible with the Monolog output this replaced —
+ *
+ *     [2026-01-22T07:21:30.184085+00:00] tofu.INFO: Message {"context":1} []
+ *
+ * — so log files written before and after the change stay greppable with the
+ * same expressions, and existing files can be appended to rather than
+ * orphaned. The trailing `[]` is Monolog's "extra" field, which this plugin
+ * never populated; it is emitted so the column layout matches.
+ *
+ * Every method is a no-op unless WP_DEBUG is true, so calls can be left in
+ * hot paths without a guard at the call site.
+ */
 class Logger
 {
-    /** @var MonologLogger */
-    protected static $logger;
+    /** @var bool */
+    protected static $initialized = false;
 
-    /** @var string */
-    protected static $filePath;
+    /** @var ?string */
+    protected static $filePath = null;
+
+    /**
+     * Channel name, the `tofu` in `tofu.INFO`.
+     */
+    protected const CHANNEL = 'tofu';
 
     /**
      * Initialize the logger.
@@ -22,12 +41,13 @@ class Logger
      */
     public static function init(string $file): void
     {
-        if (WP_DEBUG) {
-            $logDir = Directory::createUploadSubDirectory(Consts::LOG_SUBFOLDER);
-            self::$filePath = $logDir . \DIRECTORY_SEPARATOR . $file . '.log';
-            $handler = new StreamHandler(self::$filePath);
-            self::$logger = new MonologLogger('tofu', [$handler]);
+        if (!WP_DEBUG) {
+            return;
         }
+
+        $logDir = Directory::createUploadSubDirectory(Consts::LOG_SUBFOLDER);
+        self::$filePath = $logDir . \DIRECTORY_SEPARATOR . $file . '.log';
+        self::$initialized = true;
     }
 
     /**
@@ -38,15 +58,13 @@ class Logger
      */
     public static function getLogFilePath(): ?string
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
-
-            return self::$filePath;
-        } else {
+        if (!WP_DEBUG) {
             return null;
         }
+
+        self::assertInitialized();
+
+        return self::$filePath;
     }
 
     /**
@@ -57,13 +75,7 @@ class Logger
      */
     public static function info(string $message, array $context = []): void
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
-
-            self::$logger->info($message, $context);
-        }
+        self::write('INFO', $message, $context);
     }
 
     /**
@@ -74,13 +86,7 @@ class Logger
      */
     public static function warning(string $message, array $context = []): void
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
-
-            self::$logger->warning($message, $context);
-        }
+        self::write('WARNING', $message, $context);
     }
 
     /**
@@ -91,13 +97,7 @@ class Logger
      */
     public static function error(string $message, array $context = []): void
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
-
-            self::$logger->error($message, $context);
-        }
+        self::write('ERROR', $message, $context);
     }
 
     /**
@@ -108,13 +108,7 @@ class Logger
      */
     public static function critical(string $message, array $context = []): void
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
-
-            self::$logger->critical($message, $context);
-        }
+        self::write('CRITICAL', $message, $context);
     }
 
     /**
@@ -125,13 +119,7 @@ class Logger
      */
     public static function alert(string $message, array $context = []): void
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
-
-            self::$logger->alert($message, $context);
-        }
+        self::write('ALERT', $message, $context);
     }
 
     /**
@@ -142,12 +130,65 @@ class Logger
      */
     public static function emergency(string $message, array $context = []): void
     {
-        if (WP_DEBUG) {
-            if (!self::$logger) {
-                throw new \Exception('Logger is not initialized.');
-            }
+        self::write('EMERGENCY', $message, $context);
+    }
 
-            self::$logger->emergency($message, $context);
+    /**
+     * @param array<string, mixed> $context
+     * @throws \Exception when called before init().
+     */
+    protected static function write(string $level, string $message, array $context): void
+    {
+        if (!WP_DEBUG) {
+            return;
+        }
+
+        self::assertInitialized();
+
+        $line = sprintf(
+            "[%s] %s.%s: %s %s []\n",
+            (new \DateTimeImmutable('now'))->format('Y-m-d\TH:i:s.uP'),
+            self::CHANNEL,
+            $level,
+            $message,
+            self::encodeContext($context)
+        );
+
+        // A full disk or an unwritable directory must never take down a form
+        // submission: debug logging is a convenience, not part of the
+        // contract with the visitor.
+        try {
+            @file_put_contents((string) self::$filePath, $line, FILE_APPEND | LOCK_EX);
+        } catch (\Throwable) {
+            // Nothing useful to do — reporting the failure would need the
+            // very channel that just failed.
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    protected static function encodeContext(array $context): string
+    {
+        if ($context === []) {
+            return '[]';
+        }
+
+        $encoded = json_encode(
+            $context,
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR
+        );
+
+        return $encoded === false ? '[]' : $encoded;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected static function assertInitialized(): void
+    {
+        if (!self::$initialized) {
+            throw new \Exception('Logger is not initialized.');
         }
     }
 }

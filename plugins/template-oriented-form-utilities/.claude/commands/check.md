@@ -3,8 +3,8 @@ description: Run composer check (PHPStan + PHPUnit) and fix any failures
 allowed-tools: Bash(composer:*), Bash(vendor/bin/phpstan:*), Bash(vendor/bin/phpunit:*), Read, Edit, Grep, Glob
 ---
 
-Run `composer check` (this runs `composer phpstan` then `composer test` — it does **not** run
-`test:scoped`, see the known issue noted in `CLAUDE.md`).
+Run `composer check` (this runs `composer phpstan` then `composer test`). There is no PHP CI, so
+this is the gate before pushing.
 
 1. Run `composer check`.
 2. If PHPStan fails: read each reported file/line, understand the real type error (don't just

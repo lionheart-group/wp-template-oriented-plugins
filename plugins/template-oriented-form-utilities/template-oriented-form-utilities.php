@@ -47,6 +47,23 @@ use TofuPlugin\Logger;
 // Prepare Logger
 Logger::init('tofu');
 
+/**
+ * Load translations from the bundled languages/ directory.
+ *
+ * Without this the plugin's own .mo files are never registered, so every
+ * __() call — validation messages, reCAPTCHA and Turnstile errors, the
+ * "Remove File" label — renders untranslated English no matter the site
+ * locale. Runs on `init` because that is the earliest point translations
+ * are allowed to load.
+ */
+add_action('init', function () {
+    load_plugin_textdomain(
+        'template-oriented-form-utilities',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
+});
+
 // Register hooks that are fired when the plugin is activated or deactivated.
 register_activation_hook(__FILE__, function () {
     Initializer::activate();

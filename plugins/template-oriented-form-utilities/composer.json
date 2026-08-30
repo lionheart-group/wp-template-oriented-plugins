@@ -28,9 +28,7 @@
         }
     },
     "require": {
-        "monolog/monolog": "^2.9",
-        "php": "^8.1",
-        "somnambulist/validation": "^1.12"
+        "php": "^8.1"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.10",
@@ -40,21 +38,15 @@
         "yoast/phpunit-polyfills": "^2.0"
     },
     "scripts": {
-        "phpstan": "phpstan analyse --memory-limit=512M",
+        "phpstan": "phpstan analyse --memory-limit=1024M",
         "test": "phpunit",
-        "test:scoped": "phpunit -c phpunit.scoped.xml",
         "check": [
             "@phpstan",
             "@test"
         ],
-        "scoper": "php -d memory_limit=512M tools/php-scoper.phar add-prefix --config=scoper.inc.php --force",
-        "scoper:composer": "php scripts/generate-build-composer.php",
-        "scoper:dump": "composer dump-autoload --working-dir=build --classmap-authoritative",
         "build": [
-            "@scoper",
-            "@scoper:composer",
-            "@scoper:dump",
-            "@test:scoped"
+            "@check",
+            "php scripts/build-release.php"
         ]
     }
 }

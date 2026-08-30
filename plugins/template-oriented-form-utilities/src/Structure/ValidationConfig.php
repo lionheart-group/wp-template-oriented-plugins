@@ -72,8 +72,19 @@ class ValidationConfig
          * ],
          * ```
          *
+         * Rules may also be given as an array, which is the only way to
+         * write a pattern containing a pipe:
+         *
+         * ```php
+         * rules: [
+         *     'name' => ['required', 'max' => 200],
+         *     'code' => ['regex' => '/^(a|b)-\d+$/'],
+         * ],
+         * ```
+         *
          * @var array
-         * @via https://github.com/somnambulist-tech/validation?tab=readme-ov-file#available-rules
+         * @see \TofuPlugin\Validation\ValidatorFactory::defaultRules() for every available rule
+         * @see docs/settings/validationconfig.md for the rule reference
          */
         public readonly array $rules,
 
