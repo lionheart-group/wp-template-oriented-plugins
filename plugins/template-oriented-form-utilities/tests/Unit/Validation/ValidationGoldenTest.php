@@ -210,7 +210,7 @@ class ValidationGoldenTest extends BaseTestCase
     public function testOverrideLedgerHasTheExpectedSize(): void
     {
         $this->assertCount(
-            1434,
+            1459,
             self::overrides(),
             'The number of deliberate deviations changed. Review the new entries, then update this count.'
         );

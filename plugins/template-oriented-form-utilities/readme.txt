@@ -104,6 +104,9 @@ removed, so existing `rules:` configuration keeps working unchanged.**
      fall back to English until a `.po` is contributed for them.
 
 3. **Behaviour fixes that may change what a form accepts:**
+   - A full-width space (U+3000) now counts as blank. It is what a Japanese IME emits
+     for the space bar in full-width mode, and it previously passed `required` — a field
+     the visitor believes is empty could satisfy a required check.
    - `required` now understands file fields. It previously accepted a file input that
      the visitor left empty, because the `$_FILES` entry is a non-empty array.
    - Invalid input no longer raises a fatal error. `after`, `before`, `extension` and

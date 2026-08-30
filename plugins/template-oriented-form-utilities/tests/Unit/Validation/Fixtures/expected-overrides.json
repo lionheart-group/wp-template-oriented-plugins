@@ -1,6 +1,7 @@
 {
     "_readme": "Deliberate deviations from expected.json, which stays frozen. Each entry records why the behaviour changed, what it was, and what it became. ValidationGoldenTest verifies that every \"before\" still matches the frozen fixture, so a stale entry fails loudly.",
     "_reasons": {
+        "blank_is_unicode_aware": "Emptiness is judged in Unicode terms rather than bytes. PHP trim() strips ASCII whitespace only, so a value consisting solely of an ideographic space (U+3000) — what a Japanese IME emits for the space bar in full-width mode — counted as real input: it satisfied `required` and was measured by the length rules. A full-width space now behaves exactly like an ASCII one.",
         "broken_file_rule_now_works": "A file rule that could never pass now works. uploaded_file, mimes and extension all depended on is_uploaded_file(), which is only ever true during the request that received the upload — so they failed (or fatally errored) even for genuine files on the confirm step. They now share the same predicates as the plugin's own file rules.",
         "config_error_exception_type": "Same configuration error, raised by this engine's own exception class instead of the departing library's. The condition detected and the point it is detected at are unchanged.",
         "dotted_keys_treated_literally": "A rule key containing a dot is treated as a literal field name. The previous engine read it as a nested path and handed ValidationErrorCollection::addError() an array, fataling with a TypeError — so no form could use the notation anyway.",
@@ -250,7 +251,7 @@
             }
         },
         "companion/prohibited_if/sibling_present/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -258,14 +259,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field cannot be used when other is \"trigger\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_if/sibling_present/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -273,10 +272,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはotherが\"trigger\"の場合は使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_if/sibling_present/int_100/en_US": {
@@ -696,7 +693,7 @@
             }
         },
         "companion/prohibited_unless/sibling_absent/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -704,14 +701,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field can only be used when other is \"trigger\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_unless/sibling_absent/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -719,10 +714,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはotherが\"trigger\"の場合のみ使用できます"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_unless/sibling_absent/int_100/en_US": {
@@ -1142,7 +1135,7 @@
             }
         },
         "companion/prohibited_with/sibling_present/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -1150,14 +1143,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field cannot be used together with \"other\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_with/sibling_present/ideographic_space/ja_JP": {
-            "reason": "japanese_translation_added",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -1165,10 +1156,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは\"other\"と同時には使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_with/sibling_present/int_100/en_US": {
@@ -1588,7 +1577,7 @@
             }
         },
         "companion/prohibited_with_all/sibling_present/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -1596,14 +1585,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field cannot be used when all of \"other\" are filled in"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_with_all/sibling_present/ideographic_space/ja_JP": {
-            "reason": "japanese_translation_added",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -1611,10 +1598,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは\"other\"がすべて入力されている場合は使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_with_all/sibling_present/int_100/en_US": {
@@ -2577,6 +2562,32 @@
                 }
             }
         },
+        "companion/prohibited_without/sibling_present/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field can only be used once \"other\" are filled in"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_present/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"が入力されている場合のみ使用できます"
+                }
+            }
+        },
         "companion/prohibited_without/sibling_present/null/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -2784,7 +2795,7 @@
             }
         },
         "companion/prohibited_without_all/sibling_absent/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -2792,14 +2803,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field can only be used once all of \"other\" are filled in"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_without_all/sibling_absent/ideographic_space/ja_JP": {
-            "reason": "japanese_translation_added",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -2807,10 +2816,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは\"other\"がすべて入力されている場合のみ使用できます"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_without_all/sibling_absent/int_100/en_US": {
@@ -3199,6 +3206,32 @@
                 }
             }
         },
+        "companion/required_if_active/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when other is \"trigger\""
+                }
+            }
+        },
+        "companion/required_if_active/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはotherが\"trigger\"の場合は必須です"
+                }
+            }
+        },
         "companion/required_if_active/null/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -3364,6 +3397,32 @@
         },
         "companion/required_unless/sibling_absent/file_no_file/ja_JP": {
             "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはotherが\"trigger\"でない場合は必須です"
+                }
+            }
+        },
+        "companion/required_unless/sibling_absent/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required unless other is \"trigger\""
+                }
+            }
+        },
+        "companion/required_unless/sibling_absent/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": false,
                 "errors": []
@@ -3551,6 +3610,32 @@
                 }
             }
         },
+        "companion/required_with_all/sibling_present/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when all of \"other\" are filled in"
+                }
+            }
+        },
+        "companion/required_with_all/sibling_present/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて入力されている場合は必須です"
+                }
+            }
+        },
         "companion/required_with_all/sibling_present/null/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -3716,6 +3801,32 @@
         },
         "companion/required_with_present/file_no_file/ja_JP": {
             "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"が入力されている場合は必須です"
+                }
+            }
+        },
+        "companion/required_with_present/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when \"other\" is filled in"
+                }
+            }
+        },
+        "companion/required_with_present/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": false,
                 "errors": []
@@ -3903,6 +4014,32 @@
                 }
             }
         },
+        "companion/required_without_absent/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when \"other\" is left blank"
+                }
+            }
+        },
+        "companion/required_without_absent/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"が未入力の場合は必須です"
+                }
+            }
+        },
         "companion/required_without_absent/null/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -4068,6 +4205,32 @@
         },
         "companion/required_without_all/sibling_absent/file_no_file/ja_JP": {
             "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて未入力の場合は必須です"
+                }
+            }
+        },
+        "companion/required_without_all/sibling_absent/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when all of \"other\" are left blank"
+                }
+            }
+        },
+        "companion/required_without_all/sibling_absent/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": false,
                 "errors": []
@@ -4890,7 +5053,7 @@
             }
         },
         "companion/same/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -4898,14 +5061,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must match other"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/same/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -4913,10 +5074,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはotherと同じ値にしてください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/same/int_100/en_US": {
@@ -6269,29 +6428,25 @@
             }
         },
         "value_sweep/after/ideographic_space/en_US": {
-            "reason": "user_input_no_longer_throws",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
                 "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be later than 2020-01-01"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/after/ideographic_space/ja_JP": {
-            "reason": "user_input_no_longer_throws",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
                 "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは2020-01-01より後の日付である必要があります"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/after/int_100/en_US": {
@@ -6701,7 +6856,7 @@
             }
         },
         "value_sweep/alpha/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -6709,14 +6864,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must contain letters only"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/alpha/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -6724,10 +6877,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはアルファベットのみで入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/alpha/int_100/en_US": {
@@ -7091,7 +7242,7 @@
             }
         },
         "value_sweep/alpha_dash/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7099,14 +7250,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must contain letters, numbers, hyphens and underscores only"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/alpha_dash/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7114,10 +7263,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはアルファベット、数字、ハイフン、アンダースコアのみで入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/alpha_dash/true/en_US": {
@@ -7301,7 +7448,7 @@
             }
         },
         "value_sweep/alpha_num/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7309,14 +7456,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must contain letters and numbers only"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/alpha_num/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7324,10 +7469,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはアルファベットと数字のみで入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/alpha_num/true/en_US": {
@@ -7796,7 +7939,7 @@
             }
         },
         "value_sweep/any_of/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7804,10 +7947,21 @@
                 }
             },
             "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/any_of/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
                 "fails": true,
                 "errors": {
-                    "field": "Every entry in field must be one of \"abc\", \"foo\", \"bar\""
+                    "field": "fieldの各値は\"abc\", \"foo\", \"bar\"のいずれかである必要があります"
                 }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/any_of/int_100/en_US": {
@@ -7946,7 +8100,7 @@
             }
         },
         "value_sweep/array/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7954,14 +8108,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be a list of values"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/array/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -7969,10 +8121,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは値のリストである必要があります"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/array/int_100/en_US": {
@@ -8396,7 +8546,7 @@
             }
         },
         "value_sweep/array_can_only_have_keys/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -8404,14 +8554,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field accepts only these keys: \"a\", \"b\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/array_can_only_have_keys/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -8419,10 +8567,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldで指定できるキーは次のみです: \"a\", \"b\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/array_can_only_have_keys/int_100/en_US": {
@@ -8846,7 +8992,7 @@
             }
         },
         "value_sweep/array_must_have_keys/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -8854,14 +9000,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field is missing one or more required keys: \"a\", \"b\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/array_must_have_keys/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -8869,10 +9013,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldに必要なキーが不足しています: \"a\", \"b\""
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/array_must_have_keys/int_100/en_US": {
@@ -9320,29 +9462,25 @@
             }
         },
         "value_sweep/before/ideographic_space/en_US": {
-            "reason": "user_input_no_longer_throws",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
                 "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be earlier than 2020-01-01"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/before/ideographic_space/ja_JP": {
-            "reason": "user_input_no_longer_throws",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
                 "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは2020-01-01より前の日付である必要があります"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/before/int_100/en_US": {
@@ -9601,6 +9739,32 @@
                 }
             }
         },
+        "value_sweep/between/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be between 3 and 20"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/between/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは3から20の間である必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "value_sweep/boolean/array_list/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -9722,7 +9886,7 @@
             }
         },
         "value_sweep/boolean/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -9730,14 +9894,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be either true or false"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/boolean/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -9745,10 +9907,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはtrueまたはfalseである必要があります"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/boolean/int_100/en_US": {
@@ -11098,7 +11258,7 @@
             }
         },
         "value_sweep/date/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -11106,14 +11266,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field as a valid date"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/date/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -11121,10 +11279,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効な日付を入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/date/int_100/en_US": {
@@ -11554,7 +11710,7 @@
             }
         },
         "value_sweep/digits/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -11562,14 +11718,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be exactly 5 digits"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/digits/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -11577,10 +11731,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは5桁の数字で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/digits/int_100/en_US": {
@@ -12010,7 +12162,7 @@
             }
         },
         "value_sweep/digits_between/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -12018,14 +12170,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be between 2 and 5 digits"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/digits_between/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -12033,10 +12183,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは2桁から5桁の数字で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/digits_between/string_abc/en_US": {
@@ -12400,7 +12548,7 @@
             }
         },
         "value_sweep/email/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -12408,14 +12556,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field as a valid email address"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/email/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -12423,10 +12569,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効なメールアドレスを入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/email/int_100/en_US": {
@@ -12697,6 +12841,32 @@
                 "errors": {
                     "field": "fieldは有効なメールアドレスを入力してください"
                 }
+            }
+        },
+        "value_sweep/ends_with/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must end with bc"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/ends_with/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはbcで終わる必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/extension/array_list/en_US": {
@@ -13248,7 +13418,7 @@
             }
         },
         "value_sweep/float/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -13256,14 +13426,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be a decimal number"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/float/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -13271,10 +13439,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは小数で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/float/int_100/en_US": {
@@ -13517,6 +13683,32 @@
                 }
             }
         },
+        "value_sweep/in/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be one of \"abc\", \"foo\", \"bar\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/in/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"abc\", \"foo\", \"bar\"のいずれかである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "value_sweep/integer/array_list/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -13668,7 +13860,7 @@
             }
         },
         "value_sweep/integer/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -13676,14 +13868,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be a whole number"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/integer/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -13691,10 +13881,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは整数で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/integer/string_abc/en_US": {
@@ -13938,7 +14126,7 @@
             }
         },
         "value_sweep/ip/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -13946,14 +14134,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field as a valid IP address"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/ip/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -13961,10 +14147,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効なIPアドレスを入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/ip/int_100/en_US": {
@@ -14388,7 +14572,7 @@
             }
         },
         "value_sweep/ipv4/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -14396,14 +14580,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field as a valid IPv4 address"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/ipv4/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -14411,10 +14593,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効なIPv4アドレスを入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/ipv4/int_100/en_US": {
@@ -14838,7 +15018,7 @@
             }
         },
         "value_sweep/ipv6/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -14846,14 +15026,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field as a valid IPv6 address"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/ipv6/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -14861,10 +15039,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効なIPv6アドレスを入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/ipv6/int_100/en_US": {
@@ -15288,7 +15464,7 @@
             }
         },
         "value_sweep/json/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -15296,14 +15472,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be valid JSON"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/json/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -15311,10 +15485,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効なJSONである必要があります"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/json/int_100/en_US": {
@@ -15714,7 +15886,7 @@
             }
         },
         "value_sweep/length/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -15722,14 +15894,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be exactly 5 characters"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/length/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -15737,10 +15907,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは5文字で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/length/int_100/en_US": {
@@ -16266,7 +16434,7 @@
             }
         },
         "value_sweep/matches/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -16274,14 +16442,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field is not in the expected format"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/matches/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -16289,10 +16455,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldの形式が正しくありません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/matches/int_100/en_US": {
@@ -16712,7 +16876,7 @@
             }
         },
         "value_sweep/min/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -16720,14 +16884,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field may not be less than 3"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/min/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -16735,10 +16897,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは3以上にしてください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/min/true/en_US": {
@@ -17072,7 +17232,7 @@
             }
         },
         "value_sweep/number/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -17080,14 +17240,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be a whole number"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/number/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -17095,10 +17253,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは整数で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/number/string_abc/en_US": {
@@ -17342,7 +17498,7 @@
             }
         },
         "value_sweep/numeric/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -17350,14 +17506,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field must be a number"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/numeric/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -17365,10 +17519,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは数値で入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/numeric/string_abc/en_US": {
@@ -17618,7 +17770,7 @@
             }
         },
         "value_sweep/phone/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -17626,14 +17778,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field in international format, such as +81312345678"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/phone/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -17641,10 +17791,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは国際形式で入力してください（例: +81312345678）"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/phone/string_abc/en_US": {
@@ -18008,7 +18156,7 @@
             }
         },
         "value_sweep/prohibited/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -18016,14 +18164,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field cannot be used here"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/prohibited/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -18031,10 +18177,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldはここでは使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/prohibited/int_100/en_US": {
@@ -18464,7 +18608,7 @@
             }
         },
         "value_sweep/regex/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -18472,14 +18616,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "field is not in the expected format"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/regex/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -18487,10 +18629,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldの形式が正しくありません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/regex/int_100/en_US": {
@@ -19269,6 +19409,58 @@
                 }
             }
         },
+        "value_sweep/required/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required"
+                }
+            }
+        },
+        "value_sweep/required/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必須項目です"
+                }
+            }
+        },
+        "value_sweep/starts_with/ideographic_space/en_US": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must start with ab"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/starts_with/ideographic_space/ja_JP": {
+            "reason": "blank_is_unicode_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはabで始まる必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "value_sweep/string/array_list/en_US": {
             "reason": "messages_rewritten_in_house",
             "before": {
@@ -19848,7 +20040,7 @@
             }
         },
         "value_sweep/url/ideographic_space/en_US": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -19856,14 +20048,12 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "Enter field as a valid URL"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/url/ideographic_space/ja_JP": {
-            "reason": "messages_rewritten_in_house",
+            "reason": "blank_is_unicode_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -19871,10 +20061,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは有効なURLを入力してください"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "value_sweep/url/int_100/en_US": {

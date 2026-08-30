@@ -176,17 +176,43 @@ class EmptyValueSkippingTest extends BaseTestCase
     // dedicated follow-up commit (Phase 1.5), never silently.
     // -----------------------------------------------------------------
 
-    public function testRequiredPassesForIdeographicSpace_KNOWN_BUG(): void
+    /**
+     * A full-width space is a space.
+     *
+     * U+3000 is what a Japanese IME emits for the space bar in full-width
+     * mode, so it reaches forms by accident constantly. PHP's trim() is
+     * byte-wise and strips ASCII whitespace only, so such a value used to
+     * read as real input and satisfy `required`. Emptiness is judged in
+     * Unicode terms now.
+     */
+    public function testIdeographicSpaceIsTreatedAsWhitespace(): void
     {
-        // PHP's trim() only strips ASCII whitespace. A full-width space
-        // (U+3000, extremely common as accidental input on Japanese IMEs)
-        // is therefore NOT trimmed away, so the value is treated as
-        // non-empty and `required` incorrectly passes. This is real-world
-        // harmful for Japanese forms and must be fixed — but as a separate,
-        // clearly-labelled commit (see the plan's Phase 1.5), not silently
-        // folded into the engine replacement where it could be mistaken
-        // for scope creep or, worse, go unnoticed either way.
-        $result = EngineProbe::run(['field' => "\u{3000}"], ['field' => 'required']);
-        $this->assertFalse($result['fails'], 'KNOWN BUG: an ideographic-space-only value currently satisfies `required`.');
+        $fullWidth = EngineProbe::run(['field' => "\u{3000}"], ['field' => 'required']);
+        $ascii     = EngineProbe::run(['field' => ' '], ['field' => 'required']);
+
+        $this->assertTrue($fullWidth['fails'], 'A full-width space alone is not an answer.');
+        $this->assertSame(
+            $ascii['fails'],
+            $fullWidth['fails'],
+            'A full-width space must behave exactly like an ASCII space.'
+        );
+    }
+
+    /**
+     * The corollary: it makes an optional field optional, rather than
+     * failing length checks on a value the visitor thinks is blank.
+     */
+    public function testIdeographicSpaceSkipsNonImplicitRulesLikeAnyOtherBlank(): void
+    {
+        $result = EngineProbe::run(['field' => "\u{3000}"], ['field' => 'min:3']);
+
+        $this->assertFalse($result['fails']);
+    }
+
+    public function testAFullWidthSpaceFollowedByRealInputIsNotBlank(): void
+    {
+        $result = EngineProbe::run(['field' => "\u{3000}あ"], ['field' => 'required']);
+
+        $this->assertFalse($result['fails'], 'Only leading whitespace — there is an answer here.');
     }
 }

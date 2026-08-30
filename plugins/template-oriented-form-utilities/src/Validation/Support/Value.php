@@ -25,12 +25,12 @@ final class Value
      * Note `'0'`, `0`, `0.0`, `false` and `[0]` are NOT empty — a literal
      * zero is a legitimate answer and must satisfy `required`.
      *
-     * KNOWN BUG (reproduced deliberately): trim() only strips ASCII
-     * whitespace, so a value consisting solely of an ideographic space
-     * (U+3000, common accidental input on Japanese IMEs) is NOT considered
-     * empty and therefore satisfies `required`. Pinned by
-     * EmptyValueSkippingTest::testRequiredPassesForIdeographicSpace_KNOWN_BUG
-     * and scheduled for a separate, deliberate fix.
+     * Whitespace is judged in Unicode terms, not bytes. PHP's trim() strips
+     * ASCII whitespace only, so a value consisting solely of an ideographic
+     * space (U+3000) used to count as real input and satisfy `required` —
+     * and U+3000 is what a Japanese IME produces when the space bar is
+     * pressed in full-width mode, so it lands in forms by accident
+     * constantly. A full-width space now behaves exactly like an ASCII one.
      */
     public static function isEmpty(mixed $value): bool
     {
@@ -39,7 +39,7 @@ final class Value
         }
 
         if (is_string($value)) {
-            return trim($value) === '';
+            return self::isBlank($value);
         }
 
         if (is_array($value)) {
@@ -47,6 +47,26 @@ final class Value
         }
 
         return false;
+    }
+
+    /**
+     * Whether a string holds nothing but whitespace, in any script.
+     *
+     * `\p{Z}` covers the Unicode separators that `\s` misses, U+3000 among
+     * them.
+     */
+    private static function isBlank(string $value): bool
+    {
+        $result = preg_match('/^[\s\p{Z}]*+$/u', $value);
+
+        // preg_match returns false on malformed UTF-8, where the Unicode
+        // question is unanswerable; fall back to the byte-wise test rather
+        // than calling such a value empty.
+        if ($result === false) {
+            return trim($value) === '';
+        }
+
+        return $result === 1;
     }
 
     /**
