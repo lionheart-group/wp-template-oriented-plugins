@@ -113,6 +113,26 @@ class ValidationGoldenTest extends BaseTestCase
     }
 
     /**
+     * assertArrayHasKey() without handing PHPUnit the whole array.
+     *
+     * Since PHPUnit 10 the event emitter exports the asserted value even
+     * when the assertion PASSES (sebastianbergmann/phpunit#5183), and
+     * assertArrayHasKey()'s asserted value is the array itself. With the
+     * corpus and the frozen fixture both running to thousands of nested
+     * entries, that export costs ~45ms per call — replayed once per case it
+     * took this file from 7 seconds to three and a half minutes.
+     *
+     * Asserting on the boolean instead exports a boolean. The check and its
+     * failure message are unchanged.
+     *
+     * @param array<string, mixed> $array
+     */
+    private function assertHasKey(string $key, array $array, string $message): void
+    {
+        $this->assertTrue(array_key_exists($key, $array), $message);
+    }
+
+    /**
      * @return array<string, array{0: string}>
      */
     public static function caseIdProvider(): array
@@ -131,7 +151,7 @@ class ValidationGoldenTest extends BaseTestCase
     public function testCaseMatchesGoldenExpectation(string $caseId): void
     {
         $cases = Corpus::cases();
-        $this->assertArrayHasKey($caseId, $cases, 'Corpus case referenced by the data provider is missing.');
+        $this->assertHasKey($caseId, $cases, 'Corpus case referenced by the data provider is missing.');
 
         // Whether the case is frozen, deviated or added is checked by
         // testEveryCorpusCaseHasAContract; here we only compare against
@@ -179,7 +199,7 @@ class ValidationGoldenTest extends BaseTestCase
         $override = self::overrides()[$caseId];
         $expectedAll = self::expected();
 
-        $this->assertArrayHasKey(
+        $this->assertHasKey(
             $caseId,
             $expectedAll,
             "Override '{$caseId}' names a case that is not in the frozen fixture."
@@ -196,7 +216,7 @@ class ValidationGoldenTest extends BaseTestCase
         );
         $this->assertIsString($override['reason']);
         $this->assertNotSame('', $override['reason'], "Override '{$caseId}' has no reason.");
-        $this->assertArrayHasKey(
+        $this->assertHasKey(
             $override['reason'],
             self::$reasons ?? [],
             "Override '{$caseId}' cites an undocumented reason code."
@@ -232,7 +252,7 @@ class ValidationGoldenTest extends BaseTestCase
                 $expectedAll,
                 "Addition '{$caseId}' already exists in the frozen fixture — record it as an override instead."
             );
-            $this->assertArrayHasKey($caseId, $corpus, "Addition '{$caseId}' is not a corpus case.");
+            $this->assertHasKey($caseId, $corpus, "Addition '{$caseId}' is not a corpus case.");
             $this->assertIsString($addition['reason']);
             $this->assertNotSame('', $addition['reason'], "Addition '{$caseId}' has no reason.");
         }

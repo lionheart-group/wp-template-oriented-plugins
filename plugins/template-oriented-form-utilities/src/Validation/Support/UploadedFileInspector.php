@@ -86,7 +86,7 @@ final class UploadedFileInspector
     /**
      * The file's size in bytes, or null when it is unusable.
      */
-    public static function size(mixed $value): int|float|null
+    public static function size(mixed $value): ?float
     {
         if (!is_array($value) || !isset($value['size']) || !is_numeric($value['size'])) {
             return null;

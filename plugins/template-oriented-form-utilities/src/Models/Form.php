@@ -246,7 +246,7 @@ class Form
      */
     public function isFieldAllowed(string $field, array $allowsList = []): bool
     {
-        if (is_array($allowsList) && !empty($allowsList) && in_array($field, $allowsList, true)) {
+        if (!empty($allowsList) && in_array($field, $allowsList, true)) {
             return true;
         }
 
