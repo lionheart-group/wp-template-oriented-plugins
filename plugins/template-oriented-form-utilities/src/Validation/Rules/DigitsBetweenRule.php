@@ -5,6 +5,12 @@ namespace TofuPlugin\Validation\Rules;
 use TofuPlugin\Validation\Rule;
 use TofuPlugin\Validation\Support\Value;
 
+/**
+ * Digits only, with a length between two bounds.
+ *
+ * Base for `digits`, which is the same check with both bounds set to the
+ * same number.
+ */
 class DigitsBetweenRule extends Rule
 {
     protected string $message = 'rule.digits_between';
@@ -21,7 +27,16 @@ class DigitsBetweenRule extends Rule
 
         $length = strlen($string);
 
-        return $length >= (int) $this->parameter('min')
-            && $length <= (int) $this->parameter('max');
+        return $length >= (int) $this->minLength() && $length <= (int) $this->maxLength();
+    }
+
+    protected function minLength(): mixed
+    {
+        return $this->parameter('min');
+    }
+
+    protected function maxLength(): mixed
+    {
+        return $this->parameter('max');
     }
 }

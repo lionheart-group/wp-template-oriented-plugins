@@ -76,13 +76,10 @@ class UploadedFileRule extends Rule
 
         /** @var array<int, string> $allowed */
         $allowed = $this->parameter('allowed_types', []);
-        if ($allowed !== []) {
-            $detected = UploadedFileInspector::detectMimeType($value);
-            if ($detected === null || !in_array($detected, $allowed, true)) {
-                $this->message = 'rule.uploaded_file.type';
+        if ($allowed !== [] && !UploadedFileInspector::hasAllowedMimeType($value, $allowed)) {
+            $this->message = 'rule.uploaded_file.type';
 
-                return false;
-            }
+            return false;
         }
 
         return true;

@@ -2,27 +2,20 @@
 
 namespace TofuPlugin\Validation\Rules;
 
-use TofuPlugin\Validation\Rule;
-
 /**
  * The inverse of `accepted`: the field must carry a negative value.
  */
-class RejectedRule extends Rule
+class RejectedRule extends ValueListRule
 {
-    protected bool $implicit = true;
     protected string $message = 'rule.rejected';
 
-    /** @var list<string|int|bool> */
-    protected const REJECTED = ['no', 'off', '0', 0, false, 'false'];
-
-    public function __construct()
+    protected function allowed(): array
     {
-        // Surfaced as :rejected in the message.
-        $this->params['rejected'] = self::REJECTED;
+        return ['no', 'off', '0', 0, false, 'false'];
     }
 
-    public function check(mixed $value): bool
+    protected function parameterName(): string
     {
-        return in_array($value, self::REJECTED, true);
+        return 'rejected';
     }
 }

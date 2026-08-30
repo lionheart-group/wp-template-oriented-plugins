@@ -2,17 +2,12 @@
 
 namespace TofuPlugin\Validation\Rules;
 
-use TofuPlugin\Validation\Rule;
-use TofuPlugin\Validation\Support\Value;
-
-class LowercaseRule extends Rule
+class LowercaseRule extends CaseRule
 {
     protected string $message = 'rule.lowercase';
 
-    public function check(mixed $value): bool
+    protected function transform(string $value): string
     {
-        $string = Value::toStringOrNull($value);
-
-        return $string !== null && mb_strtolower($string, 'UTF-8') === $string;
+        return mb_strtolower($value, 'UTF-8');
     }
 }

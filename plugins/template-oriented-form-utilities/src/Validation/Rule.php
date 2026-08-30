@@ -6,9 +6,9 @@ namespace TofuPlugin\Validation;
  * Base class for every validation rule.
  *
  * The protected surface here is a compatibility contract, not just an
- * implementation detail: `src/Rules/` (the plugin's own file rules) and any
- * rule a theme registers extend this class. Three constraints in particular
- * must survive future edits:
+ * implementation detail: every rule in `Rules/` — including the plugin's own
+ * file rules — and any rule a theme registers extends this class. Three
+ * constraints in particular must survive future edits:
  *
  * 1. `fillParameters()` returns `self`, NOT `static`. MimeTypeRule overrides
  *    it as `: self`, and PHP forbids narrowing `static` to `self` — getting

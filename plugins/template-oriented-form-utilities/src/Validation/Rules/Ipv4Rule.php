@@ -2,15 +2,8 @@
 
 namespace TofuPlugin\Validation\Rules;
 
-use TofuPlugin\Validation\Rule;
-
-class Ipv4Rule extends Rule
+class Ipv4Rule extends IpRule
 {
     protected string $message = 'rule.ipv4';
-
-    public function check(mixed $value): bool
-    {
-        return is_string($value)
-            && filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
-    }
+    protected int $flags = FILTER_FLAG_IPV4;
 }

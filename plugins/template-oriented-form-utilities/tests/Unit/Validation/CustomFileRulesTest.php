@@ -7,9 +7,10 @@ use TofuPlugin\Tests\Unit\Validation\Fixtures\Corpus;
 use TofuPlugin\Tests\Unit\Validation\Support\EngineProbe;
 
 /**
- * Pins the three plugin-authored file rules (src/Rules/RequiredFileRule.php,
- * MaxMbRule.php, MimeTypeRule.php) and, most importantly, WHY
- * `custom_required_file` exists instead of the built-in `required`.
+ * Pins the three file rules TOFU adds on top of the generic ones
+ * (RequiredFileRule, MaxMbRule, MimeTypeRule in src/Validation/Rules/) and,
+ * most importantly, WHY `custom_required_file` exists instead of the
+ * built-in `required`.
  */
 class CustomFileRulesTest extends BaseTestCase
 {

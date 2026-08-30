@@ -1,19 +1,23 @@
 <?php
 
-namespace TofuPlugin\Rules;
+namespace TofuPlugin\Validation\Rules;
 
-use TofuPlugin\Validation\Rule;
 use TofuPlugin\Consts;
+use TofuPlugin\Validation\Rule;
 
 /**
- * Custom validation rule: required file upload.
+ * A file must be attached to this field.
  *
- * Passes if a new file was uploaded (UPLOAD_ERR_OK) OR a session-persisted
- * file ID is present in the __tofu_uploaded_files input.
+ * Plain `required` is wrong for file fields in both directions: the
+ * `$_FILES` entry for "no file chosen" is a non-empty array, so `required`
+ * passes when nothing was selected; and on the confirm step the key is
+ * absent entirely, so `required` fails even though a file was uploaded a
+ * request ago.
+ *
+ * Passes when a new upload arrived (UPLOAD_ERR_OK), or when the
+ * `__tofu_uploaded_files` map still carries an ID for this field.
  *
  * Usage in rules: 'attachment' => 'custom_required_file'
- *
- * @package TofuPlugin\Rules
  */
 class RequiredFileRule extends Rule
 {
@@ -22,12 +26,12 @@ class RequiredFileRule extends Rule
 
     public function check(mixed $value): bool
     {
-        // New upload present
+        // A new upload in this request.
         if (is_array($value) && isset($value['error']) && $value['error'] === \UPLOAD_ERR_OK) {
             return true;
         }
 
-        // Session-persisted file present
+        // Or one carried over from a previous step.
         $fieldName = $this->attribute()?->key();
         if ($fieldName !== null) {
             $uploadedFiles = $this->attribute()->value(Consts::UPLOADED_FILES_INPUT_NAME);

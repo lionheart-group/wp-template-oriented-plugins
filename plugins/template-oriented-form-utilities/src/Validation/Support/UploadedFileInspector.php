@@ -49,6 +49,21 @@ final class UploadedFileInspector
     }
 
     /**
+     * Whether the file's sniffed content type is in the allowed list.
+     *
+     * Both `mime_type` and `uploaded_file`'s type parameter answer exactly
+     * this question, so they ask it here rather than each keeping their own
+     * copy — which is how the built-in file rules drifted into being broken
+     * while the plugin's own kept working.
+     *
+     * @param array<int, string> $allowed
+     */
+    public static function hasAllowedMimeType(mixed $value, array $allowed): bool
+    {
+        return in_array(self::detectMimeType($value), $allowed, true);
+    }
+
+    /**
      * The file's declared extension, lowercased, taken from its original
      * name.
      */

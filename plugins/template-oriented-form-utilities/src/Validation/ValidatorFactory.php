@@ -2,10 +2,6 @@
 
 namespace TofuPlugin\Validation;
 
-use TofuPlugin\Rules\MaxMbRule;
-use TofuPlugin\Rules\MimeTypeRule;
-use TofuPlugin\Rules\RequiredFileRule;
-
 /**
  * Builds a configured Validator.
  *
@@ -149,13 +145,15 @@ class ValidatorFactory
             'after'                    => new Rules\AfterRule(),
             'before'                   => new Rules\BeforeRule(),
 
-            // Files — the built-in trio, plus the plugin's own.
+            // Files. The last three are TOFU's own, added because the
+            // generic ones cannot express "a file survived the confirm step"
+            // or check content rather than filename.
             'uploaded_file'            => new Rules\UploadedFileRule(),
             'mimes'                    => new Rules\MimesRule(),
             'extension'                => new Rules\ExtensionRule(),
-            'custom_required_file'     => new RequiredFileRule(),
-            'max_mb'                   => new MaxMbRule(),
-            'mime_type'                => new MimeTypeRule(),
+            'custom_required_file'     => new Rules\RequiredFileRule(),
+            'max_mb'                   => new Rules\MaxMbRule(),
+            'mime_type'                => new Rules\MimeTypeRule(),
         ];
     }
 }

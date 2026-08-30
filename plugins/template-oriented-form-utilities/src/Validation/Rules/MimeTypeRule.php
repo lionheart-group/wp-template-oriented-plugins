@@ -1,26 +1,27 @@
 <?php
 
-namespace TofuPlugin\Rules;
+namespace TofuPlugin\Validation\Rules;
 
 use TofuPlugin\Validation\Rule;
 use TofuPlugin\Validation\Support\UploadedFileInspector;
 
 /**
- * Custom validation rule: allowed MIME types for file uploads.
+ * Allowed content types for an upload, given as comma-separated MIME types.
  *
- * Accepts one or more MIME types as comma-separated parameters.
- * Skips silently if no file is present.
+ * Unlike `mimes` and `extension`, which trust the file's name, this sniffs
+ * the actual bytes — a text file renamed to .pdf does not pass
+ * `mime_type:application/pdf`.
+ *
+ * Skips silently when no file was chosen.
  *
  * Usage in rules: 'attachment' => 'mime_type:application/pdf,image/jpeg'
- *
- * @package TofuPlugin\Rules
  */
 class MimeTypeRule extends Rule
 {
     protected string $message = 'rule.mime_type';
 
     /**
-     * Override to collect all CSV params as an array under the 'types' key.
+     * Collects every CSV parameter as the allowed-type list.
      */
     public function fillParameters(array $params): self
     {
@@ -36,15 +37,11 @@ class MimeTypeRule extends Rule
             throw new \InvalidArgumentException('mime_type rule requires at least one MIME type parameter.');
         }
 
-        // Skip if no file uploaded
         if (UploadedFileInspector::shouldSkip($value)) {
             return true;
         }
 
-        // Sniffs the file's actual content, not the client-supplied type —
-        // shared with the engine's own file rules so the two cannot drift.
-        $fileMimeType = UploadedFileInspector::detectMimeType($value);
-
-        return in_array($fileMimeType, $allowedTypes, true);
+        /** @var array<int, string> $allowedTypes */
+        return UploadedFileInspector::hasAllowedMimeType($value, $allowedTypes);
     }
 }

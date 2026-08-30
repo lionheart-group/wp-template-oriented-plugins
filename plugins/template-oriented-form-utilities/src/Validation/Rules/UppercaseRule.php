@@ -2,17 +2,12 @@
 
 namespace TofuPlugin\Validation\Rules;
 
-use TofuPlugin\Validation\Rule;
-use TofuPlugin\Validation\Support\Value;
-
-class UppercaseRule extends Rule
+class UppercaseRule extends CaseRule
 {
     protected string $message = 'rule.uppercase';
 
-    public function check(mixed $value): bool
+    protected function transform(string $value): string
     {
-        $string = Value::toStringOrNull($value);
-
-        return $string !== null && mb_strtoupper($string, 'UTF-8') === $string;
+        return mb_strtoupper($value, 'UTF-8');
     }
 }

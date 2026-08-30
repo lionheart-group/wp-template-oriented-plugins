@@ -45,7 +45,7 @@ final class Messages
             'rule.before'                   => __(':attribute must be a date before :time.', 'template-oriented-form-utilities'),
             'rule.between'                  => __(':attribute must be between :min and :max', 'template-oriented-form-utilities'),
             'rule.boolean'                  => __(':attribute must be a boolean', 'template-oriented-form-utilities'),
-            // The plugin's own file rules (src/Rules/). Their English text
+            // TOFU's own file rules. Their English text
             // predates this catalogue and is kept word for word so existing
             // sites see no change; the Japanese is new, replacing the
             // English that used to leak through on ja sites because these
