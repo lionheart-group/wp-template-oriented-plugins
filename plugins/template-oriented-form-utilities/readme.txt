@@ -1,7 +1,7 @@
 === TOFU (Template-Oriented Form Utilities) ===
 Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.0.7
 License: GPLv3 or later
@@ -101,6 +101,13 @@ OR…
     - Fixed: the plugin never called `load_plugin_textdomain()`, so its bundled Japanese
       translations were not loaded and validation, reCAPTCHA and Turnstile messages rendered
       in English on Japanese sites.
+    - Fixed: "reCAPTCHA token is missing." and "Turnstile token is missing." were the only
+      bot-protection messages not passed through `__()`, so they stayed English even on a
+      translated site.
+    - Fixed: none of the recorded-submissions admin screen's text had been extracted for
+      translation since it was added in 0.0.4, so translators never received it. It is in the
+      .pot now, with Japanese supplied.
+    - Tested against WordPress 7.1.
 
 
 == Upgrade Notice ==

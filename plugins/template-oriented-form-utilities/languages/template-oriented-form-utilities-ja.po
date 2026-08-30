@@ -43,6 +43,14 @@ msgstr "https://www.lionheart.co.jp/"
 msgid "Remove File"
 msgstr "ファイルの削除"
 
+#: src/Models/Form.php:497
+msgid "reCAPTCHA token is missing."
+msgstr "reCAPTCHAのトークンが取得できませんでした。ページを再読み込みしてお試しください。"
+
+#: src/Models/Form.php:535
+msgid "Turnstile token is missing."
+msgstr "Turnstileのトークンが取得できませんでした。ページを再読み込みしてお試しください。"
+
 #: build/src/Helpers/ReCAPTCHA.php:27
 #: build/src/Helpers/ReCAPTCHA.php:33
 #: src/Helpers/ReCAPTCHA.php:41
@@ -137,6 +145,89 @@ msgstr "応答の検証中に内部エラーが発生しました。"
 #, php-format
 msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
 msgstr "Turnstileの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてください。"
+
+#: src/Init/AdminPage.php:29
+#: src/Init/AdminPage.php:78
+#: src/Init/AdminPage.php:198
+msgid "TOFU Records"
+msgstr "TOFU 送信記録"
+
+#: src/Init/AdminPage.php:30
+msgid "TOFU"
+msgstr "TOFU"
+
+#: src/Init/AdminPage.php:45
+msgid "You do not have sufficient permissions to access this page."
+msgstr "このページにアクセスする権限がありません。"
+
+#: src/Init/AdminPage.php:85
+msgid "Filter by form"
+msgstr "フォームで絞り込む"
+
+#: src/Init/AdminPage.php:88
+msgid "All forms"
+msgstr "すべてのフォーム"
+
+#: src/Init/AdminPage.php:95
+msgid "Filter"
+msgstr "絞り込む"
+
+#: src/Init/AdminPage.php:118
+#: src/Init/AdminPage.php:155
+#: src/Init/AdminPage.php:231
+msgid "ID"
+msgstr "ID"
+
+#: src/Init/AdminPage.php:119
+#: src/Init/AdminPage.php:156
+#: src/Init/AdminPage.php:235
+msgid "Form"
+msgstr "フォーム"
+
+#: src/Init/AdminPage.php:120
+#: src/Init/AdminPage.php:157
+#: src/Init/AdminPage.php:239
+msgid "Submitted"
+msgstr "送信日時"
+
+#: src/Init/AdminPage.php:121
+#: src/Init/AdminPage.php:158
+msgid "Fields"
+msgstr "入力内容"
+
+#: src/Init/AdminPage.php:127
+msgid "No records found."
+msgstr "送信記録がありません。"
+
+#: src/Init/AdminPage.php:199
+msgid "Record not found."
+msgstr "送信記録が見つかりませんでした。"
+
+#: src/Init/AdminPage.php:201
+#: src/Init/AdminPage.php:225
+msgid "Back to list"
+msgstr "一覧へ戻る"
+
+#. translators: %d = record ID
+#: src/Init/AdminPage.php:218
+msgid "TOFU Record #%d"
+msgstr "TOFU 送信記録 #%d"
+
+#: src/Init/AdminPage.php:245
+msgid "Submitted Fields"
+msgstr "送信された項目"
+
+#: src/Init/AdminPage.php:248
+msgid "Field data could not be decrypted or is unavailable."
+msgstr "項目データを復号できないか、利用できません。"
+
+#: src/Init/AdminPage.php:253
+msgid "Field"
+msgstr "項目"
+
+#: src/Init/AdminPage.php:254
+msgid "Value"
+msgstr "値"
 
 #. Validation message: rule.accepted
 #: src/Validation/Messages.php

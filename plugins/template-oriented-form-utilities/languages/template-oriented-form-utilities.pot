@@ -44,6 +44,14 @@ msgstr ""
 msgid "Remove File"
 msgstr ""
 
+#: src/Models/Form.php:497
+msgid "reCAPTCHA token is missing."
+msgstr ""
+
+#: src/Models/Form.php:535
+msgid "Turnstile token is missing."
+msgstr ""
+
 #: build/src/Helpers/ReCAPTCHA.php:27
 #: build/src/Helpers/ReCAPTCHA.php:33
 #: src/Helpers/ReCAPTCHA.php:41
@@ -137,6 +145,89 @@ msgstr ""
 #: src/Helpers/Turnstile.php:97
 #, php-format
 msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
+msgstr ""
+
+#: src/Init/AdminPage.php:29
+#: src/Init/AdminPage.php:78
+#: src/Init/AdminPage.php:198
+msgid "TOFU Records"
+msgstr ""
+
+#: src/Init/AdminPage.php:30
+msgid "TOFU"
+msgstr ""
+
+#: src/Init/AdminPage.php:45
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: src/Init/AdminPage.php:85
+msgid "Filter by form"
+msgstr ""
+
+#: src/Init/AdminPage.php:88
+msgid "All forms"
+msgstr ""
+
+#: src/Init/AdminPage.php:95
+msgid "Filter"
+msgstr ""
+
+#: src/Init/AdminPage.php:118
+#: src/Init/AdminPage.php:155
+#: src/Init/AdminPage.php:231
+msgid "ID"
+msgstr ""
+
+#: src/Init/AdminPage.php:119
+#: src/Init/AdminPage.php:156
+#: src/Init/AdminPage.php:235
+msgid "Form"
+msgstr ""
+
+#: src/Init/AdminPage.php:120
+#: src/Init/AdminPage.php:157
+#: src/Init/AdminPage.php:239
+msgid "Submitted"
+msgstr ""
+
+#: src/Init/AdminPage.php:121
+#: src/Init/AdminPage.php:158
+msgid "Fields"
+msgstr ""
+
+#: src/Init/AdminPage.php:127
+msgid "No records found."
+msgstr ""
+
+#: src/Init/AdminPage.php:199
+msgid "Record not found."
+msgstr ""
+
+#: src/Init/AdminPage.php:201
+#: src/Init/AdminPage.php:225
+msgid "Back to list"
+msgstr ""
+
+#. translators: %d = record ID
+#: src/Init/AdminPage.php:218
+msgid "TOFU Record #%d"
+msgstr ""
+
+#: src/Init/AdminPage.php:245
+msgid "Submitted Fields"
+msgstr ""
+
+#: src/Init/AdminPage.php:248
+msgid "Field data could not be decrypted or is unavailable."
+msgstr ""
+
+#: src/Init/AdminPage.php:253
+msgid "Field"
+msgstr ""
+
+#: src/Init/AdminPage.php:254
+msgid "Value"
 msgstr ""
 
 #. Validation message: rule.accepted

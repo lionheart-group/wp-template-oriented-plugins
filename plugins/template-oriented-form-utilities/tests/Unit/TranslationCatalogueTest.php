@@ -21,6 +21,16 @@ class TranslationCatalogueTest extends BaseTestCase
 {
     private const DOMAIN = 'template-oriented-form-utilities';
 
+    /**
+     * A call to one of WordPress's translation functions whose first
+     * argument is a string literal, capturing that literal.
+     *
+     * Longest names lead the alternation so `esc_html__` is not consumed as
+     * a bare `__`, and the lookbehind keeps `$obj->__(` and identifiers
+     * ending in these names out.
+     */
+    private const TRANSLATION_CALL = '/(?<![\w$>])(?:esc_html__|esc_attr__|esc_html_e|esc_attr_e|__|_e|_x)\s*\(\s*(?P<quote>[\'"])(?P<text>(?:\\\\.|(?!\g{quote})[^\\\\])*)\g{quote}/';
+
     private static function languagesDir(): string
     {
         return dirname(__DIR__, 2) . '/languages';
@@ -68,6 +78,87 @@ class TranslationCatalogueTest extends BaseTestCase
         }
 
         $this->assertSame([], $missing, 'Catalogue strings with no msgid in the .pot.');
+    }
+
+    /**
+     * Every user-facing string in src/ must go through __() or _x(), and
+     * every one of those must have a msgid in the .pot.
+     *
+     * The catalogue checks above only cover Messages::all(). They said
+     * nothing about the strings scattered through the rest of src/, which is
+     * how 'reCAPTCHA token is missing.' and its Turnstile twin sat in
+     * Models/Form.php as bare literals — shown to visitors, in English, on a
+     * fully translated site, while every other bot-protection message
+     * beside them was translatable.
+     *
+     * Only literal calls are checked. That is the same set `wp i18n
+     * make-pot` can extract, so anything this test cannot see is something
+     * translators would never receive either.
+     */
+    public function testEveryTranslatableStringInSourceIsInThePot(): void
+    {
+        $pot = file_get_contents(self::languagesDir() . '/' . self::DOMAIN . '.pot');
+        $this->assertIsString($pot);
+
+        $found = 0;
+        $missing = [];
+        foreach (self::sourceFiles() as $file) {
+            $code = (string) file_get_contents($file);
+
+            preg_match_all(self::TRANSLATION_CALL, $code, $matches, PREG_SET_ORDER);
+            $found += count($matches);
+
+            foreach ($matches as $match) {
+                // Un-escape the PHP literal, then re-escape it the way a
+                // .pot file writes a msgid.
+                $text = $match['quote'] === '"'
+                    ? stripcslashes($match['text'])
+                    : str_replace(['\\\'', '\\\\'], ['\'', '\\'], $match['text']);
+
+                if (!str_contains($pot, 'msgid "' . addcslashes($text, "\"\\") . '"')) {
+                    $missing[str_replace(dirname(__DIR__, 2) . '/', '', $file)][] = $text;
+                }
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $missing,
+            'Translatable strings in src/ with no msgid in the .pot. Regenerate it with '
+            . '`wp i18n make-pot . languages/' . self::DOMAIN . '.pot`, then add the '
+            . 'translations to the .po and recompile the .mo.'
+        );
+
+        // A pattern that matches nothing would make the check above pass no
+        // matter what — which is exactly what the first version of it did,
+        // because \b never matches between the two underscores of `__(`.
+        $this->assertGreaterThan(
+            100,
+            $found,
+            'Found almost no translatable strings in src/. The pattern has stopped matching, '
+            . 'so this test is no longer checking anything.'
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function sourceFiles(): array
+    {
+        $files = [];
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(dirname(__DIR__, 2) . '/src', \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                $files[] = $file->getPathname();
+            }
+        }
+
+        sort($files);
+
+        return $files;
     }
 
     /**
