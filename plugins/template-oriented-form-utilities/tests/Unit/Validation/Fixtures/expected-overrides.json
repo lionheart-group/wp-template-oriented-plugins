@@ -1,14 +1,69 @@
 {
     "_readme": "Deliberate deviations from expected.json, which stays frozen. Each entry records why the behaviour changed, what it was, and what it became. ValidationGoldenTest verifies that every \"before\" still matches the frozen fixture, so a stale entry fails loudly.",
     "_reasons": {
-        "user_input_no_longer_throws": "Invalid user input is now a validation failure instead of an uncaught exception. The previous engine raised a PHP TypeError or ParameterException for values it could not coerce — a blank date field was enough to return a 500 — so reproducing it would mean shipping a rule nobody can safely use. Exceptions are now reserved for invalid rule PARAMETERS, which are the form author's error rather than the visitor's.",
-        "config_error_exception_type": "Same configuration error, raised by this engine's own exception class instead of the departing library's. The condition detected and the point it is detected at are unchanged.",
-        "japanese_translation_added": "Japanese text where English used to leak through. The message key had no ja entry, so ja_JP sites saw the English fallback; it is now translated in languages/*.po like every other string in the plugin. English output is unchanged.",
         "broken_file_rule_now_works": "A file rule that could never pass now works. uploaded_file, mimes and extension all depended on is_uploaded_file(), which is only ever true during the request that received the upload — so they failed (or fatally errored) even for genuine files on the confirm step. They now share the same predicates as the plugin's own file rules.",
-        "whitespace_tolerated_in_rule_string": "Whitespace around a pipe segment is accepted rather than fatal. \"required | max:5\" used to throw; tolerating it can only turn a previously-broken configuration into a working one.",
-        "dotted_keys_treated_literally": "A rule key containing a dot is treated as a literal field name. The previous engine read it as a nested path and handed ValidationErrorCollection::addError() an array, fataling with a TypeError — so no form could use the notation anyway."
+        "config_error_exception_type": "Same configuration error, raised by this engine's own exception class instead of the departing library's. The condition detected and the point it is detected at are unchanged.",
+        "dotted_keys_treated_literally": "A rule key containing a dot is treated as a literal field name. The previous engine read it as a nested path and handed ValidationErrorCollection::addError() an array, fataling with a TypeError — so no form could use the notation anyway.",
+        "japanese_translation_added": "Japanese text where English used to leak through. The message key had no ja entry, so ja_JP sites saw the English fallback; it is now translated in languages/*.po like every other string in the plugin. English output is unchanged.",
+        "new_rule_label": "Cases for a rule label that did not exist when the fixture was frozen.",
+        "presence_now_file_aware": "required and the required_*/prohibited_* families now share one presence test with custom_required_file, so they understand file fields. Previously a $_FILES entry for \"no file chosen\" counted as an answer, because it is a non-empty array — a required attachment passed when nothing had been attached.",
+        "upload_claim_must_be_server_verified": "A carried-over upload counts only when the SERVER holds a matching session record. The client-supplied __tofu_uploaded_files input is now treated as a claim to verify rather than proof, so a forged hidden field can no longer satisfy a required file.",
+        "user_input_no_longer_throws": "Invalid user input is now a validation failure instead of an uncaught exception. The previous engine raised a PHP TypeError or ParameterException for values it could not coerce — a blank date field was enough to return a 500 — so reproducing it would mean shipping a rule nobody can safely use. Exceptions are now reserved for invalid rule PARAMETERS, which are the form author's error rather than the visitor's.",
+        "whitespace_tolerated_in_rule_string": "Whitespace around a pipe segment is accepted rather than fatal. \"required | max:5\" used to throw; tolerating it can only turn a previously-broken configuration into a working one."
     },
     "overrides": {
+        "companion/prohibited_if/sibling_present/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not allowed if other has value(s) \"trigger\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "companion/prohibited_if/sibling_present/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはotherの値が\"trigger\"の場合は使用できません"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "companion/prohibited_unless/sibling_absent/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not allowed if other does not have value(s) \"trigger\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "companion/prohibited_unless/sibling_absent/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはotherの値が\"trigger\"ではない場合は使用できません"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "companion/prohibited_with/sibling_present/array_list/ja_JP": {
             "reason": "japanese_translation_added",
             "before": {
@@ -54,8 +109,21 @@
                 }
             }
         },
+        "companion/prohibited_with/sibling_present/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not allowed with \"other\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "companion/prohibited_with/sibling_present/file_no_file/ja_JP": {
-            "reason": "japanese_translation_added",
+            "reason": "presence_now_file_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -63,10 +131,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは\"other\"がある場合は使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_with/sibling_present/file_ok/ja_JP": {
@@ -279,8 +345,21 @@
                 }
             }
         },
+        "companion/prohibited_with_all/sibling_present/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not allowed with all of \"other\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "companion/prohibited_with_all/sibling_present/file_no_file/ja_JP": {
-            "reason": "japanese_translation_added",
+            "reason": "presence_now_file_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -288,10 +367,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは\"other\"すべてがある場合は使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_with_all/sibling_present/file_ok/ja_JP": {
@@ -879,8 +956,21 @@
                 }
             }
         },
+        "companion/prohibited_without_all/sibling_absent/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not allowed when all of the following fields are absents: \"other\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
         "companion/prohibited_without_all/sibling_absent/file_no_file/ja_JP": {
-            "reason": "japanese_translation_added",
+            "reason": "presence_now_file_aware",
             "before": {
                 "fails": true,
                 "errors": {
@@ -888,10 +978,8 @@
                 }
             },
             "after": {
-                "fails": true,
-                "errors": {
-                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
-                }
+                "fails": false,
+                "errors": []
             }
         },
         "companion/prohibited_without_all/sibling_absent/file_ok/ja_JP": {
@@ -1056,6 +1144,188 @@
                 "fails": true,
                 "errors": {
                     "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/required_if_active/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required if other has a value of \"trigger\""
+                }
+            }
+        },
+        "companion/required_if_active/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはotherの値が\"trigger\"の場合は必須です"
+                }
+            }
+        },
+        "companion/required_unless/sibling_absent/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required if other has one of \"trigger\""
+                }
+            }
+        },
+        "companion/required_unless/sibling_absent/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldはotherの値が\"trigger\"ではない場合は必須です"
+                }
+            }
+        },
+        "companion/required_with_all/sibling_present/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required with all of \"other\""
+                }
+            }
+        },
+        "companion/required_with_all/sibling_present/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は必須です"
+                }
+            }
+        },
+        "companion/required_with_present/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required with \"other\""
+                }
+            }
+        },
+        "companion/required_with_present/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は必須です"
+                }
+            }
+        },
+        "companion/required_without_absent/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when \"other\" are empty"
+                }
+            }
+        },
+        "companion/required_without_absent/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"が空の場合は必須です"
+                }
+            }
+        },
+        "companion/required_without_all/sibling_absent/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required when \"other\" are all empty"
+                }
+            }
+        },
+        "companion/required_without_all/sibling_absent/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて空の場合は必須です"
+                }
+            }
+        },
+        "file/custom_required_file/confirm_step_key_absent_with_session_id": {
+            "reason": "upload_claim_must_be_server_verified",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "attachment": "The attachment field is required."
+                }
+            }
+        },
+        "file/required/no_file_selected": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "attachment": "attachment is required"
                 }
             }
         },
@@ -4242,6 +4512,32 @@
                 }
             }
         },
+        "value_sweep/required/file_no_file/en_US": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is required"
+                }
+            }
+        },
+        "value_sweep/required/file_no_file/ja_JP": {
+            "reason": "presence_now_file_aware",
+            "before": {
+                "fails": false,
+                "errors": []
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必須項目です"
+                }
+            }
+        },
         "value_sweep/uploaded_file/file_ok/en_US": {
             "reason": "broken_file_rule_now_works",
             "before": {
@@ -4777,6 +5073,373 @@
                 "fails": true,
                 "errors": {
                     "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        }
+    },
+    "additions": {
+        "key_missing/required_file": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/array_list/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/array_list/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/array_zero/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/array_zero/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/ascii_whitespace/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/ascii_whitespace/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/empty_array/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/empty_array/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/empty_string/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/empty_string/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/false/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/false/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/file_no_file/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/file_no_file/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/file_ok/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/required_file/file_ok/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/required_file/ideographic_space/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/ideographic_space/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/int_100/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/int_100/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/null/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/null/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/numeric_string_100/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/numeric_string_100/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/single_space/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/single_space/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/string_abc/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/string_abc/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/string_japanese/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/string_japanese/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/string_phone/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/string_phone/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/true/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/true/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/zero_float/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/zero_float/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/zero_int/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/zero_int/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/required_file/zero_string/en_US": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            }
+        },
+        "value_sweep/required_file/zero_string/ja_JP": {
+            "reason": "new_rule_label",
+            "result": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
                 }
             }
         }

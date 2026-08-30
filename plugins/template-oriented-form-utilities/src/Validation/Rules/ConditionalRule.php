@@ -3,6 +3,7 @@
 namespace TofuPlugin\Validation\Rules;
 
 use TofuPlugin\Validation\Rule;
+use TofuPlugin\Validation\Support\Presence;
 use TofuPlugin\Validation\Support\Value;
 
 /**
@@ -50,9 +51,13 @@ abstract class ConditionalRule extends Rule
             return true;
         }
 
-        return $this->demandsValue
-            ? !Value::isEmpty($value)
-            : Value::isEmpty($value);
+        // The presence test is the same one `required` uses, so a
+        // conditionally-required FILE field behaves like an unconditionally
+        // required one. Only the target side is file-aware; the condition
+        // side still reads sibling values literally.
+        $present = Presence::satisfied($this->attribute(), $value);
+
+        return $this->demandsValue ? $present : !$present;
     }
 
     protected function siblingValue(string $field): mixed

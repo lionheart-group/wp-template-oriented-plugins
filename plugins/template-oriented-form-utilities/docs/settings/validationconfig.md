@@ -51,12 +51,24 @@ $validation = new ValidationConfig(
 
 ## File Upload Validation Rules
 
-The default validation does not fit well for file upload fields. You can use the following custom rules:
-
-- `custom_required_file`: Ensures a file is uploaded.
-    - **The default `required` rule does not work when you return to the input page after validation errors or from the confirmation page.**
+- `required_file`: Ensures a file is uploaded, and that the submitted value really is a file.
+    - Also available under its former name `custom_required_file`. Both names run the same
+      rule, so existing forms keep working — but prefer `required_file` in new code.
+    - `required` also understands file fields, so either will do when you only need
+      "an attachment must be present". Reach for `required_file` when the field must be a
+      file and nothing else: `required` accepts any non-empty value, so a form posted
+      outside the browser could satisfy it with an ordinary string.
 - `max_mb:<number>`: Validates the maximum file size in megabytes.
-- `mime_type:<type1>,<type2>,...`: Validates the file MIME type.
+- `mime_type:<type1>,<type2>,...`: Validates the file's MIME type by inspecting its
+  **contents**, not its filename or the browser-supplied type — a text file renamed to
+  `.pdf` does not pass `mime_type:application/pdf`.
+    - `mimes:<ext1>,<ext2>` and `extension:<ext1>,<ext2>` check the filename extension
+      instead, which the visitor chooses. Use `mime_type` when it matters.
+
+> A file uploaded on the input page survives the trip to the confirmation page and back:
+> the plugin keeps it in the session and re-associates it on each request. Validation
+> confirms that against the server's own record, so a tampered form cannot claim an
+> upload that is not there.
 
 ## Custom Validation with `after` Callback
 

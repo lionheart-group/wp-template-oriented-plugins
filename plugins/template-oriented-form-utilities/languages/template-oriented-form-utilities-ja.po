@@ -474,7 +474,7 @@ msgstr ":attributeは有効なURLではありません"
 msgid ":attribute is not a valid UUID or is NIL"
 msgstr ":attributeは有効なUUIDではなくNILです"
 
-#. Validation message: rule.custom_required_file
+#. Validation message: rule.required_file
 #: src/Validation/Messages.php
 msgid "The :attribute field is required."
 msgstr ":attributeを選択してください"

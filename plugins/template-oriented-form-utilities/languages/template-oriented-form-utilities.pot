@@ -475,7 +475,7 @@ msgstr ""
 msgid ":attribute is not a valid UUID or is NIL"
 msgstr ""
 
-#. Validation message: rule.custom_required_file
+#. Validation message: rule.required_file
 #: src/Validation/Messages.php
 msgid "The :attribute field is required."
 msgstr ""

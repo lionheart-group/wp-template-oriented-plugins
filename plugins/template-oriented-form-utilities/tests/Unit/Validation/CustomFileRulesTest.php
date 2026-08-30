@@ -33,47 +33,81 @@ class CustomFileRulesTest extends BaseTestCase
     // file fields, which is the entire justification for a custom rule.
     // -----------------------------------------------------------------
 
-    public function testPlainRequiredFalselyPassesWhenNoFileIsSelected(): void
+    /**
+     * @return array<string, array{0: string}>
+     */
+    public static function requiredLabelProvider(): array
     {
-        // The $_FILES entry for "no file chosen" is a non-empty 5-key
-        // array, so it does not count as "empty" and `required` passes —
-        // a false negative that would let a mandatory attachment through.
-        $result = EngineProbe::run(['attachment' => $this->noFileSelected()], ['attachment' => 'required']);
-        $this->assertFalse($result['fails'], 'KNOWN LIMITATION of plain `required`: passes when no file was actually chosen.');
+        return [
+            'required'             => ['required'],
+            'required_file'        => ['required_file'],
+            'custom_required_file' => ['custom_required_file'],
+        ];
     }
 
-    public function testCustomRequiredFileCorrectlyFailsWhenNoFileIsSelected(): void
+    /**
+     * Plain `required` understands file fields now.
+     *
+     * It used to pass here: the $_FILES entry for "no file chosen" is a
+     * non-empty five-key array, so an emptiness test said a file was
+     * present. All three labels share one presence test, so all three agree.
+     *
+     * @dataProvider requiredLabelProvider
+     */
+    public function testNoFileSelectedFailsUnderEveryRequiredLabel(string $label): void
     {
-        $result = EngineProbe::run(['attachment' => $this->noFileSelected()], ['attachment' => 'custom_required_file']);
-        $this->assertTrue($result['fails']);
+        $result = EngineProbe::run(['attachment' => $this->noFileSelected()], ['attachment' => $label]);
+
+        $this->assertTrue($result['fails'], "'{$label}' must reject an empty file input.");
     }
 
-    public function testPlainRequiredFalselyFailsOnConfirmStepRerenderWithSessionRestoredFile(): void
+    /**
+     * A carried-over upload is proven by the SERVER's session record, not by
+     * the client-supplied hidden field.
+     *
+     * EngineProbe has no Form behind it, so nothing is verified here — which
+     * is exactly the forgery case: a POST claiming an upload, with no
+     * matching file on the server, must not satisfy the rule. The genuine
+     * confirm-step path is covered end-to-end in
+     * ValidationModelIntegrationTest, where a real session record exists.
+     *
+     * @dataProvider requiredLabelProvider
+     */
+    public function testUnverifiedUploadClaimNeverSatisfiesARequiredLabel(string $label): void
     {
-        // On the confirm step (or after a validation error re-renders the
-        // input page), $_FILES is empty and the field key is absent
-        // entirely — only the hidden __tofu_uploaded_files map carries the
-        // previously-uploaded file's ID. `required` sees a missing key and
-        // fails — a false positive that would reject an already-uploaded file.
         $result = EngineProbe::run(
-            ['__tofu_uploaded_files' => ['attachment' => 'previously-issued-id']],
-            ['attachment' => 'required'],
+            ['__tofu_uploaded_files' => ['attachment' => 'forged-or-stale-id']],
+            ['attachment' => $label],
         );
-        $this->assertTrue($result['fails'], 'KNOWN LIMITATION of plain `required`: fails on session-restored uploads.');
+
+        $this->assertTrue(
+            $result['fails'],
+            "'{$label}' must not accept an upload claim the server cannot corroborate."
+        );
     }
 
-    public function testCustomRequiredFileCorrectlyPassesOnConfirmStepRerenderWithSessionRestoredFile(): void
+    /**
+     * `required_file` is the current name and `custom_required_file` the
+     * original one. They are the same class, so they must never disagree —
+     * this walks every value in the corpus's repertoire through both.
+     */
+    public function testRequiredFileAndItsLegacyLabelBehaveIdentically(): void
     {
-        $result = EngineProbe::run(
-            ['__tofu_uploaded_files' => ['attachment' => 'previously-issued-id']],
-            ['attachment' => 'custom_required_file'],
-        );
-        $this->assertFalse($result['fails'], 'custom_required_file must read the sibling __tofu_uploaded_files field.');
+        foreach (Corpus::values() as $name => $value) {
+            $current = EngineProbe::run(['attachment' => $value], ['attachment' => 'required_file']);
+            $legacy  = EngineProbe::run(['attachment' => $value], ['attachment' => 'custom_required_file']);
+
+            $this->assertSame(
+                $current,
+                $legacy,
+                "required_file and custom_required_file disagreed for the '{$name}' value."
+            );
+        }
     }
 
-    public function testCustomRequiredFileFailsWhenNeitherAFreshUploadNorASessionRecordExists(): void
+    public function testRequiredFileFailsWhenNeitherAFreshUploadNorASessionRecordExists(): void
     {
-        $result = EngineProbe::run([], ['attachment' => 'custom_required_file']);
+        $result = EngineProbe::run([], ['attachment' => 'required_file']);
         $this->assertTrue($result['fails']);
     }
 

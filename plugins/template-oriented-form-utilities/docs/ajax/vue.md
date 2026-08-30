@@ -382,7 +382,7 @@ async function handleSubmit() {
 
 > **Validation rules** in `ValidationConfig`:
 > ```php
-> rules: ['attachment' => 'custom_required_file|max_mb:5|mime_type:application/pdf,image/jpeg'],
+> rules: ['attachment' => 'required_file|max_mb:5|mime_type:application/pdf,image/jpeg'],
 > ```
 
 ---

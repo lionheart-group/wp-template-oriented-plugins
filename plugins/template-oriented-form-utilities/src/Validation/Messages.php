@@ -45,15 +45,6 @@ final class Messages
             'rule.before'                   => __(':attribute must be a date before :time.', 'template-oriented-form-utilities'),
             'rule.between'                  => __(':attribute must be between :min and :max', 'template-oriented-form-utilities'),
             'rule.boolean'                  => __(':attribute must be a boolean', 'template-oriented-form-utilities'),
-            // TOFU's own file rules. Their English text
-            // predates this catalogue and is kept word for word so existing
-            // sites see no change; the Japanese is new, replacing the
-            // English that used to leak through on ja sites because these
-            // three keys had no translation at all.
-            'rule.custom_required_file'     => __('The :attribute field is required.', 'template-oriented-form-utilities'),
-            'rule.max_mb'                   => __('The :attribute field must be less than :max_mb MB in size.', 'template-oriented-form-utilities'),
-            'rule.mime_type'                => __('The :attribute field must be a file of an allowed type.', 'template-oriented-form-utilities'),
-
             'rule.date'                     => __(':attribute is not valid date format', 'template-oriented-form-utilities'),
             'rule.default'                  => __(':attribute is not valid', 'template-oriented-form-utilities'),
             'rule.default_value'            => __(':attribute default is :default', 'template-oriented-form-utilities'),
@@ -90,6 +81,16 @@ final class Messages
             'rule.regex'                    => __(':attribute does not meet required format', 'template-oriented-form-utilities'),
             'rule.rejected'                 => __(':attribute must be one of: :rejected', 'template-oriented-form-utilities'),
             'rule.required'                 => __(':attribute is required', 'template-oriented-form-utilities'),
+
+            // TOFU's own file rules. Their English text predates this
+            // catalogue and is kept word for word so existing sites see no
+            // change; the Japanese is new, replacing the English that used
+            // to leak through on ja sites because these three keys had no
+            // translation at all.
+            'rule.required_file'            => __('The :attribute field is required.', 'template-oriented-form-utilities'),
+            'rule.max_mb'                   => __('The :attribute field must be less than :max_mb MB in size.', 'template-oriented-form-utilities'),
+            'rule.mime_type'                => __('The :attribute field must be a file of an allowed type.', 'template-oriented-form-utilities'),
+
             'rule.required_if'              => __(':attribute is required if :field has a value of :values', 'template-oriented-form-utilities'),
             'rule.required_unless'          => __(':attribute is required if :field has one of :values', 'template-oriented-form-utilities'),
             'rule.required_with'            => __(':attribute is required with :fields', 'template-oriented-form-utilities'),

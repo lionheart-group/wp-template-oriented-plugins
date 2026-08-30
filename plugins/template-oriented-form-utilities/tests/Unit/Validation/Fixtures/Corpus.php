@@ -117,6 +117,7 @@ final class Corpus
         'not_in'                => 'not_in:abc,foo,bar',
         'regex'                 => 'regex:/^[a-z]+$/',
         'custom_required_file'  => 'custom_required_file',
+        'required_file'         => 'required_file',
         'max_mb'                => 'max_mb:5',
         'mime_type'             => 'mime_type:text/plain,application/pdf',
         // Added when the port scope widened to every registered rule.

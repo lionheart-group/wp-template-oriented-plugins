@@ -2,44 +2,28 @@
 
 namespace TofuPlugin\Validation\Rules;
 
-use TofuPlugin\Consts;
-use TofuPlugin\Validation\Rule;
-
 /**
  * A file must be attached to this field.
  *
- * Plain `required` is wrong for file fields in both directions: the
- * `$_FILES` entry for "no file chosen" is a non-empty array, so `required`
- * passes when nothing was selected; and on the confirm step the key is
- * absent entirely, so `required` fails even though a file was uploaded a
- * request ago.
+ * Runs exactly the same code as `required` — there is no check() here — and
+ * differs by one flag: a value that is not a file never satisfies it.
  *
- * Passes when a new upload arrived (UPLOAD_ERR_OK), or when the
- * `__tofu_uploaded_files` map still carries an ID for this field.
+ * That flag is load-bearing rather than cosmetic. max_mb and mime_type both
+ * skip silently when the value is not an array, so without it
+ * `'attachment' => 'custom_required_file|max_mb:5|mime_type:application/pdf'`
+ * would be satisfied by POSTing `attachment=abc`, and a mandatory
+ * attachment could be bypassed with a one-line curl.
  *
- * Usage in rules: 'attachment' => 'custom_required_file'
+ * Registered under two labels. `required_file` is the current name;
+ * `custom_required_file` is the original one, from when the rule had to
+ * avoid colliding with the departed library's names, and stays registered
+ * because existing forms are written against it — an unknown rule name
+ * throws at config-parse time, which would white screen a live form.
+ *
+ * Usage in rules: 'attachment' => 'required_file'
  */
-class RequiredFileRule extends Rule
+class RequiredFileRule extends RequiredRule
 {
-    protected bool $implicit = true;
-    protected string $message = 'rule.custom_required_file';
-
-    public function check(mixed $value): bool
-    {
-        // A new upload in this request.
-        if (is_array($value) && isset($value['error']) && $value['error'] === \UPLOAD_ERR_OK) {
-            return true;
-        }
-
-        // Or one carried over from a previous step.
-        $fieldName = $this->attribute()?->key();
-        if ($fieldName !== null) {
-            $uploadedFiles = $this->attribute()->value(Consts::UPLOADED_FILES_INPUT_NAME);
-            if (is_array($uploadedFiles) && !empty($uploadedFiles[$fieldName])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    protected bool $fileOnly = true;
+    protected string $message = 'rule.required_file';
 }

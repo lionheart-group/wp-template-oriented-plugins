@@ -38,10 +38,33 @@ class Validation
             }
         }
 
+        // Which fields genuinely have a file waiting on the server.
+        //
+        // A hidden __tofu_uploaded_files input travels with the form to say
+        // "keep the file I uploaded earlier", but it is client-supplied and
+        // therefore only a CLAIM. A claim counts only when the session
+        // actually holds a file for that field AND the ID matches, so a
+        // forged input cannot make an empty field look answered.
+        $sessionFiles = $files->getAllFiles();
+        $claims = $targetValues[Consts::UPLOADED_FILES_INPUT_NAME] ?? null;
+        $verifiedUploads = [];
+
+        if (is_array($claims)) {
+            foreach ($sessionFiles as $name => $file) {
+                $claim = $claims[$name] ?? null;
+                // hash_equals() raises a TypeError on non-strings, and a
+                // forged claim can be any type at all.
+                if (is_string($claim) && $claim !== '' && hash_equals((string) $file->getId(), $claim)) {
+                    $verifiedUploads[] = $name;
+                }
+            }
+        }
+
         $factory = new ValidatorFactory(new GettextTranslator($customMessages));
 
         $validation = $factory->make($targetValues, $form->config->validation->rules)
             ->setAliases($form->config->validation->names)
+            ->setVerifiedUploads($verifiedUploads)
             ->validate();
 
         if ($validation->fails()) {
@@ -60,26 +83,18 @@ class Validation
             $values->addValue($key, $value);
         }
 
-        // Clean up uploaded files
-        // Remove files not exists in previous values or with different ID
-        $currentFiles = $files->getAllFiles();
-        $previousValues = $targetValues[Consts::UPLOADED_FILES_INPUT_NAME] ?? null;
-        foreach ($currentFiles as $uploadedFile) {
+        // Drop session files the submission did not claim back.
+        //
+        // This reuses the set computed before validation rather than
+        // repeating the ID comparison, so validation and the surviving file
+        // set agree by construction — a field can no longer pass `required`
+        // via an upload that this loop then deletes.
+        foreach ($sessionFiles as $uploadedFile) {
             // Unset value to avoid duplication
             $values->unsetValue($uploadedFile->name);
 
-            if (!is_array($previousValues) || !isset($previousValues[$uploadedFile->name])) {
-                // If not exists in previous values, remove it
+            if (!in_array($uploadedFile->name, $verifiedUploads, true)) {
                 $files->removeFile($uploadedFile->name);
-                continue;
-            }
-
-            // If exists, compare ID to keep the file
-            // If ID is different, remove it
-            $previousFileData = $previousValues[$uploadedFile->name];
-            if ($previousFileData !== $uploadedFile->getId()) {
-                $files->removeFile($uploadedFile->name);
-                continue;
             }
         }
 

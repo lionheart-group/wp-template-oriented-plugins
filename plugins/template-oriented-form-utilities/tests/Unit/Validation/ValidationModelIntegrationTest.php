@@ -8,6 +8,7 @@ use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Structure\MailConfig;
 use TofuPlugin\Structure\MailRecipientsCollection;
 use TofuPlugin\Structure\MailRecipientsConfig;
+use TofuPlugin\Structure\UploadedFile;
 use TofuPlugin\Structure\ValidationConfig;
 use TofuPlugin\Tests\Unit\BaseTestCase;
 use TofuPlugin\Tests\Unit\Validation\Fixtures\Corpus;
@@ -166,23 +167,99 @@ class ValidationModelIntegrationTest extends BaseTestCase
     // $this->values->toArray() alone — no $_FILES, ever.
     // -----------------------------------------------------------------
 
-    public function testVerifySessionPassesForAFileFieldBackedOnlyByTheUploadedFilesSessionRecord(): void
+    /**
+     * Seed a form the way the Form constructor would on a confirm-step
+     * request: no $_FILES at all, but the session carrying both the
+     * UploadedFile itself and the hidden map naming its ID.
+     */
+    private function seedRestoredUpload(Form $form, string $field, string $id): void
+    {
+        $form->getFiles()->addFile(new UploadedFile(
+            id: $id,
+            name: $field,
+            fileName: 'sample.txt',
+            mimeType: 'text/plain',
+            tempName: Corpus::samplePath(),
+            size: (int) filesize(Corpus::samplePath()),
+        ));
+        $form->getValues()->addValue('__tofu_uploaded_files', [$field => $id]);
+    }
+
+    public function testVerifySessionPassesForAFileFieldRestoredFromTheSession(): void
     {
         $form = $this->makeForm(new ValidationConfig(
             allows: ['attachment'],
-            rules: ['attachment' => 'custom_required_file'],
+            rules: ['attachment' => 'required_file'],
             names: ['attachment' => 'Attachment'],
         ));
 
-        // Simulate what the Form constructor would have restored from the
-        // session on the confirm-step GET request: no $_FILES, just the
-        // hidden field recording which upload ID belongs to this field.
-        $form->getValues()->addValue('__tofu_uploaded_files', ['attachment' => 'previously-issued-id']);
+        $this->seedRestoredUpload($form, 'attachment', 'previously-issued-id');
 
         $ok = $form->verifySession();
 
-        $this->assertTrue($ok, 'custom_required_file must pass using only the session-restored upload record.');
+        $this->assertTrue($ok, 'A genuinely restored upload must satisfy the rule on the confirm step.');
         $this->assertFalse($form->getErrors()->hasErrors());
+    }
+
+    /**
+     * The hidden `__tofu_uploaded_files` input travels with the form and is
+     * therefore attacker-controlled. It only counts when the server holds a
+     * file whose ID matches; a bare claim proves nothing.
+     */
+    public function testVerifySessionRejectsAnUploadClaimWithNoMatchingServerRecord(): void
+    {
+        $form = $this->makeForm(new ValidationConfig(
+            allows: ['attachment'],
+            rules: ['attachment' => 'required_file'],
+            names: ['attachment' => 'Attachment'],
+        ));
+
+        // A claim, with nothing behind it.
+        $form->getValues()->addValue('__tofu_uploaded_files', ['attachment' => 'forged-id']);
+
+        $this->assertFalse($form->verifySession());
+        $this->assertTrue($form->getErrors()->hasFieldErrors('attachment'));
+    }
+
+    public function testVerifySessionRejectsAnUploadClaimWhoseIdDoesNotMatch(): void
+    {
+        $form = $this->makeForm(new ValidationConfig(
+            allows: ['attachment'],
+            rules: ['attachment' => 'required_file'],
+            names: ['attachment' => 'Attachment'],
+        ));
+
+        $this->seedRestoredUpload($form, 'attachment', 'the-real-id');
+        // Overwrite the claim with a different ID than the stored file's.
+        $form->getValues()->addValue('__tofu_uploaded_files', ['attachment' => 'a-different-id']);
+
+        $this->assertFalse($form->verifySession());
+        $this->assertTrue($form->getErrors()->hasFieldErrors('attachment'));
+    }
+
+    /**
+     * Anything that passes a required check through the upload channel must
+     * still have its file afterwards.
+     *
+     * Validation and the post-validation cleanup now share one verified set,
+     * so "passed validation, then the file was discarded" — which would send
+     * a confirmation page and an email with no attachment — cannot happen.
+     */
+    public function testAFileThatSatisfiedValidationSurvivesTheCleanup(): void
+    {
+        $form = $this->makeForm(new ValidationConfig(
+            allows: ['attachment'],
+            rules: ['attachment' => 'required_file'],
+            names: ['attachment' => 'Attachment'],
+        ));
+
+        $this->seedRestoredUpload($form, 'attachment', 'previously-issued-id');
+
+        $this->assertTrue($form->verifySession());
+        $this->assertTrue(
+            $form->getFiles()->hasFile('attachment'),
+            'The upload that satisfied validation was discarded by the cleanup pass.'
+        );
     }
 
     public function testVerifySessionFailsWhenNoUploadedFilesRecordExists(): void

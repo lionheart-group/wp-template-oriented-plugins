@@ -151,6 +151,11 @@ class ValidatorFactory
             'uploaded_file'            => new Rules\UploadedFileRule(),
             'mimes'                    => new Rules\MimesRule(),
             'extension'                => new Rules\ExtensionRule(),
+            'required_file'            => new Rules\RequiredFileRule(),
+            // Kept because it is what existing forms are written against.
+            // `custom_required_file` dates from when the rule had to avoid
+            // colliding with the departed library's own names; `required_file`
+            // is the name to use from here on. Same class, same behaviour.
             'custom_required_file'     => new Rules\RequiredFileRule(),
             'max_mb'                   => new Rules\MaxMbRule(),
             'mime_type'                => new Rules\MimeTypeRule(),

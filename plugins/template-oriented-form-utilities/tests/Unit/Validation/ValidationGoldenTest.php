@@ -29,6 +29,9 @@ class ValidationGoldenTest extends BaseTestCase
     /** @var array<string, array{reason: string, before: mixed, after: mixed}>|null */
     private static ?array $overrides = null;
 
+    /** @var array<string, array{reason: string, result: mixed}>|null */
+    private static ?array $additions = null;
+
     /** @var array<string, string>|null */
     private static ?array $reasons = null;
 
@@ -61,6 +64,7 @@ class ValidationGoldenTest extends BaseTestCase
         self::assertIsArray($decoded);
 
         self::$overrides = $decoded['overrides'] ?? [];
+        self::$additions = $decoded['additions'] ?? [];
         self::$reasons = $decoded['_reasons'] ?? [];
     }
 
@@ -75,16 +79,37 @@ class ValidationGoldenTest extends BaseTestCase
     }
 
     /**
+     * Cases added to the corpus after the fixture was frozen — a new rule
+     * label, say. They have no "before" to restate, so they are recorded
+     * separately from the deviations.
+     *
+     * @return array<string, array{reason: string, result: mixed}>
+     */
+    private static function additions(): array
+    {
+        self::loadOverrides();
+
+        return self::$additions ?? [];
+    }
+
+    /**
      * The result this case must produce: the ledger's "after" when the case
-     * has a recorded deviation, otherwise the frozen expectation.
+     * has a recorded deviation, its "result" when the case is an addition,
+     * otherwise the frozen expectation.
      */
     private static function contractFor(string $caseId): mixed
     {
         $overrides = self::overrides();
+        if (array_key_exists($caseId, $overrides)) {
+            return $overrides[$caseId]['after'];
+        }
 
-        return array_key_exists($caseId, $overrides)
-            ? $overrides[$caseId]['after']
-            : self::expected()[$caseId];
+        $additions = self::additions();
+        if (array_key_exists($caseId, $additions)) {
+            return $additions[$caseId]['result'];
+        }
+
+        return self::expected()[$caseId];
     }
 
     /**
@@ -107,14 +132,10 @@ class ValidationGoldenTest extends BaseTestCase
     {
         $cases = Corpus::cases();
         $this->assertArrayHasKey($caseId, $cases, 'Corpus case referenced by the data provider is missing.');
-        $expectedAll = self::expected();
-        $this->assertArrayHasKey(
-            $caseId,
-            $expectedAll,
-            "No golden expectation recorded for '{$caseId}' — run scripts/regenerate-validation-golden.php " .
-            'ONLY if this is a newly added corpus case, never to "fix" a failing existing one.'
-        );
 
+        // Whether the case is frozen, deviated or added is checked by
+        // testEveryCorpusCaseHasAContract; here we only compare against
+        // whichever of those three applies.
         $case = $cases[$caseId];
         $actual = EngineProbe::run(
             $case['data'],
@@ -189,9 +210,60 @@ class ValidationGoldenTest extends BaseTestCase
     public function testOverrideLedgerHasTheExpectedSize(): void
     {
         $this->assertCount(
-            369,
+            392,
             self::overrides(),
             'The number of deliberate deviations changed. Review the new entries, then update this count.'
+        );
+    }
+
+    /**
+     * An addition must name a case that genuinely did NOT exist when the
+     * fixture was frozen — otherwise it belongs in `overrides`, where its
+     * "before" would be checked.
+     */
+    public function testAdditionsAreCasesTheFrozenFixtureNeverHad(): void
+    {
+        $expectedAll = self::expected();
+        $corpus = Corpus::cases();
+
+        foreach (self::additions() as $caseId => $addition) {
+            $this->assertArrayNotHasKey(
+                $caseId,
+                $expectedAll,
+                "Addition '{$caseId}' already exists in the frozen fixture — record it as an override instead."
+            );
+            $this->assertArrayHasKey($caseId, $corpus, "Addition '{$caseId}' is not a corpus case.");
+            $this->assertIsString($addition['reason']);
+            $this->assertNotSame('', $addition['reason'], "Addition '{$caseId}' has no reason.");
+        }
+    }
+
+    /**
+     * Every corpus case must be accounted for: frozen, deviated, or added.
+     * Without this a new case could silently assert nothing.
+     */
+    public function testEveryCorpusCaseHasAContract(): void
+    {
+        $expectedAll = self::expected();
+        $overrides = self::overrides();
+        $additions = self::additions();
+
+        $orphans = [];
+        foreach (array_keys(Corpus::cases()) as $caseId) {
+            if (
+                array_key_exists($caseId, $expectedAll)
+                || array_key_exists($caseId, $overrides)
+                || array_key_exists($caseId, $additions)
+            ) {
+                continue;
+            }
+            $orphans[] = $caseId;
+        }
+
+        $this->assertSame(
+            [],
+            $orphans,
+            'Corpus cases with no recorded contract. Add them to the "additions" section of the ledger.'
         );
     }
 
@@ -214,19 +286,21 @@ class ValidationGoldenTest extends BaseTestCase
         );
     }
 
-    public function testCorpusAndFixtureCoverTheSameCaseIds(): void
+    /**
+     * Nothing in the fixture may be silently dropped from the corpus: a
+     * frozen expectation with no case to exercise it is dead weight that
+     * hides a lost check.
+     */
+    public function testEveryFrozenCaseStillExistsInTheCorpus(): void
     {
         $corpusIds = array_keys(Corpus::cases());
-        $fixtureIds = array_keys(self::expected());
-
-        sort($corpusIds);
-        sort($fixtureIds);
+        $missing = array_values(array_diff(array_keys(self::expected()), $corpusIds));
 
         $this->assertSame(
-            $corpusIds,
-            $fixtureIds,
-            'Corpus.php and expected.json have drifted apart — regenerate the golden ' .
-            'file (only while the current engine is still installed) if cases were intentionally added.'
+            [],
+            $missing,
+            'Cases present in the frozen fixture are no longer generated by Corpus.php. ' .
+            'Removing coverage needs to be deliberate, not a side effect.'
         );
     }
 }

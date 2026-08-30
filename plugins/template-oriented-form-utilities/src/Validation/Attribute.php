@@ -97,6 +97,20 @@ class Attribute
         return $this->validator->hasInput($key ?? $this->key);
     }
 
+    /**
+     * Whether the server holds an upload for THIS field.
+     *
+     * Deliberately scoped to the attribute itself: a rule cannot ask about
+     * another field's upload state, so the API cannot be misused the way a
+     * raw injected map could. The answer comes from the session record that
+     * Models\Validation verified, never from the client-supplied
+     * `__tofu_uploaded_files` input.
+     */
+    public function hasVerifiedUpload(): bool
+    {
+        return $this->validator->hasVerifiedUpload($this->key);
+    }
+
     public function validator(): Validator
     {
         return $this->validator;
