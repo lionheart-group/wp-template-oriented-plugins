@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.0.6
+Stable tag: 0.0.7
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -80,11 +80,32 @@ OR…
     - Fixed: AJAX form submissions with a field literally named `key` could fail with a
       "form not found" error, because the REST handlers read the form key from the merged
       request parameters instead of strictly from the URL route.
+* v0.0.7
+    - Replaced the bundled validation library with an in-house engine. The plugin now has no
+      runtime dependencies at all. Every rule name still resolves, so existing `rules:`
+      configuration keeps working — see the upgrade notice for the behavioural differences.
+    - Added: `required_file` as the name of the required-file rule. `custom_required_file`,
+      its name since 0.0.3, still works and runs the same code.
+    - Fixed: a full-width space (U+3000) no longer satisfies `required`. It is what a Japanese
+      IME emits for the space bar, so a field the visitor sees as empty could pass.
+    - Fixed: `required` now recognises an empty file input as empty.
+    - Fixed: `after`, `before`, `extension` and `uuid` no longer raise a fatal error on
+      ordinary input — a blank date field was enough to return a 500.
+    - Fixed: `uploaded_file`, `mimes` and `extension` now work. They depended on a check that
+      is never true in this plugin's request flow.
+    - Fixed: a file carried over to the confirm page is verified against the server's own
+      session record, so a tampered form cannot claim an upload that is not there.
+    - Fixed: the session cookie is issued only when a session is actually saved. It was
+      previously sent on every request, including pages with no form and the admin screens,
+      which is enough to stop most full-page caches serving anything cached.
+    - Fixed: the plugin never called `load_plugin_textdomain()`, so its bundled Japanese
+      translations were not loaded and validation, reCAPTCHA and Turnstile messages rendered
+      in English on Japanese sites.
 
 
 == Upgrade Notice ==
 
-= Unreleased =
+= 0.0.7 =
 **The validation library has been replaced with an in-house engine. No rule name was
 removed, so existing `rules:` configuration keeps working unchanged.**
 
