@@ -70,9 +70,11 @@ php scripts/build-release.php --zip   # build and also produce build/<slug>-<ver
 `composer check` has to be run locally before pushing.
 
 `build-release.php` copies an **allow-list** (`src/`, `assets/`, `languages/`, `migrations/`
-plus the three root files) and regenerates a classmap autoloader, rather than excluding what we
-remember to exclude. The plugin ships with zero runtime dependencies, so `vendor/` in the build
-holds nothing but Composer's autoloader.
+plus the three root files) into `build/` and regenerates a classmap autoloader, rather than
+excluding what we remember to exclude. The plugin ships with zero runtime dependencies, so
+`build/vendor/` holds nothing but Composer's autoloader. Files sit directly in `build/`, as
+they did under the previous pipeline; only the `--zip` archive nests them under a slug-named
+directory, which is the layout WordPress expects on upload.
 
 > There used to be a PHP-Scoper step here, prefixing bundled libraries to `TofuVendor\` so they
 > could not collide with another plugin's copy. Nothing is bundled any more, so it was removed

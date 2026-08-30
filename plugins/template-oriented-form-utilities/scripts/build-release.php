@@ -78,7 +78,11 @@ function rcopy(string $from, string $to): int
 
 // ---------------------------------------------------------------------
 
-$target = $build . '/' . $slug;
+// The plugin files sit directly in build/, as they did under the previous
+// pipeline. The zip still gets the slug-named top-level directory that
+// WordPress expects, because the in-archive paths are set independently of
+// the layout on disk.
+$target = $build;
 
 rrmdir($build);
 mkdir($target, 0755, true);
@@ -133,6 +137,16 @@ if (in_array('--zip', $argv, true)) {
         $version = $m[1];
     }
 
+    // Collect before creating the archive: it is written into the very
+    // directory being walked, so opening it first would let it add itself.
+    $contents = [];
+    $entries = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($target, FilesystemIterator::SKIP_DOTS)
+    );
+    foreach ($entries as $entry) {
+        $contents[$entry->getPathname()] = $slug . '/' . $entries->getSubPathName();
+    }
+
     $archive = sprintf('%s/%s-%s.zip', $build, $slug, $version);
     $zip = new ZipArchive();
     if ($zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -140,15 +154,14 @@ if (in_array('--zip', $argv, true)) {
         exit(1);
     }
 
-    $entries = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($target, FilesystemIterator::SKIP_DOTS)
-    );
-    foreach ($entries as $entry) {
-        $zip->addFile($entry->getPathname(), $slug . '/' . $entries->getSubPathName());
+    // Everything is nested under a slug-named directory, which is the
+    // layout WordPress expects when the archive is uploaded as a plugin.
+    foreach ($contents as $path => $inArchive) {
+        $zip->addFile($path, $inArchive);
     }
     $zip->close();
 
-    printf("\nArchive: %s\n", $archive);
+    printf("\nArchive: %s (%d files)\n", $archive, count($contents));
 }
 
 printf("\nBuilt %s (%d files).\n", $target, $total);
