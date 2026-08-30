@@ -532,11 +532,11 @@ final class Corpus
             [],
             ['field' => ['required' => 'Custom required message for :attribute']],
         );
-        // rule.prohibited_with has no entry in src/Resources/i18n/ja.php
-        // (confirmed by grep) despite `prohibited_with` being a registered
-        // rule — the real-world case S17 describes: when a locale bag is
-        // missing a rule's message key, the bag key itself is rendered
-        // literally rather than falling back to English or `rule.default`.
+        // When this baseline was captured, rule.prohibited_with had no
+        // Japanese entry, so the raw message key was rendered on the page.
+        // The case is kept because it is now the regression guard for the
+        // opposite property: an untranslated key must fall back to readable
+        // English, never surface as "rule.something".
         $cases['message/missing_locale_key_renders_literally'] = self::make(
             ['field' => 'x', 'other' => 'x'],
             ['field' => 'prohibited_with:other'],

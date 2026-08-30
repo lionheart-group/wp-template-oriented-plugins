@@ -27,18 +27,24 @@ class LocaleMessagesTest extends BaseTestCase
     }
 
     /**
-     * Reference values for locales the plugin currently supports but the
-     * Phase 1 in-house engine will NOT (decision: en/ja only). These exist
-     * so the readme's "de/fr/tr/zh now fall back to English" changelog
-     * entry is written against a documented, verified baseline rather than
-     * a guess.
+     * de / fr / tr / zh now fall back to English.
+     *
+     * The departing library bundled catalogues for those four; the plugin
+     * ships translations only for the languages it actually supports, and
+     * anything without a `languages/*.po` file renders the English source.
+     * Adding a locale is now a matter of contributing a .po rather than
+     * waiting on an upstream release — which is the main reason for routing
+     * messages through WordPress i18n in the first place.
      */
-    public function testGermanFrenchTurkishAndChineseLocalesCurrentlyRenderTheirOwnLanguage(): void
+    public function testUnshippedLocalesFallBackToEnglish(): void
     {
-        $this->assertSame('n ist erforderlich', EngineProbe::run(['n' => ''], ['n' => 'required'], [], [], 'de_DE')['errors']['n']);
-        $this->assertSame('Le champ n est obligatoire.', EngineProbe::run(['n' => ''], ['n' => 'required'], [], [], 'fr_FR')['errors']['n']);
-        $this->assertSame('n zorunludur', EngineProbe::run(['n' => ''], ['n' => 'required'], [], [], 'tr_TR')['errors']['n']);
-        $this->assertSame('n 必须存在', EngineProbe::run(['n' => ''], ['n' => 'required'], [], [], 'zh_TW')['errors']['n']);
+        foreach (['de_DE', 'fr_FR', 'tr_TR', 'zh_TW'] as $locale) {
+            $this->assertSame(
+                'n is required',
+                EngineProbe::run(['n' => ''], ['n' => 'required'], [], [], $locale)['errors']['n'],
+                "Expected the English fallback for {$locale}."
+            );
+        }
     }
 
     public function testUnsupportedLocaleFallsBackToEnglish(): void
@@ -58,16 +64,13 @@ class LocaleMessagesTest extends BaseTestCase
     }
 
     /**
-     * src/Resources/i18n/ja.php is out of sync with the actual registered
-     * rule set: it carries keys for rules that don't exist as registered
-     * rules under the names it uses (rule.exists, rule.unique,
-     * rule.uploaded_file.*), while some real, checkable rules
-     * (prohibited_with and its siblings) have NO ja.php entry at all and
-     * therefore render their literal message key under ja_JP. This test
-     * documents that gap so a future ja.php cleanup (Phase 1 per the plan)
-     * has a concrete "before" state to diff against.
+     * The prohibited_* family is translated now.
+     *
+     * Those four keys had no Japanese entry at all, so ja_JP sites rendered
+     * the raw message key — literally the text "rule.prohibited_with" — on
+     * the page. Moving the catalogue into languages/*.po closed the gap.
      */
-    public function testProhibitedWithHasNoJapaneseTranslationAndRendersItsKeyLiterally(): void
+    public function testProhibitedWithIsTranslatedRatherThanRenderingItsKey(): void
     {
         $result = EngineProbe::run(
             ['field' => 'x', 'other' => 'x'],
@@ -76,6 +79,20 @@ class LocaleMessagesTest extends BaseTestCase
         );
 
         $this->assertTrue($result['fails']);
-        $this->assertSame('rule.prohibited_with', $result['errors']['field']);
+        $this->assertStringNotContainsString('rule.', $result['errors']['field']);
+        $this->assertSame('fieldは"other"がある場合は使用できません', $result['errors']['field']);
+    }
+
+    /**
+     * The plugin's own file rules are translated too. Their text came from
+     * __() calls that were then overridden by the English catalogue, so
+     * ja_JP sites saw English for file fields and Japanese everywhere else.
+     */
+    public function testPluginFileRuleMessagesAreTranslated(): void
+    {
+        $result = EngineProbe::run([], ['attachment' => 'custom_required_file'], [], [], 'ja_JP');
+
+        $this->assertTrue($result['fails']);
+        $this->assertSame('attachmentを選択してください', $result['errors']['attachment']);
     }
 }

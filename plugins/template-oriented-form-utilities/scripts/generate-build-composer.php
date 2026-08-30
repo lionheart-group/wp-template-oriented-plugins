@@ -26,7 +26,6 @@ $composerConfig = [
             // Vendor namespaces are prefixed with TofuVendor
             'TofuVendor\\Monolog\\' => 'vendor/monolog/monolog/src/Monolog/',
             'TofuVendor\\Psr\\Log\\' => 'vendor/psr/log/src/',
-            'TofuVendor\\Somnambulist\\Components\\Validation\\' => 'vendor/somnambulist/validation/src/',
         ],
     ],
 ];

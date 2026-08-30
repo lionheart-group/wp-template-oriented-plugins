@@ -2,8 +2,8 @@
 
 namespace TofuPlugin\Rules;
 
-use finfo;
-use Somnambulist\Components\Validation\Rule;
+use TofuPlugin\Validation\Rule;
+use TofuPlugin\Validation\Support\UploadedFileInspector;
 
 /**
  * Custom validation rule: allowed MIME types for file uploads.
@@ -32,17 +32,18 @@ class MimeTypeRule extends Rule
     public function check(mixed $value): bool
     {
         $allowedTypes = $this->parameter('types', []);
-        if (empty($allowedTypes)) {
+        if (empty($allowedTypes) || !is_array($allowedTypes)) {
             throw new \InvalidArgumentException('mime_type rule requires at least one MIME type parameter.');
         }
 
         // Skip if no file uploaded
-        if (!is_array($value) || empty($value['tmp_name'])) {
+        if (UploadedFileInspector::shouldSkip($value)) {
             return true;
         }
 
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $fileMimeType = $finfo->file($value['tmp_name']);
+        // Sniffs the file's actual content, not the client-supplied type —
+        // shared with the engine's own file rules so the two cannot drift.
+        $fileMimeType = UploadedFileInspector::detectMimeType($value);
 
         return in_array($fileMimeType, $allowedTypes, true);
     }

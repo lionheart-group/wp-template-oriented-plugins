@@ -138,26 +138,353 @@ msgstr "応答の検証中に内部エラーが発生しました。"
 msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
 msgstr "Turnstileの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてください。"
 
-#: build/src/Models/Validation.php:120
-msgid "The {field} field is required."
-msgstr "{field} の項目は必ず入力してください。"
+#. Validation message: rule.accepted
+#: src/Validation/Messages.php
+msgid ":attribute must be one of: :accepted"
+msgstr ":attributeは次のいずれかである必要があります: :accepted"
 
-#: build/src/Models/Validation.php:134
-msgid "The {field} field must be less than {param[0]} MB in size."
-msgstr "{field} の項目は{param[0]} MBより小さくなければなりません。"
+#. Validation message: rule.after
+#: src/Validation/Messages.php
+msgid ":attribute must be a date after :time"
+msgstr ":attributeは:timeより後の日付である必要があります"
 
-#: build/src/Models/Validation.php:147
-msgid "The {field} field must be a file of type: {param}."
-msgstr "{field} の項目は {param} の種類のファイルでなければなりません。"
+#. Validation message: rule.alpha
+#: src/Validation/Messages.php
+msgid ":attribute only allows alphabetic characters"
+msgstr ":attributeはアルファベット文字のみを使用できます"
 
-#: src/Models/Validation.php:75
+#. Validation message: rule.alpha_dash
+#: src/Validation/Messages.php
+msgid ":attribute only allows a-z, 0-9, _ and -"
+msgstr ":attributeはa-z、0-9、_、-のみを使用できます"
+
+#. Validation message: rule.alpha_num
+#: src/Validation/Messages.php
+msgid ":attribute only allows alphabetic and numeric characters"
+msgstr ":attributeはアルファベットと数字のみを使用できます"
+
+#. Validation message: rule.alpha_spaces
+#: src/Validation/Messages.php
+msgid ":attribute may only contain alphabetic characters and spaces"
+msgstr ":attributeはアルファベットとスペースのみを含めることができます"
+
+#. Validation message: rule.any_of
+#: src/Validation/Messages.php
+msgid "Each value in :attribute must be one of :allowed_values"
+msgstr ":attributeの各値は:allowed_valuesのいずれかである必要があります"
+
+#. Validation message: rule.array
+#: src/Validation/Messages.php
+msgid ":attribute must be an array"
+msgstr ":attributeは配列である必要があります"
+
+#. Validation message: rule.array_can_only_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute must only have the following keys: :keys"
+msgstr ":attributeは次のキーのみを保持できます: :keys"
+
+#. Validation message: rule.array_must_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute must specify all of the following keys: :keys"
+msgstr ":attributeは次のキーをすべて指定する必要があります: :keys"
+
+#. Validation message: rule.before
+#: src/Validation/Messages.php
+msgid ":attribute must be a date before :time."
+msgstr ":attributeは:timeより前の日付である必要があります"
+
+#. Validation message: rule.between
+#: src/Validation/Messages.php
+msgid ":attribute must be between :min and :max"
+msgstr ":attributeは:minから:maxの間である必要があります"
+
+#. Validation message: rule.boolean
+#: src/Validation/Messages.php
+msgid ":attribute must be a boolean"
+msgstr ":attributeはブール値である必要があります"
+
+#. Validation message: rule.date
+#: src/Validation/Messages.php
+msgid ":attribute is not valid date format"
+msgstr ":attributeは有効な日付形式ではありません"
+
+#. Validation message: rule.default
+#: src/Validation/Messages.php
+msgid ":attribute is not valid"
+msgstr ":attributeは有効ではありません"
+
+#. Validation message: rule.default_value
+#: src/Validation/Messages.php
+msgid ":attribute default is :default"
+msgstr ":attributeのデフォルト値は:defaultです"
+
+#. Validation message: rule.different
+#: src/Validation/Messages.php
+msgid ":attribute must be different to :field"
+msgstr ":attributeは:fieldと異なる必要があります"
+
+#. Validation message: rule.digits
+#: src/Validation/Messages.php
+msgid ":attribute must be numeric and must have an exact length of :length"
+msgstr ":attributeは数値である必要があり、正確に:length桁である必要があります"
+
+#. Validation message: rule.digits_between
+#: src/Validation/Messages.php
+msgid ":attribute be numeric and must have a length between :min and :max"
+msgstr ":attributeは数値である必要があり、:minから:maxの間の長さである必要があります"
+
+#. Validation message: rule.email
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid email address"
+msgstr ":attributeは有効なメールアドレスではありません"
+
+#. Validation message: rule.ends_with
+#: src/Validation/Messages.php
+msgid ":attribute must end with :compare_with"
+msgstr ":attributeは:compare_withで終わる必要があります"
+
+#. Validation message: rule.exists
+#: src/Validation/Messages.php
+msgid ":attribute must match an existing record"
+msgstr ":attributeは既存のレコードと一致する必要があります"
+
+#. Validation message: rule.extension
+#: src/Validation/Messages.php
+msgid ":attribute must be a :allowed_extensions file"
+msgstr ":attributeは:allowed_extensionsファイルである必要があります"
+
+#. Validation message: rule.float
+#: src/Validation/Messages.php
+msgid ":attribute must be a floating point number"
+msgstr ":attributeは浮動小数点数である必要があります"
+
+#. Validation message: rule.in
+#: src/Validation/Messages.php
+msgid ":attribute must be one of :allowed_values"
+msgstr ":attributeは:allowed_valuesのいずれかである必要があります"
+
+#. Validation message: rule.integer
+#: src/Validation/Messages.php
+msgid ":attribute must be integer"
+msgstr ":attributeは整数である必要があります"
+
+#. Validation message: rule.ip
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid IP address"
+msgstr ":attributeは有効なIPアドレスである必要があります"
+
+#. Validation message: rule.ipv4
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid IPv4 address"
+msgstr ":attributeは有効なIPv4アドレスである必要があります"
+
+#. Validation message: rule.ipv6
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid IPv6 address"
+msgstr ":attributeは有効なIPv6アドレスである必要があります"
+
+#. Validation message: rule.json
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid JSON string"
+msgstr ":attributeは有効なJSON文字列である必要があります"
+
+#. Validation message: rule.length
+#: src/Validation/Messages.php
+msgid ":attribute must be a string of exactly :length characters"
+msgstr ":attributeは正確に:length文字の文字列である必要があります"
+
+#. Validation message: rule.lowercase
+#: src/Validation/Messages.php
+msgid ":attribute must be lowercase"
+msgstr ":attributeは小文字である必要があります"
+
+#. Validation message: rule.max
+#: src/Validation/Messages.php
+msgid ":attribute maximum is :max"
+msgstr ":attributeの最大値は:maxです"
+
+#. Validation message: rule.mimes
+#: src/Validation/Messages.php
+msgid ":attribute file type must be :allowed_types"
+msgstr ":attributeのファイルタイプは:allowed_typesである必要があります"
+
+#. Validation message: rule.min
+#: src/Validation/Messages.php
+msgid ":attribute minimum is :min"
+msgstr ":attributeの最小値は:minです"
+
+#. Validation message: rule.not_in
+#: src/Validation/Messages.php
+msgid ":attribute must not be one of :disallowed_values"
+msgstr ":attributeは:disallowed_valuesのいずれでもない必要があります"
+
+#. Validation message: rule.numeric
+#: src/Validation/Messages.php
+msgid ":attribute must be numeric"
+msgstr ":attributeは数値である必要があります"
+
+#. Validation message: rule.phone_number
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid E.164 phone number"
+msgstr ":attributeは有効なE.164電話番号ではありません"
+
+#. Validation message: rule.present
+#: src/Validation/Messages.php
+msgid ":attribute must be present"
+msgstr ":attributeは存在する必要があります"
+
+#. Validation message: rule.prohibited
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed"
+msgstr ":attributeは使用できません"
+
+#. Validation message: rule.prohibited_if
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed if :field has value(s) :values"
+msgstr ":attributeは:fieldの値が:valuesの場合は使用できません"
+
+#. Validation message: rule.prohibited_unless
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed if :field does not have value(s) :values"
+msgstr ":attributeは:fieldの値が:valuesではない場合は使用できません"
+
+#. Validation message: rule.prohibited_with
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed with :fields"
+msgstr ":attributeは:fieldsがある場合は使用できません"
+
+#. Validation message: rule.prohibited_with_all
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed with all of :fields"
+msgstr ":attributeは:fieldsすべてがある場合は使用できません"
+
+#. Validation message: rule.prohibited_without
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed when one of the following fields is absent: :fields"
+msgstr ":attributeは:fieldsのいずれかが無い場合は使用できません"
+
+#. Validation message: rule.prohibited_without_all
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed when all of the following fields are absents: :fields"
+msgstr ":attributeは:fieldsがすべて無い場合は使用できません"
+
+#. Validation message: rule.regex
+#: src/Validation/Messages.php
+msgid ":attribute does not meet required format"
+msgstr ":attributeは必要な形式を満たしていません"
+
+#. Validation message: rule.rejected
+#: src/Validation/Messages.php
+msgid ":attribute must be one of: :rejected"
+msgstr ":attributeは:rejectedのいずれかである必要があります"
+
+#. Validation message: rule.required
+#: src/Validation/Messages.php
+msgid ":attribute is required"
+msgstr ":attributeは必須項目です"
+
+#. Validation message: rule.required_if
+#: src/Validation/Messages.php
+msgid ":attribute is required if :field has a value of :values"
+msgstr ":attributeは:fieldの値が:valuesの場合は必須です"
+
+#. Validation message: rule.required_unless
+#: src/Validation/Messages.php
+msgid ":attribute is required if :field has one of :values"
+msgstr ":attributeは:fieldの値が:valuesではない場合は必須です"
+
+#. Validation message: rule.required_with
+#: src/Validation/Messages.php
+msgid ":attribute is required with :fields"
+msgstr ":attributeは:fieldsがある場合は必須です"
+
+#. Validation message: rule.required_with_all
+#: src/Validation/Messages.php
+msgid ":attribute is required with all of :fields"
+msgstr ":attributeは:fieldsすべてがある場合は必須です"
+
+#. Validation message: rule.required_without
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields are empty"
+msgstr ":attributeは:fieldsが空の場合は必須です"
+
+#. Validation message: rule.required_without_all
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields are all empty"
+msgstr ":attributeは:fieldsがすべて空の場合は必須です"
+
+#. Validation message: rule.requires
+#: src/Validation/Messages.php
+msgid ":attribute requires :fields"
+msgstr ":attributeは:fieldsが必要です"
+
+#. Validation message: rule.same
+#: src/Validation/Messages.php
+msgid ":attribute must be the same as :field"
+msgstr ":attributeは:fieldと同じである必要があります"
+
+#. Validation message: rule.starts_with
+#: src/Validation/Messages.php
+msgid ":attribute must start with :compare_with"
+msgstr ":attributeは:compare_withで始まる必要があります"
+
+#. Validation message: rule.string
+#: src/Validation/Messages.php
+msgid ":attribute must be a string"
+msgstr ":attributeは文字列である必要があります"
+
+#. Validation message: rule.unique
+#: src/Validation/Messages.php
+msgid ":attribute must be unique, :value already exists"
+msgstr ":attributeは一意である必要があります。:valueは既に存在しています"
+
+#. Validation message: rule.uploaded_file
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid uploaded file"
+msgstr ":attributeは有効なアップロードファイルではありません"
+
+#. Validation message: rule.uploaded_file.max_size
+#: src/Validation/Messages.php
+msgid ":attribute file is too large, maximum size is :max_size"
+msgstr ":attributeファイルが大きすぎます。最大サイズは:max_sizeです"
+
+#. Validation message: rule.uploaded_file.min_size
+#: src/Validation/Messages.php
+msgid ":attribute file is too small, minimum size is :min_size"
+msgstr ":attributeファイルが小さすぎます。最小サイズは:min_sizeです"
+
+#. Validation message: rule.uploaded_file.type
+#: src/Validation/Messages.php
+msgctxt "uploaded_file rule"
+msgid ":attribute file type must be :allowed_types"
+msgstr ":attributeファイルのタイプは:allowed_typesである必要があります"
+
+#. Validation message: rule.uppercase
+#: src/Validation/Messages.php
+msgid ":attribute must be uppercase"
+msgstr ":attributeは大文字である必要があります"
+
+#. Validation message: rule.url
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid URL"
+msgstr ":attributeは有効なURLではありません"
+
+#. Validation message: rule.uuid
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid UUID or is NIL"
+msgstr ":attributeは有効なUUIDではなくNILです"
+
+#. Validation message: rule.custom_required_file
+#: src/Validation/Messages.php
 msgid "The :attribute field is required."
-msgstr ":attribute の項目は必ず入力してください。"
+msgstr ":attributeを選択してください"
 
-#: src/Models/Validation.php:76
+#. Validation message: rule.max_mb
+#: src/Validation/Messages.php
 msgid "The :attribute field must be less than :max_mb MB in size."
-msgstr ":attribute の項目は :max_mb MB より小さくなければなりません。"
+msgstr ":attributeは:max_mb MB以内のファイルを選択してください"
 
-#: src/Models/Validation.php:77
+#. Validation message: rule.mime_type
+#: src/Validation/Messages.php
 msgid "The :attribute field must be a file of an allowed type."
-msgstr ":attribute の項目は許可されたタイプのファイルでなければなりません。"
+msgstr ":attributeは許可された形式のファイルを選択してください"

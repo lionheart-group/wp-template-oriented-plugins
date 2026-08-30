@@ -1,0 +1,4784 @@
+{
+    "_readme": "Deliberate deviations from expected.json, which stays frozen. Each entry records why the behaviour changed, what it was, and what it became. ValidationGoldenTest verifies that every \"before\" still matches the frozen fixture, so a stale entry fails loudly.",
+    "_reasons": {
+        "user_input_no_longer_throws": "Invalid user input is now a validation failure instead of an uncaught exception. The previous engine raised a PHP TypeError or ParameterException for values it could not coerce — a blank date field was enough to return a 500 — so reproducing it would mean shipping a rule nobody can safely use. Exceptions are now reserved for invalid rule PARAMETERS, which are the form author's error rather than the visitor's.",
+        "config_error_exception_type": "Same configuration error, raised by this engine's own exception class instead of the departing library's. The condition detected and the point it is detected at are unchanged.",
+        "japanese_translation_added": "Japanese text where English used to leak through. The message key had no ja entry, so ja_JP sites saw the English fallback; it is now translated in languages/*.po like every other string in the plugin. English output is unchanged.",
+        "broken_file_rule_now_works": "A file rule that could never pass now works. uploaded_file, mimes and extension all depended on is_uploaded_file(), which is only ever true during the request that received the upload — so they failed (or fatally errored) even for genuine files on the confirm step. They now share the same predicates as the plugin's own file rules.",
+        "whitespace_tolerated_in_rule_string": "Whitespace around a pipe segment is accepted rather than fatal. \"required | max:5\" used to throw; tolerating it can only turn a previously-broken configuration into a working one.",
+        "dotted_keys_treated_literally": "A rule key containing a dot is treated as a literal field name. The previous engine read it as a nested path and handed ValidationErrorCollection::addError() an array, fataling with a TypeError — so no form could use the notation anyway."
+    },
+    "overrides": {
+        "companion/prohibited_with/sibling_present/array_list/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/array_zero/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/false/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/file_no_file/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/file_ok/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/ideographic_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/int_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/numeric_string_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/string_abc/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/string_japanese/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/string_phone/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/true/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/zero_float/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/zero_int/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with/sibling_present/zero_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/array_list/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/array_zero/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/false/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/file_no_file/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/file_ok/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/ideographic_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/int_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/numeric_string_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/string_abc/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/string_japanese/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/string_phone/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/true/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/zero_float/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/zero_int/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_with_all/sibling_present/zero_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"すべてがある場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/array_list/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/array_zero/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/ascii_whitespace/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/empty_array/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/empty_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/false/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/file_no_file/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/file_ok/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/ideographic_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/int_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/null/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/numeric_string_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/single_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/string_abc/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/string_japanese/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/string_phone/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/true/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/zero_float/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/zero_int/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_absent/zero_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_present/ascii_whitespace/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_present/empty_array/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_present/empty_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_present/null/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without/sibling_present/single_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"のいずれかが無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/array_list/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/array_zero/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/false/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/file_no_file/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/file_ok/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/ideographic_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/int_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/numeric_string_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/string_abc/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/string_japanese/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/string_phone/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/true/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/zero_float/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/zero_int/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "companion/prohibited_without_all/sibling_absent/zero_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_without_all"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がすべて無い場合は使用できません"
+                }
+            }
+        },
+        "key_missing/after": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, null given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "key_missing/before": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, null given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "key_missing/callback": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "key_missing/extension": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, null given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "message/missing_locale_key_renders_literally": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "rule.prohibited_with"
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"other\"がある場合は使用できません"
+                }
+            }
+        },
+        "parse/missing_required_param_throws": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"max\" on rule \"max\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"max\" on rule \"max\" for field \"field\"."
+            }
+        },
+        "parse/regex_with_pipe_in_pattern_throws": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\RuleException",
+                "message": "Validator \"b)$/\" is not registered"
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Validation rule \"b)$/\" is not registered."
+            }
+        },
+        "parse/space_padded_segment_throws": {
+            "reason": "whitespace_tolerated_in_rule_string",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\RuleException",
+                "message": "Validator \"required \" is not registered"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "parse/unknown_rule_throws": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\RuleException",
+                "message": "Validator \"no_such_rule\" is not registered"
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Validation rule \"no_such_rule\" is not registered."
+            }
+        },
+        "parse/uppercase_rule_name_throws": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\RuleException",
+                "message": "Validator \"REQUIRED\" is not registered"
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Validation rule \"REQUIRED\" is not registered."
+            }
+        },
+        "value_sweep/after/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/after/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/after/empty_string/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/after/empty_string/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/after/false/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, false given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/false/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, false given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/ideographic_space/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/ideographic_space/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/int_100/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/int_100/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/null/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, null given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/after/null/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, null given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/after/numeric_string_100/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"100\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/numeric_string_100/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"100\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/string_abc/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"abc\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/string_abc/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"abc\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/string_japanese/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"あいうえお\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/string_japanese/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"あいうえお\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/string_phone/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0312345678\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/string_phone/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0312345678\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/true/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, true given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/true/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, true given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/zero_float/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, float given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/zero_float/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, float given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/zero_int/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/zero_int/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\After::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/after/zero_string/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date after 2020-01-01"
+                }
+            }
+        },
+        "value_sweep/after/zero_string/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より後の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/before/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/before/empty_string/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/before/empty_string/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/before/false/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, false given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/false/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, false given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/ideographic_space/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/ideographic_space/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"　\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/int_100/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/int_100/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/null/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, null given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/before/null/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, null given, called in <file>"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/before/numeric_string_100/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"100\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/numeric_string_100/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"100\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/string_abc/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"abc\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/string_abc/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"abc\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/string_japanese/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"あいうえお\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/string_japanese/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"あいうえお\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/string_phone/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0312345678\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/string_phone/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0312345678\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/true/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, true given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/true/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, true given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/zero_float/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, float given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/zero_float/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, float given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/zero_int/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/zero_int/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Before::assertDate(): Argument #1 ($date) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/before/zero_string/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a date before 2020-01-01."
+                }
+            }
+        },
+        "value_sweep/before/zero_string/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "\"0\" is not a valid date format. Expected a date like: 2016-12-08, 2016-12-02 14:58, or tomorrow"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは2020-01-01より前の日付である必要があります"
+                }
+            }
+        },
+        "value_sweep/callback/array_list/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/array_list/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/array_zero/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/array_zero/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/ascii_whitespace/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/ascii_whitespace/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/empty_array/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/empty_array/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/empty_string/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/empty_string/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/false/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/false/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/file_no_file/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/file_no_file/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/file_ok/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/file_ok/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/ideographic_space/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/ideographic_space/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/int_100/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/int_100/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/null/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/null/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/numeric_string_100/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/numeric_string_100/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/single_space/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/single_space/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/string_abc/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/string_abc/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/string_japanese/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/string_japanese/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/string_phone/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/string_phone/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/true/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/true/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/zero_float/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/zero_float/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/zero_int/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/zero_int/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/zero_string/en_US": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/callback/zero_string/ja_JP": {
+            "reason": "config_error_exception_type",
+            "before": {
+                "throws": "Somnambulist\\Components\\Validation\\Exceptions\\ParameterException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\""
+            },
+            "after": {
+                "throws": "TofuPlugin\\Validation\\ValidationConfigurationException",
+                "message": "Missing required parameter \"callback\" on rule \"callback\" for field \"field\"."
+            }
+        },
+        "value_sweep/custom_required_file/array_list/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/array_zero/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/ascii_whitespace/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/empty_array/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/empty_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/false/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/file_no_file/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/ideographic_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/int_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/null/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/numeric_string_100/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/single_space/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/string_abc/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/string_japanese/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/string_phone/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/true/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/zero_float/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/zero_int/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/custom_required_file/zero_string/ja_JP": {
+            "reason": "japanese_translation_added",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "The field field is required."
+                }
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldを選択してください"
+                }
+            }
+        },
+        "value_sweep/date/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not valid date format"
+                }
+            }
+        },
+        "value_sweep/date/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効な日付形式ではありません"
+                }
+            }
+        },
+        "value_sweep/date/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not valid date format"
+                }
+            }
+        },
+        "value_sweep/date/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効な日付形式ではありません"
+                }
+            }
+        },
+        "value_sweep/date/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/date/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/date/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not valid date format"
+                }
+            }
+        },
+        "value_sweep/date/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効な日付形式ではありません"
+                }
+            }
+        },
+        "value_sweep/date/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not valid date format"
+                }
+            }
+        },
+        "value_sweep/date/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効な日付形式ではありません"
+                }
+            }
+        },
+        "value_sweep/digits/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be numeric and must have an exact length of 5"
+                }
+            }
+        },
+        "value_sweep/digits/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、正確に5桁である必要があります"
+                }
+            }
+        },
+        "value_sweep/digits/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be numeric and must have an exact length of 5"
+                }
+            }
+        },
+        "value_sweep/digits/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、正確に5桁である必要があります"
+                }
+            }
+        },
+        "value_sweep/digits/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/digits/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/digits/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be numeric and must have an exact length of 5"
+                }
+            }
+        },
+        "value_sweep/digits/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、正確に5桁である必要があります"
+                }
+            }
+        },
+        "value_sweep/digits/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be numeric and must have an exact length of 5"
+                }
+            }
+        },
+        "value_sweep/digits/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、正確に5桁である必要があります"
+                }
+            }
+        },
+        "value_sweep/digits_between/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field be numeric and must have a length between 2 and 5"
+                }
+            }
+        },
+        "value_sweep/digits_between/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、2から5の間の長さである必要があります"
+                }
+            }
+        },
+        "value_sweep/digits_between/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field be numeric and must have a length between 2 and 5"
+                }
+            }
+        },
+        "value_sweep/digits_between/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、2から5の間の長さである必要があります"
+                }
+            }
+        },
+        "value_sweep/digits_between/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/digits_between/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/digits_between/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field be numeric and must have a length between 2 and 5"
+                }
+            }
+        },
+        "value_sweep/digits_between/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、2から5の間の長さである必要があります"
+                }
+            }
+        },
+        "value_sweep/digits_between/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field be numeric and must have a length between 2 and 5"
+                }
+            }
+        },
+        "value_sweep/digits_between/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは数値である必要があり、2から5の間の長さである必要があります"
+                }
+            }
+        },
+        "value_sweep/extension/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/false/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, false given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/false/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, false given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, array given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/ideographic_space/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a \"txt\", \"pdf\" file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/ideographic_space/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"txt\", \"pdf\"ファイルである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/int_100/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, int given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/int_100/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, int given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/null/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, null given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/null/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, null given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/numeric_string_100/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a \"txt\", \"pdf\" file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/numeric_string_100/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"txt\", \"pdf\"ファイルである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/string_abc/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a \"txt\", \"pdf\" file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/string_abc/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"txt\", \"pdf\"ファイルである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/string_japanese/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a \"txt\", \"pdf\" file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/string_japanese/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"txt\", \"pdf\"ファイルである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/string_phone/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a \"txt\", \"pdf\" file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/string_phone/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"txt\", \"pdf\"ファイルである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/true/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, true given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/true/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, true given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/zero_float/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, float given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/zero_float/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, float given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/zero_int/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, int given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/zero_int/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "pathinfo(): Argument #1 ($path) must be of type string, int given"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/zero_string/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a \"txt\", \"pdf\" file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/extension/zero_string/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは\"txt\", \"pdf\"ファイルである必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/length/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a string of exactly 5 characters"
+                }
+            }
+        },
+        "value_sweep/length/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは正確に5文字の文字列である必要があります"
+                }
+            }
+        },
+        "value_sweep/length/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a string of exactly 5 characters"
+                }
+            }
+        },
+        "value_sweep/length/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは正確に5文字の文字列である必要があります"
+                }
+            }
+        },
+        "value_sweep/length/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/length/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/length/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a string of exactly 5 characters"
+                }
+            }
+        },
+        "value_sweep/length/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは正確に5文字の文字列である必要があります"
+                }
+            }
+        },
+        "value_sweep/length/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be a string of exactly 5 characters"
+                }
+            }
+        },
+        "value_sweep/length/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは正確に5文字の文字列である必要があります"
+                }
+            }
+        },
+        "value_sweep/lowercase/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be lowercase"
+                }
+            }
+        },
+        "value_sweep/lowercase/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは小文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/lowercase/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be lowercase"
+                }
+            }
+        },
+        "value_sweep/lowercase/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは小文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/lowercase/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/lowercase/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/lowercase/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be lowercase"
+                }
+            }
+        },
+        "value_sweep/lowercase/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは小文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/lowercase/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be lowercase"
+                }
+            }
+        },
+        "value_sweep/lowercase/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは小文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/matches/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/matches/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/matches/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/matches/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/matches/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/matches/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/matches/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/matches/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/matches/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/matches/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/mimes/file_ok/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field file type must be \"txt\", \"pdf\""
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/mimes/file_ok/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldのファイルタイプは\"txt\", \"pdf\"である必要があります"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/phone/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid E.164 phone number"
+                }
+            }
+        },
+        "value_sweep/phone/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なE.164電話番号ではありません"
+                }
+            }
+        },
+        "value_sweep/phone/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid E.164 phone number"
+                }
+            }
+        },
+        "value_sweep/phone/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なE.164電話番号ではありません"
+                }
+            }
+        },
+        "value_sweep/phone/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/phone/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/phone/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid E.164 phone number"
+                }
+            }
+        },
+        "value_sweep/phone/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なE.164電話番号ではありません"
+                }
+            }
+        },
+        "value_sweep/phone/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid E.164 phone number"
+                }
+            }
+        },
+        "value_sweep/phone/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なE.164電話番号ではありません"
+                }
+            }
+        },
+        "value_sweep/regex/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/regex/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/regex/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/regex/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/regex/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/regex/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/regex/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/regex/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/regex/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field does not meet required format"
+                }
+            }
+        },
+        "value_sweep/regex/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは必要な形式を満たしていません"
+                }
+            }
+        },
+        "value_sweep/uploaded_file/file_ok/en_US": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid uploaded file"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/uploaded_file/file_ok/ja_JP": {
+            "reason": "broken_file_rule_now_works",
+            "before": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なアップロードファイルではありません"
+                }
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/uppercase/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be uppercase"
+                }
+            }
+        },
+        "value_sweep/uppercase/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは大文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/uppercase/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be uppercase"
+                }
+            }
+        },
+        "value_sweep/uppercase/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは大文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/uppercase/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/uppercase/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/uppercase/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be uppercase"
+                }
+            }
+        },
+        "value_sweep/uppercase/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは大文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/uppercase/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field must be uppercase"
+                }
+            }
+        },
+        "value_sweep/uppercase/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは大文字である必要があります"
+                }
+            }
+        },
+        "value_sweep/url/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid URL"
+                }
+            }
+        },
+        "value_sweep/url/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なURLではありません"
+                }
+            }
+        },
+        "value_sweep/url/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid URL"
+                }
+            }
+        },
+        "value_sweep/url/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なURLではありません"
+                }
+            }
+        },
+        "value_sweep/url/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/url/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": false,
+                "errors": []
+            }
+        },
+        "value_sweep/url/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid URL"
+                }
+            }
+        },
+        "value_sweep/url/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なURLではありません"
+                }
+            }
+        },
+        "value_sweep/url/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid URL"
+                }
+            }
+        },
+        "value_sweep/url/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "ErrorException",
+                "message": "Array to string conversion"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なURLではありません"
+                }
+            }
+        },
+        "value_sweep/uuid/array_list/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/array_list/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/array_zero/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/array_zero/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/empty_array/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/empty_array/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/false/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, false given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/false/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, false given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/file_no_file/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/file_no_file/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/file_ok/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/file_ok/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, array given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/int_100/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/int_100/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/true/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, true given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/true/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, true given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/zero_float/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, float given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/zero_float/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, float given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        },
+        "value_sweep/uuid/zero_int/en_US": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "field is not a valid UUID or is NIL"
+                }
+            }
+        },
+        "value_sweep/uuid/zero_int/ja_JP": {
+            "reason": "user_input_no_longer_throws",
+            "before": {
+                "throws": "TypeError",
+                "message": "Somnambulist\\Components\\Validation\\Rules\\Uuid::validate(): Argument #1 ($uuid) must be of type string, int given, called in <file>"
+            },
+            "after": {
+                "fails": true,
+                "errors": {
+                    "field": "fieldは有効なUUIDではなくNILです"
+                }
+            }
+        }
+    }
+}

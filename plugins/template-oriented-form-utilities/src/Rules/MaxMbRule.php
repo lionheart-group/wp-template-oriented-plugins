@@ -2,7 +2,7 @@
 
 namespace TofuPlugin\Rules;
 
-use Somnambulist\Components\Validation\Rule;
+use TofuPlugin\Validation\Rule;
 
 /**
  * Custom validation rule: maximum file size in megabytes.

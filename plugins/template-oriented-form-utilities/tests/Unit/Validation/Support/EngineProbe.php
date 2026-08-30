@@ -2,10 +2,8 @@
 
 namespace TofuPlugin\Tests\Unit\Validation\Support;
 
-use Somnambulist\Components\Validation\Factory;
-use TofuPlugin\Rules\MaxMbRule;
-use TofuPlugin\Rules\MimeTypeRule;
-use TofuPlugin\Rules\RequiredFileRule;
+use TofuPlugin\Validation\GettextTranslator;
+use TofuPlugin\Validation\ValidatorFactory;
 
 /**
  * The single choke point this whole test suite drives — and the ONLY file a
@@ -25,16 +23,8 @@ use TofuPlugin\Rules\RequiredFileRule;
 final class EngineProbe
 {
     /**
-     * The plugin's own rules, registered on top of the engine's built-ins.
-     *
-     * @var string[]
-     */
-    private const PLUGIN_RULES = ['custom_required_file', 'max_mb', 'mime_type'];
-
-    /**
-     * Every rule name resolvable through this probe — the engine's built-ins
-     * plus the plugin's own. Used by ValidationGoldenTest to prove the
-     * corpus has no blind spots.
+     * Every rule name the engine resolves. Used by ValidationGoldenTest to
+     * prove the corpus has no blind spots.
      *
      * Like run(), this is engine-specific and gets rewritten by an engine
      * swap; the assertion that consumes it does not.
@@ -43,14 +33,7 @@ final class EngineProbe
      */
     public static function registeredRuleNames(): array
     {
-        $factory = new Factory();
-        $property = new \ReflectionProperty(Factory::class, 'rules');
-        $property->setAccessible(true);
-
-        /** @var array<string, mixed> $builtIns */
-        $builtIns = $property->getValue($factory);
-
-        return array_merge(array_keys($builtIns), self::PLUGIN_RULES);
+        return array_keys(ValidatorFactory::defaultRules());
     }
 
     /**
@@ -81,32 +64,12 @@ final class EngineProbe
             throw new \ErrorException($errstr, 0, $errno);
         });
 
+        // The engine reads the locale through get_locale(), which
+        // tests/bootstrap.php resolves from this global.
+        $previousLocale = $GLOBALS['__tofu_test_locale'] ?? null;
+        $GLOBALS['__tofu_test_locale'] = $locale;
+
         try {
-            // Mirrors src/Models/Validation.php's locale resolution verbatim.
-            $lang = explode('_', $locale)[0];
-            $localeFile = null;
-            switch ($lang) {
-                case 'ja':
-                    $localeFile = dirname(__DIR__, 4) . '/src/Resources/i18n/ja.php';
-                    break;
-                case 'de':
-                case 'en':
-                case 'fr':
-                case 'tr':
-                case 'zh':
-                    // Library-bundled messages, no file to load.
-                    break;
-                default:
-                    $lang = 'en';
-                    break;
-            }
-
-            $factory = new Factory();
-            $factory->registerLanguageMessages($lang, $localeFile);
-            $factory->addRule('custom_required_file', new RequiredFileRule());
-            $factory->addRule('max_mb', new MaxMbRule());
-            $factory->addRule('mime_type', new MimeTypeRule());
-
             // Mirrors the 'field:rule' flattening in src/Models/Validation.php.
             $customMessages = [];
             foreach ($messages as $field => $ruleMsgs) {
@@ -114,37 +77,16 @@ final class EngineProbe
                     $customMessages[$field . ':' . $rule] = $message;
                 }
             }
-            if (!empty($customMessages)) {
-                $factory->messages()->add($lang, $customMessages);
-            }
 
-            // Identical (untranslated) wording to the __() calls in
-            // src/Models/Validation.php — the textdomain is irrelevant here
-            // since tests/bootstrap.php's __() stub is the identity function.
-            $factory->messages()->add($lang, [
-                'rule.custom_required_file' => 'The :attribute field is required.',
-                'rule.max_mb'               => 'The :attribute field must be less than :max_mb MB in size.',
-                'rule.mime_type'            => 'The :attribute field must be a file of an allowed type.',
-            ]);
+            $factory = new ValidatorFactory(new GettextTranslator($customMessages));
 
-            $validation = $factory->make($data, $rules);
-
-            foreach ($aliases as $field => $alias) {
-                $validation->setAlias($field, $alias);
-            }
-
-            $validation->setLanguage($lang)->validate();
+            $validation = $factory->make($data, $rules)
+                ->setAliases($aliases)
+                ->validate();
 
             $errors = [];
-            if ($validation->fails()) {
-                foreach ($validation->errors()->firstOfAll() as $field => $message) {
-                    // firstOfAll() only returns a flat string per field for
-                    // flat (non-dotted) field names — which is all this
-                    // corpus uses. See ErrorHarvestingTest for the
-                    // dot-notation edge case, exercised separately through
-                    // the real TofuPlugin\Models\Validation pathway.
-                    $errors[(string) $field] = (string) $message;
-                }
+            foreach ($validation->errors()->firstOfAll() as $field => $message) {
+                $errors[(string) $field] = (string) $message;
             }
 
             return ['fails' => $validation->fails(), 'errors' => $errors];
@@ -152,6 +94,12 @@ final class EngineProbe
             return ['throws' => get_class($e), 'message' => self::normalizeMessage($e->getMessage())];
         } finally {
             restore_error_handler();
+
+            if ($previousLocale === null) {
+                unset($GLOBALS['__tofu_test_locale']);
+            } else {
+                $GLOBALS['__tofu_test_locale'] = $previousLocale;
+            }
         }
     }
 

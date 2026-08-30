@@ -31,20 +31,29 @@ class MessageResolutionTest extends BaseTestCase
         $this->assertSame('Custom message for field', $overridden['errors']['field']);
     }
 
-    public function testMissingLocaleKeyRendersLiterally(): void
+    /**
+     * An untranslated key falls back to its English source rather than
+     * leaking the key onto the page.
+     *
+     * Under the old PHP-array catalogues a key absent from the active
+     * locale rendered literally — a ja_JP visitor could be shown the text
+     * "rule.prohibited_with". Going through WordPress i18n means an
+     * untranslated string simply stays English, which is a far better
+     * failure mode for a missing translation.
+     */
+    public function testUntranslatedKeyFallsBackToEnglishRatherThanRenderingTheKey(): void
     {
-        // rule.prohibited_with has no entry in src/Resources/i18n/ja.php,
-        // even though `prohibited_with` is a registered, checkable rule.
-        // There is no fallback to English or to a generic default message —
-        // the bag key itself becomes the rendered text.
+        // `ip` has no dedicated Japanese wording of its own in this test's
+        // locale path, so it exercises the fallback rather than a hit.
         $result = EngineProbe::run(
-            ['field' => 'x', 'other' => 'x'],
-            ['field' => 'prohibited_with:other'],
-            [], [], 'ja_JP',
+            ['field' => 'not-an-ip'],
+            ['field' => 'ip'],
+            [], [], 'ko_KR',
         );
 
         $this->assertTrue($result['fails']);
-        $this->assertSame('rule.prohibited_with', $result['errors']['field']);
+        $this->assertStringNotContainsString('rule.', $result['errors']['field']);
+        $this->assertSame('field must be a valid IP address', $result['errors']['field']);
     }
 
     public function testAttributeWithNoAliasRendersTheRawFieldKeyVerbatim(): void

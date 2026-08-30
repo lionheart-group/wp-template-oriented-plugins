@@ -124,15 +124,97 @@ if (!function_exists('esc_sql')) {
     }
 }
 
+/**
+ * Minimal gettext catalogue read straight from languages/*.po.
+ *
+ * The __() stub used to be the identity function. That was fine while
+ * validation messages lived in PHP arrays, but they now come from the
+ * plugin's .po files — an identity stub would render every locale in
+ * English and quietly make the Japanese half of the golden corpus
+ * meaningless. Parsing the .po keeps the tests exercising the translations
+ * that actually ship.
+ *
+ * Reads the .po rather than the compiled .mo so the source of truth in the
+ * repository is what gets tested, and so a stale .mo cannot mask a missing
+ * translation.
+ *
+ * @return array<string, string> Keyed by msgid, or "context\4msgid".
+ */
+function tofu_test_load_translations(string $locale): array {
+    static $cache = [];
+
+    if (isset($cache[$locale])) {
+        return $cache[$locale];
+    }
+
+    $language = explode('_', $locale)[0];
+    $path = dirname(__DIR__) . '/languages/template-oriented-form-utilities-' . $language . '.po';
+
+    $catalogue = [];
+    if (is_file($path)) {
+        $context = null;
+        $id = null;
+        $field = null;
+        $buffer = ['msgctxt' => '', 'msgid' => '', 'msgstr' => ''];
+
+        $flush = static function () use (&$buffer, &$catalogue): void {
+            if ($buffer['msgid'] !== '' && $buffer['msgstr'] !== '') {
+                $key = $buffer['msgctxt'] !== ''
+                    ? $buffer['msgctxt'] . "\4" . $buffer['msgid']
+                    : $buffer['msgid'];
+                $catalogue[$key] = $buffer['msgstr'];
+            }
+            $buffer = ['msgctxt' => '', 'msgid' => '', 'msgstr' => ''];
+        };
+
+        foreach (file($path, FILE_IGNORE_NEW_LINES) as $line) {
+            $line = trim($line);
+
+            if ($line === '' || $line[0] === '#') {
+                if ($line === '') {
+                    $flush();
+                    $field = null;
+                }
+                continue;
+            }
+
+            if (preg_match('/^(msgctxt|msgid|msgstr)\s+"(.*)"$/s', $line, $m) === 1) {
+                $field = $m[1];
+                $buffer[$field] = stripcslashes($m[2]);
+                continue;
+            }
+
+            // Continuation line of the previous field.
+            if ($field !== null && preg_match('/^"(.*)"$/s', $line, $m) === 1) {
+                $buffer[$field] .= stripcslashes($m[1]);
+            }
+        }
+
+        $flush();
+    }
+
+    return $cache[$locale] = $catalogue;
+}
+
 if (!function_exists('__')) {
     function __($text, $domain = 'default') {
-        return $text;
+        $catalogue = tofu_test_load_translations(get_locale());
+
+        return $catalogue[$text] ?? $text;
+    }
+}
+
+if (!function_exists('_x')) {
+    function _x($text, $context, $domain = 'default') {
+        $catalogue = tofu_test_load_translations(get_locale());
+
+        return $catalogue[$context . "\4" . $text] ?? $text;
     }
 }
 
 if (!function_exists('_e')) {
     function _e($text, $domain = 'default') {
-        echo $text;
+        echo __($text, $domain);
     }
 }
 

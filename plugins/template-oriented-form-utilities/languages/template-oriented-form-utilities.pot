@@ -139,26 +139,353 @@ msgstr ""
 msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
 msgstr ""
 
-#: build/src/Models/Validation.php:120
-msgid "The {field} field is required."
+#. Validation message: rule.accepted
+#: src/Validation/Messages.php
+msgid ":attribute must be one of: :accepted"
 msgstr ""
 
-#: build/src/Models/Validation.php:134
-msgid "The {field} field must be less than {param[0]} MB in size."
+#. Validation message: rule.after
+#: src/Validation/Messages.php
+msgid ":attribute must be a date after :time"
 msgstr ""
 
-#: build/src/Models/Validation.php:147
-msgid "The {field} field must be a file of type: {param}."
+#. Validation message: rule.alpha
+#: src/Validation/Messages.php
+msgid ":attribute only allows alphabetic characters"
 msgstr ""
 
-#: src/Models/Validation.php:75
+#. Validation message: rule.alpha_dash
+#: src/Validation/Messages.php
+msgid ":attribute only allows a-z, 0-9, _ and -"
+msgstr ""
+
+#. Validation message: rule.alpha_num
+#: src/Validation/Messages.php
+msgid ":attribute only allows alphabetic and numeric characters"
+msgstr ""
+
+#. Validation message: rule.alpha_spaces
+#: src/Validation/Messages.php
+msgid ":attribute may only contain alphabetic characters and spaces"
+msgstr ""
+
+#. Validation message: rule.any_of
+#: src/Validation/Messages.php
+msgid "Each value in :attribute must be one of :allowed_values"
+msgstr ""
+
+#. Validation message: rule.array
+#: src/Validation/Messages.php
+msgid ":attribute must be an array"
+msgstr ""
+
+#. Validation message: rule.array_can_only_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute must only have the following keys: :keys"
+msgstr ""
+
+#. Validation message: rule.array_must_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute must specify all of the following keys: :keys"
+msgstr ""
+
+#. Validation message: rule.before
+#: src/Validation/Messages.php
+msgid ":attribute must be a date before :time."
+msgstr ""
+
+#. Validation message: rule.between
+#: src/Validation/Messages.php
+msgid ":attribute must be between :min and :max"
+msgstr ""
+
+#. Validation message: rule.boolean
+#: src/Validation/Messages.php
+msgid ":attribute must be a boolean"
+msgstr ""
+
+#. Validation message: rule.date
+#: src/Validation/Messages.php
+msgid ":attribute is not valid date format"
+msgstr ""
+
+#. Validation message: rule.default
+#: src/Validation/Messages.php
+msgid ":attribute is not valid"
+msgstr ""
+
+#. Validation message: rule.default_value
+#: src/Validation/Messages.php
+msgid ":attribute default is :default"
+msgstr ""
+
+#. Validation message: rule.different
+#: src/Validation/Messages.php
+msgid ":attribute must be different to :field"
+msgstr ""
+
+#. Validation message: rule.digits
+#: src/Validation/Messages.php
+msgid ":attribute must be numeric and must have an exact length of :length"
+msgstr ""
+
+#. Validation message: rule.digits_between
+#: src/Validation/Messages.php
+msgid ":attribute be numeric and must have a length between :min and :max"
+msgstr ""
+
+#. Validation message: rule.email
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid email address"
+msgstr ""
+
+#. Validation message: rule.ends_with
+#: src/Validation/Messages.php
+msgid ":attribute must end with :compare_with"
+msgstr ""
+
+#. Validation message: rule.exists
+#: src/Validation/Messages.php
+msgid ":attribute must match an existing record"
+msgstr ""
+
+#. Validation message: rule.extension
+#: src/Validation/Messages.php
+msgid ":attribute must be a :allowed_extensions file"
+msgstr ""
+
+#. Validation message: rule.float
+#: src/Validation/Messages.php
+msgid ":attribute must be a floating point number"
+msgstr ""
+
+#. Validation message: rule.in
+#: src/Validation/Messages.php
+msgid ":attribute must be one of :allowed_values"
+msgstr ""
+
+#. Validation message: rule.integer
+#: src/Validation/Messages.php
+msgid ":attribute must be integer"
+msgstr ""
+
+#. Validation message: rule.ip
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid IP address"
+msgstr ""
+
+#. Validation message: rule.ipv4
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid IPv4 address"
+msgstr ""
+
+#. Validation message: rule.ipv6
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid IPv6 address"
+msgstr ""
+
+#. Validation message: rule.json
+#: src/Validation/Messages.php
+msgid ":attribute must be a valid JSON string"
+msgstr ""
+
+#. Validation message: rule.length
+#: src/Validation/Messages.php
+msgid ":attribute must be a string of exactly :length characters"
+msgstr ""
+
+#. Validation message: rule.lowercase
+#: src/Validation/Messages.php
+msgid ":attribute must be lowercase"
+msgstr ""
+
+#. Validation message: rule.max
+#: src/Validation/Messages.php
+msgid ":attribute maximum is :max"
+msgstr ""
+
+#. Validation message: rule.mimes
+#: src/Validation/Messages.php
+msgid ":attribute file type must be :allowed_types"
+msgstr ""
+
+#. Validation message: rule.min
+#: src/Validation/Messages.php
+msgid ":attribute minimum is :min"
+msgstr ""
+
+#. Validation message: rule.not_in
+#: src/Validation/Messages.php
+msgid ":attribute must not be one of :disallowed_values"
+msgstr ""
+
+#. Validation message: rule.numeric
+#: src/Validation/Messages.php
+msgid ":attribute must be numeric"
+msgstr ""
+
+#. Validation message: rule.phone_number
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid E.164 phone number"
+msgstr ""
+
+#. Validation message: rule.present
+#: src/Validation/Messages.php
+msgid ":attribute must be present"
+msgstr ""
+
+#. Validation message: rule.prohibited
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed"
+msgstr ""
+
+#. Validation message: rule.prohibited_if
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed if :field has value(s) :values"
+msgstr ""
+
+#. Validation message: rule.prohibited_unless
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed if :field does not have value(s) :values"
+msgstr ""
+
+#. Validation message: rule.prohibited_with
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed with :fields"
+msgstr ""
+
+#. Validation message: rule.prohibited_with_all
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed with all of :fields"
+msgstr ""
+
+#. Validation message: rule.prohibited_without
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed when one of the following fields is absent: :fields"
+msgstr ""
+
+#. Validation message: rule.prohibited_without_all
+#: src/Validation/Messages.php
+msgid ":attribute is not allowed when all of the following fields are absents: :fields"
+msgstr ""
+
+#. Validation message: rule.regex
+#: src/Validation/Messages.php
+msgid ":attribute does not meet required format"
+msgstr ""
+
+#. Validation message: rule.rejected
+#: src/Validation/Messages.php
+msgid ":attribute must be one of: :rejected"
+msgstr ""
+
+#. Validation message: rule.required
+#: src/Validation/Messages.php
+msgid ":attribute is required"
+msgstr ""
+
+#. Validation message: rule.required_if
+#: src/Validation/Messages.php
+msgid ":attribute is required if :field has a value of :values"
+msgstr ""
+
+#. Validation message: rule.required_unless
+#: src/Validation/Messages.php
+msgid ":attribute is required if :field has one of :values"
+msgstr ""
+
+#. Validation message: rule.required_with
+#: src/Validation/Messages.php
+msgid ":attribute is required with :fields"
+msgstr ""
+
+#. Validation message: rule.required_with_all
+#: src/Validation/Messages.php
+msgid ":attribute is required with all of :fields"
+msgstr ""
+
+#. Validation message: rule.required_without
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields are empty"
+msgstr ""
+
+#. Validation message: rule.required_without_all
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields are all empty"
+msgstr ""
+
+#. Validation message: rule.requires
+#: src/Validation/Messages.php
+msgid ":attribute requires :fields"
+msgstr ""
+
+#. Validation message: rule.same
+#: src/Validation/Messages.php
+msgid ":attribute must be the same as :field"
+msgstr ""
+
+#. Validation message: rule.starts_with
+#: src/Validation/Messages.php
+msgid ":attribute must start with :compare_with"
+msgstr ""
+
+#. Validation message: rule.string
+#: src/Validation/Messages.php
+msgid ":attribute must be a string"
+msgstr ""
+
+#. Validation message: rule.unique
+#: src/Validation/Messages.php
+msgid ":attribute must be unique, :value already exists"
+msgstr ""
+
+#. Validation message: rule.uploaded_file
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid uploaded file"
+msgstr ""
+
+#. Validation message: rule.uploaded_file.max_size
+#: src/Validation/Messages.php
+msgid ":attribute file is too large, maximum size is :max_size"
+msgstr ""
+
+#. Validation message: rule.uploaded_file.min_size
+#: src/Validation/Messages.php
+msgid ":attribute file is too small, minimum size is :min_size"
+msgstr ""
+
+#. Validation message: rule.uploaded_file.type
+#: src/Validation/Messages.php
+msgctxt "uploaded_file rule"
+msgid ":attribute file type must be :allowed_types"
+msgstr ""
+
+#. Validation message: rule.uppercase
+#: src/Validation/Messages.php
+msgid ":attribute must be uppercase"
+msgstr ""
+
+#. Validation message: rule.url
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid URL"
+msgstr ""
+
+#. Validation message: rule.uuid
+#: src/Validation/Messages.php
+msgid ":attribute is not a valid UUID or is NIL"
+msgstr ""
+
+#. Validation message: rule.custom_required_file
+#: src/Validation/Messages.php
 msgid "The :attribute field is required."
 msgstr ""
 
-#: src/Models/Validation.php:76
+#. Validation message: rule.max_mb
+#: src/Validation/Messages.php
 msgid "The :attribute field must be less than :max_mb MB in size."
 msgstr ""
 
-#: src/Models/Validation.php:77
+#. Validation message: rule.mime_type
+#: src/Validation/Messages.php
 msgid "The :attribute field must be a file of an allowed type."
 msgstr ""

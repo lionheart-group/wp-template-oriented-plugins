@@ -37,19 +37,6 @@ return [
             ->files()
             ->ignoreVCS(true)
             ->notName('/LICENSE|.*\\.md|.*\\.dist|Makefile/')
-            ->exclude([
-                'doc',
-                'docs',
-                'test',
-                'Test',
-                'tests',
-                'Tests',
-            ])
-            ->in('vendor/somnambulist'),
-        Finder::create()
-            ->files()
-            ->ignoreVCS(true)
-            ->notName('/LICENSE|.*\\.md|.*\\.dist|Makefile/')
             ->in('vendor/psr/log'),
         Finder::create()
             ->files()

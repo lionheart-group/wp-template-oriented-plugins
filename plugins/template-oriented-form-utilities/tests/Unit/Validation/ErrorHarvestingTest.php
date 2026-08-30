@@ -97,38 +97,34 @@ class ErrorHarvestingTest extends BaseTestCase
     // -----------------------------------------------------------------
 
     /**
-     * The raw engine happily produces a NESTED array for a dotted field
-     * name (`firstOfAll()` interprets the dot as a path)...
+     * A rule key containing a dot names a field called exactly that — it is
+     * NOT read as a path into nested data.
+     *
+     * The previous engine did treat it as a path, which produced a nested
+     * array where a flat message was expected and fatally errored on the
+     * way out (see the integration test below). Treating the key literally
+     * is both simpler and the only behaviour a form could ever have used.
      */
-    public function testRawEngineNestsErrorsForDottedFieldNames(): void
+    public function testDottedFieldNameIsTreatedAsALiteralKey(): void
     {
         $result = EngineProbe::run(['a.b' => ''], ['a.b' => 'required']);
 
-        // Our own EngineProbe casts each message to string for the golden
-        // corpus's sake, which turns the nested array into a PHP warning
-        // (promoted to an exception by our own error handler) — already a
-        // symptom that something downstream expects a flat string here.
-        $this->assertArrayHasKey('throws', $result);
+        $this->assertTrue($result['fails']);
+        $this->assertSame(['a.b'], array_keys($result['errors']));
     }
 
     /**
-     * ...but that nested shape reaches TofuPlugin\Models\ValidationErrorCollection
-     * ::addError(string $field, string $message), whose `string` type hint
-     * cannot accept it. In other words: dot/wildcard rule keys are not
-     * merely "unsupported" in this plugin today, they FATAL the request.
-     * No documented TOFU form uses this notation (confirmed by grep across
-     * docs/), so this is safe to leave broken — but the replacement should
-     * treat rule keys as flat, literal strings rather than silently
-     * "fixing" this into working dot-path support, which nobody asked for
-     * and nothing here has ever tested.
+     * And it now survives the real pathway, where the nested shape used to
+     * hit ValidationErrorCollection::addError(string $field, string $message)
+     * and raise a TypeError — taking the whole request down.
      */
-    public function testDottedFieldNameFatalsThroughTheRealValidationPathway_KNOWN_BUG(): void
+    public function testDottedFieldNameNoLongerFatalsThroughTheRealValidationPathway(): void
     {
         $form = $this->makeForm(['a.b' => 'required']);
 
-        $this->expectException(\TypeError::class);
-
         (new Validation())->validate($form, ['a.b' => '']);
+
+        $this->assertTrue($form->getErrors()->hasFieldErrors('a.b'));
     }
 
     private function makeForm(array $rules): Form

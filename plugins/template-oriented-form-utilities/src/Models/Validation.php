@@ -2,12 +2,10 @@
 
 namespace TofuPlugin\Models;
 
-use Somnambulist\Components\Validation\Factory;
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Uploader;
-use TofuPlugin\Rules\MaxMbRule;
-use TofuPlugin\Rules\MimeTypeRule;
-use TofuPlugin\Rules\RequiredFileRule;
+use TofuPlugin\Validation\GettextTranslator;
+use TofuPlugin\Validation\ValidatorFactory;
 
 class Validation
 {
@@ -30,62 +28,21 @@ class Validation
         // $_POST (magic_quotes behaviour). $_FILES values are not slashed by WordPress.
         $targetValues = array_merge(wp_unslash($postValues), $fileValues);
 
-        // Get locale
-        $full_locale = get_locale();
-        $locale = explode('_', $full_locale)[0];
-
-        $localeFile = null;
-        switch ($locale) {
-            case 'ja':
-                $localeFile = __DIR__ . '/../Resources/i18n/ja.php';
-                break;
-            case 'de':
-            case 'en':
-            case 'fr':
-            case 'tr':
-            case 'zh':
-                // Use built-in  messages, no need to load a file
-                break;
-            default:
-                // For unsupported locales, fallback to English messages
-                $locale = 'en';
-                break;
-        }
-
-        // Build validation factory and register custom rules
-        $factory = new Factory();
-        $factory->registerLanguageMessages($locale, $localeFile);
-        $factory->addRule('custom_required_file', new RequiredFileRule());
-        $factory->addRule('max_mb', new MaxMbRule());
-        $factory->addRule('mime_type', new MimeTypeRule());
-
-        // Register custom error messages in 'field:rule' format
+        // Flatten the per-field overrides to the 'field:rule' keys the
+        // message resolver looks up first. The rule name is the bare one the
+        // form author wrote, e.g. 'name:max', never 'name:max:200'.
         $customMessages = [];
         foreach ($form->config->validation->messages as $field => $ruleMsgs) {
             foreach ($ruleMsgs as $rule => $message) {
                 $customMessages[$field . ':' . $rule] = $message;
             }
         }
-        if (!empty($customMessages)) {
-            $factory->messages()->add($locale, $customMessages);
-        }
 
-        // Register custom rule messages
-        $factory->messages()->add($locale, [
-            'rule.custom_required_file' => __('The :attribute field is required.', 'template-oriented-form-utilities'),
-            'rule.max_mb'               => __('The :attribute field must be less than :max_mb MB in size.', 'template-oriented-form-utilities'),
-            'rule.mime_type'            => __('The :attribute field must be a file of an allowed type.', 'template-oriented-form-utilities'),
-        ]);
+        $factory = new ValidatorFactory(new GettextTranslator($customMessages));
 
-        // Create validation instance
-        $validation = $factory->make($targetValues, $form->config->validation->rules);
-
-        // Set human-readable field name aliases
-        foreach ($form->config->validation->names as $field => $alias) {
-            $validation->setAlias($field, $alias);
-        }
-
-        $validation->setLanguage($locale)->validate();
+        $validation = $factory->make($targetValues, $form->config->validation->rules)
+            ->setAliases($form->config->validation->names)
+            ->validate();
 
         if ($validation->fails()) {
             foreach ($validation->errors()->firstOfAll() as $field => $message) {

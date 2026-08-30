@@ -2,7 +2,7 @@
 
 namespace TofuPlugin\Rules;
 
-use Somnambulist\Components\Validation\Rule;
+use TofuPlugin\Validation\Rule;
 use TofuPlugin\Consts;
 
 /**
