@@ -28,6 +28,13 @@ TOFU uses separate templates for each step of the form process:
 - [Result Page Template](pages/result.md)
 - [Embedding One Form on Many Pages](pages/multi-page-embeds.md)
 
+## Hooks
+
+[Actions and filters reference](hooks/index.md)
+
+TOFU fires a small set of hooks so code outside a form's configuration can react to submissions and
+extend validation — Slack/CRM notifications, custom validation rules, per-submission mail tweaks.
+
 ## AJAX / Headless Mode
 
 [AJAX / Headless Mode overview](ajax/index.md)

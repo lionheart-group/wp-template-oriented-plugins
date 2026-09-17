@@ -108,3 +108,22 @@ directory, which is the layout WordPress expects on upload.
   re-run `git mv .github/skills .claude/skills` and delete the stray `.github/skills/` if so.
 - Public API docs live in `docs/` (settings reference, page templates, AJAX/headless guides) —
   update them alongside any change to `Structure/` or `Helpers/Form.php` public methods
+
+## Hook conventions
+
+The plugin fires seven hooks (`docs/hooks/index.md`). When adding to them:
+
+- **Hook names are never renamed or removed**, for the same reason validation rule labels aren't —
+  a site's callback silently stops running after an update.
+- **Config describes what a form *is*; a hook describes what the site *does* when a form does
+  something.** Per-form, typed, validated at registration → a `Structure/` property. Wanted by an
+  unrelated plugin, or cross-cutting → a hook.
+- **Pass mutable objects (`Mail`, `ValidatorFactory`) to `do_action`; reserve `apply_filters` for
+  scalars and arrays.** `Structure/` objects are `readonly`, so a filter can't mutate them, and
+  `apply_filters()` returns `mixed`, which PHPStan level 5 flags at every call site.
+- **Every filter needs a type guard that falls back to the unfiltered value** — a faulty callback
+  must never take a live form down.
+- Put hooks in `processInput()` / `processConfirm()`, not `actionInput()` / `actionConfirm()`: the
+  `process*` pair is shared with `Init/RestEndpoint`, so hooks placed there cover AJAX forms too.
+- `tests/bootstrap.php` implements a real mini hook registry (priorities + `accepted_args`);
+  `BaseTestCase` resets it between tests. New hooks are expected to come with tests.

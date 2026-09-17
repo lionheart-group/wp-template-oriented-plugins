@@ -155,6 +155,8 @@ removed, so existing `rules:` configuration keeps working unchanged.**
    - `valid_email` → `email`
    - `numeric` stays the same
    - `filters` parameter has been removed from `ValidationConfig` — sanitize input in the `after` hook if needed.
+   - A custom validation rule can also be registered site-wide via the
+     `tofu_register_validation_rules` action; see docs/hooks/index.md.
 
 2. **reCAPTCHA / Turnstile configuration moved to plugin level:**
    - Remove `recaptcha: new ReCAPTCHAConfig(...)` and `turnstile: new TurnstileConfig(...)` from `FormConfig`.

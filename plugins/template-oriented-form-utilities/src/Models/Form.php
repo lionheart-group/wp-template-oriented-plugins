@@ -15,6 +15,7 @@ use TofuPlugin\Models\Record;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
+use TofuPlugin\Structure\MailRecipientsConfig;
 use TofuPlugin\Structure\ReCAPTCHAConfig;
 use TofuPlugin\Structure\TemplateConfig;
 use TofuPlugin\Structure\TurnstileConfig;
@@ -458,6 +459,14 @@ class Form
         $this->storeSession();
 
         if ($this->errors->hasErrors()) {
+            /**
+             * Fires when a submission fails validation or a bot check.
+             *
+             * @param array      $errors Field name => error messages.
+             * @param FormConfig $config The form's configuration.
+             */
+            do_action('tofu_validation_failed', $this->errors->toArray(), $this->config);
+
             return ['success' => false, 'errors' => $this->errors->toArray(), 'next' => 'input'];
         }
 
@@ -672,6 +681,21 @@ class Form
                 $mail->addAttachment($uploadedFile->fileName, $uploadedFile->tempName);
             }
 
+            /**
+             * Fires just before each email is dispatched, once per configured recipient.
+             *
+             * $mail is mutable — call addHeader(), addAttachment(), addBcc() and so on
+             * to adjust the message. Note that addTo()/addCc()/addBcc() construct a
+             * MailAddress, which throws InvalidArgumentException on a malformed
+             * address rather than skipping the send.
+             *
+             * @param Mail                 $mail      The message about to be sent.
+             * @param MailRecipientsConfig $recipient The recipient config it was built from.
+             * @param array                $values    Submitted field values.
+             * @param FormConfig           $config    The form's configuration.
+             */
+            do_action('tofu_pre_send_mail', $mail, $recipient, $values, $this->config);
+
             if (!$mail->send()) {
                 Logger::error('Failed to send email', $mail->toArray());
                 return ['success' => false, 'errors' => [], 'next' => 'error'];
@@ -679,11 +703,28 @@ class Form
         }
 
         // Save form data to database (non-fatal — do not abort on failure)
+        $recordId = false;
         if ($this->config->saveToDatabase) {
             // Strip internal/unlisted fields: always intersect with $allows so
             // only fields the form owner explicitly declared can be persisted.
             // When $allows is empty this intentionally produces an empty payload.
             $allowedValues = array_intersect_key($values, array_flip($this->config->validation->allows));
+
+            /**
+             * Filters the values about to be persisted to wp_tofu_records.
+             *
+             * Deliberately applied AFTER the $allows intersection above, so a
+             * callback can only add values the server already knows (IP, user
+             * agent, post ID) — it can never be used to slip unvetted user input
+             * past the mass-assignment guard.
+             *
+             * @param array      $allowedValues Values to persist, already filtered by $allows.
+             * @param FormConfig $config        The form's configuration.
+             */
+            $filteredValues = apply_filters('tofu_record_values', $allowedValues, $this->config);
+            if (is_array($filteredValues)) {
+                $allowedValues = $filteredValues;
+            }
 
             $recordId = Record::saveRecord(
                 $this->config->key,
@@ -696,6 +737,23 @@ class Form
                 Logger::info('Record saved successfully', ['form_key' => $this->config->key, 'record_id' => $recordId]);
             }
         }
+
+        /**
+         * Fires once a submission has been fully processed — every email dispatched
+         * and, when saveToDatabase is enabled, the record persisted.
+         *
+         * Fires for the redirect flow and the REST/AJAX flow alike, since both share
+         * processConfirm(). It sits after the flushValue idempotency guard at the top
+         * of this method, so a double submit does not fire it twice.
+         *
+         * Uploaded files are still on disk here; they are deleted immediately below.
+         *
+         * @param array                  $values   Submitted field values.
+         * @param UploadedFileCollection $files    Uploaded files, still present on disk.
+         * @param int|false              $recordId Inserted record ID, or false when nothing was saved.
+         * @param FormConfig             $config   The form's configuration.
+         */
+        do_action('tofu_form_submitted', $values, $this->files, $recordId, $this->config);
 
         // Delete temporary uploaded files
         foreach ($this->files->getAllFiles() as $uploadedFile) {
@@ -765,6 +823,22 @@ class Form
             default:
                 $redirectUrl = null;
                 break;
+        }
+
+        /**
+         * Filters the URL the form is about to redirect to.
+         *
+         * A non-string or empty return value is ignored and the configured URL is
+         * used, so a faulty callback cannot take a live form down. wp_safe_redirect()
+         * below still enforces the same-host guarantee.
+         *
+         * @param string|null $redirectUrl Resolved URL, or null when not configured.
+         * @param string      $action      One of 'input', 'confirm' or 'result'.
+         * @param FormConfig  $config      The form's configuration.
+         */
+        $filteredUrl = apply_filters('tofu_redirect_url', $redirectUrl, $action, $this->config);
+        if (is_string($filteredUrl) && $filteredUrl !== '') {
+            $redirectUrl = $filteredUrl;
         }
 
         if ($redirectUrl === null) {
