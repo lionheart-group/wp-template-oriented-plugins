@@ -602,7 +602,9 @@ class Form
     public static function generateNonceField(string $key, string $action): string
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $key);
-        return wp_nonce_field($action, $nonceKey, false, false);
+        $nonceAction = sprintf(Consts::NONCE_ACTION_FORMAT, $key, $action);
+
+        return wp_nonce_field($nonceAction, $nonceKey, false, false);
     }
 
     /**

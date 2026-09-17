@@ -464,26 +464,48 @@ class Form
     /**
      * Verify nonce field.
      *
-     * @param string $action The nonce action ('input' or 'confirm').
-     * @param array  $post   POST data to read the nonce from. Defaults to $_POST.
+     * @param string  $action       The full nonce action, which includes the form
+     *                              key — see Consts::NONCE_ACTION_FORMAT and
+     *                              Consts::REST_NONCE_ACTION_FORMAT.
+     * @param array   $post         POST data to read the nonce from. Defaults to $_POST.
+     * @param ?string $legacyAction Transitional fallback action, accepted when the
+     *                              primary one fails. See below.
      * @return bool
      */
-    public function verifyNonceField(string $action, array $post = []): bool
+    public function verifyNonceField(string $action, array $post = [], ?string $legacyAction = null): bool
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
+        $legacyNonceKey = sprintf(Consts::LEGACY_NONCE_FORMAT, $this->config->key);
 
         if (empty($post)) {
             $post = $_POST;
         }
 
-        $nonce = $post[$nonceKey] ?? null;
+        // The legacy key is transitional — see LEGACY_NONCE_FORMAT.
+        $nonce = $post[$nonceKey] ?? $post[$legacyNonceKey] ?? null;
 
         // If nonce is missing or not a string, return false
         if (empty($nonce) || !is_string($nonce)) {
             return false;
         }
 
-        return wp_verify_nonce(sanitize_text_field(wp_unslash($nonce)), $action);
+        $nonce = sanitize_text_field(wp_unslash($nonce));
+
+        if (wp_verify_nonce($nonce, $action)) {
+            return true;
+        }
+
+        // Transitional: the redirect flow used to mint nonces against a bare
+        // 'input'/'confirm' action, so a visitor who loaded a form page before
+        // this plugin was updated carries one of those. Rejecting it would
+        // answer their submission with a 403. WordPress nonces last at most
+        // 24 hours, so this fallback can be dropped a release after it ships —
+        // see issues/2026-09-17-13-58-21.md.
+        if ($legacyAction !== null && wp_verify_nonce($nonce, $legacyAction)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -494,7 +516,9 @@ class Form
      */
     public function actionInput(): void
     {
-        if ($this->verifyNonceField('input') === false) {
+        $nonceAction = sprintf(Consts::NONCE_ACTION_FORMAT, $this->config->key, 'input');
+
+        if ($this->verifyNonceField($nonceAction, [], 'input') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
@@ -586,8 +610,11 @@ class Form
             $post = $_POST;
         }
 
-        // Verification type and sanitize input
-        $token = $post[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '';
+        // Verification type and sanitize input. The legacy field name is
+        // transitional — see Consts::LEGACY_RECAPTCHA_TOKEN_INPUT_NAME.
+        $token = $post[Consts::RECAPTCHA_TOKEN_INPUT_NAME]
+            ?? $post[Consts::LEGACY_RECAPTCHA_TOKEN_INPUT_NAME]
+            ?? '';
         if (empty($token) || !is_string($token)) {
             $this->errors->addError(
                 Consts::RECAPTCHA_TOKEN_INPUT_NAME,
@@ -624,8 +651,11 @@ class Form
             $post = $_POST;
         }
 
-        // Verification type and sanitize input
-        $token = $post[Consts::TURNSTILE_TOKEN_INPUT_NAME] ?? '';
+        // Verification type and sanitize input. The legacy field name is
+        // transitional — see Consts::LEGACY_TURNSTILE_TOKEN_INPUT_NAME.
+        $token = $post[Consts::TURNSTILE_TOKEN_INPUT_NAME]
+            ?? $post[Consts::LEGACY_TURNSTILE_TOKEN_INPUT_NAME]
+            ?? '';
         if (empty($token) || !is_string($token)) {
             $this->errors->addError(
                 Consts::TURNSTILE_TOKEN_INPUT_NAME,
@@ -673,7 +703,9 @@ class Form
      */
     public function actionConfirm(bool $skipVerify = false): void
     {
-        if ($skipVerify === false && $this->verifyNonceField('confirm') === false) {
+        $nonceAction = sprintf(Consts::NONCE_ACTION_FORMAT, $this->config->key, 'confirm');
+
+        if ($skipVerify === false && $this->verifyNonceField($nonceAction, [], 'confirm') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 

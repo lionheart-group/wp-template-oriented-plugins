@@ -112,6 +112,37 @@ OR…
 
 == Upgrade Notice ==
 
+= Unreleased =
+**The plugin's own hidden form fields have moved to a `__tofu_` prefix, and the field
+names a form declares may no longer start with `_tofu_` or `__tofu_`.**
+
+1. **Hidden field names renamed.** `_tofu_{key}_nonce` → `__tofu_{key}_nonce`,
+   `_tofu_recaptcha_token` → `__tofu_recaptcha_token`, `_tofu_turnstile_token` →
+   `__tofu_turnstile_token`. All of the plugin's form fields now share one prefix, which
+   the plugin also reserves, so a form's own field can never silently overwrite one.
+   - **Themes using `Form::formOpen()`/`formClose()` and the `Form::` helpers need no
+     changes** — the names are generated for you.
+   - **AJAX/headless clients that hardcode these names must be updated.** Clients reading
+     `field_name` and `token_field_name` from `GET /wp-json/tofu/v1/forms/{key}/nonce`
+     already follow automatically. Note the reCAPTCHA/Turnstile *error* keys in a
+     `{"success":false,"errors":{…}}` response change with the field names.
+   - Nothing outside form fields changed: the `_tofu_key` query parameter, the
+     `_tofu_session_key` cookie and the `_tofu_form_{key}` element ID are untouched, as
+     they cannot collide with a form's field names.
+   - A visitor who loaded a form page before updating can still submit it: the old field
+     names are accepted as a fallback for one release.
+
+2. **Field names starting with `_tofu_` or `__tofu_` are now rejected at registration.**
+   `FormConfig` throws an `InvalidArgumentException` naming the offending field if
+   `allows`, `rules`, `names`, `messages` or `records` declares one. Such a field never
+   worked — PHP keeps only the last value for a repeated name, and the plugin's input is
+   rendered last, so the form's own value was silently dropped. Rename the field.
+
+3. **Submission nonces are now bound to the form.** The redirect flow minted its nonce
+   against a bare `input`/`confirm` action, so a nonce issued for one form verified
+   against any other; the form key is now part of the action, as it already was for the
+   REST flow. No configuration change is needed.
+
 = 0.0.7 =
 **The validation library has been replaced with an in-house engine. No rule name was
 removed, so existing `rules:` configuration keeps working unchanged.**

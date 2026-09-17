@@ -329,6 +329,38 @@ if (!function_exists('get_locale')) {
     }
 }
 
+// Nonce stubs. The value encodes the action it was minted for, which is the
+// whole point under test: a nonce must not verify against an action it was not
+// created for — including another form's, since the form key is part of the
+// action (Consts::NONCE_ACTION_FORMAT).
+if (!function_exists('wp_create_nonce')) {
+    function wp_create_nonce(string $action = '-1'): string {
+        return 'nonce:' . $action;
+    }
+}
+
+if (!function_exists('wp_verify_nonce')) {
+    function wp_verify_nonce($nonce, string $action = '-1') {
+        return $nonce === 'nonce:' . $action ? 1 : false;
+    }
+}
+
+if (!function_exists('wp_nonce_field')) {
+    function wp_nonce_field(string $action = '-1', string $name = '_wpnonce', bool $referer = true, bool $display = true): string {
+        $field = sprintf(
+            '<input type="hidden" name="%s" value="%s" />',
+            $name,
+            wp_create_nonce($action)
+        );
+
+        if ($display) {
+            echo $field;
+        }
+
+        return $field;
+    }
+}
+
 // Stubs needed to drive Form::processConfirm() — the mail/record/cleanup path —
 // end to end. wp_mail() records every call in $GLOBALS['__tofu_wp_mail_calls'] so
 // tests can assert on what was actually dispatched, mirroring the setcookie()

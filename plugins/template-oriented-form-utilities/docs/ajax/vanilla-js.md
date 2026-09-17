@@ -305,17 +305,17 @@ async function getRecaptchaToken(siteKey, action = 'submit') {
 const { recaptcha } = await fetchNonce('input');
 if (recaptcha) {
     const token = await getRecaptchaToken(recaptcha.site_key, 'submit');
-    body.append(recaptcha.token_field_name, token); // '_tofu_recaptcha_token'
+    body.append(recaptcha.token_field_name, token); // '__tofu_recaptcha_token'
 }
 ```
 
 ### 3. Display reCAPTCHA errors
 
-The error field name is also returned as `recaptcha.token_field_name` (`_tofu_recaptcha_token`).
+The error field name is also returned as `recaptcha.token_field_name` (`__tofu_recaptcha_token`).
 Add a container for it:
 
 ```html
-<ul class="errors" data-field="_tofu_recaptcha_token"></ul>
+<ul class="errors" data-field="__tofu_recaptcha_token"></ul>
 ```
 
 ---
@@ -353,7 +353,7 @@ API instead of the implicit auto-render:
 
 <!-- In your form — no data-sitekey here; it's set via turnstile.render() below -->
 <div id="turnstile-container"></div>
-<ul class="errors" data-field="_tofu_turnstile_token"></ul>
+<ul class="errors" data-field="__tofu_turnstile_token"></ul>
 ```
 
 ```javascript
@@ -367,7 +367,7 @@ function renderTurnstile(siteKey) {
     if (turnstileWidgetId !== null) return; // already rendered
     turnstileWidgetId = turnstile.render('#turnstile-container', {
         sitekey: siteKey,
-        'response-field-name': '_tofu_turnstile_token',
+        'response-field-name': '__tofu_turnstile_token',
     });
 }
 
@@ -378,7 +378,7 @@ if (turnstileConfig) {
 }
 ```
 
-Turnstile automatically populates a hidden input named `_tofu_turnstile_token` (set via the
+Turnstile automatically populates a hidden input named `__tofu_turnstile_token` (set via the
 `response-field-name` option above), which `FormData` picks up automatically once the widget
 completes its challenge.
 
@@ -408,7 +408,7 @@ A full working example with error handling, loading state, and reCAPTCHA.
         <ul class="errors" data-field="message"></ul>
     </div>
 
-    <ul class="errors" data-field="_tofu_recaptcha_token"></ul>
+    <ul class="errors" data-field="__tofu_recaptcha_token"></ul>
 
     <button type="submit" id="submit-btn">Send Message</button>
 </form>

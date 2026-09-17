@@ -49,9 +49,9 @@ without full-page reloads, or from a completely separate frontend application.
 ```json
 {
   "nonce": "abc123…",
-  "field_name": "_tofu_contact_nonce",
+  "field_name": "__tofu_contact_nonce",
   "action": "input",
-  "recaptcha": { "site_key": "...", "token_field_name": "_tofu_recaptcha_token" },
+  "recaptcha": { "site_key": "...", "token_field_name": "__tofu_recaptcha_token" },
   "turnstile": null
 }
 ```
