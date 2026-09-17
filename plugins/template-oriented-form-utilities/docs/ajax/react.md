@@ -328,7 +328,7 @@ export function InputStep({ formKey, onSuccess }) {
 
         if (executeRecaptcha) {
             const token = await executeRecaptcha('submit');
-            body.append('_tofu_recaptcha_token', token);
+            body.append('__tofu_recaptcha_token', token);
         }
 
         const data = await submit('input', body);

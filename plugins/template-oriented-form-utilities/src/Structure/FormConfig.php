@@ -2,6 +2,8 @@
 
 namespace TofuPlugin\Structure;
 
+use TofuPlugin\Consts;
+
 /**
  * Form configuration class.
  *
@@ -147,6 +149,48 @@ class FormConfig
                 'For the redirect flow set template->confirmPath (or dynamicTemplate: true if it is supplied ' .
                 'per-request via Form::setTemplate()); for AJAX / headless set ajaxEnabled: true.'
             );
+        }
+
+        $this->assertNoReservedFieldNames();
+    }
+
+    /**
+     * Reject field names that would collide with the plugin's own hidden
+     * inputs (the nonce, uploaded-file claims, the template override, the
+     * reCAPTCHA/Turnstile tokens).
+     *
+     * A collision is otherwise silent: formClose() renders its input last,
+     * and PHP keeps only the last value for a duplicated name, so the
+     * form's own value simply disappears. Failing at registration — on
+     * `init`, where the developer is looking — beats debugging that later.
+     *
+     * @return void
+     */
+    private function assertNoReservedFieldNames(): void
+    {
+        $fields = array_merge(
+            $this->validation->allows,
+            $this->validation->records,
+            array_keys($this->validation->rules),
+            array_keys($this->validation->names),
+            array_keys($this->validation->messages),
+        );
+
+        foreach ($fields as $field) {
+            if (!is_string($field)) {
+                continue;
+            }
+
+            foreach (Consts::RESERVED_FIELD_PREFIXES as $prefix) {
+                if (str_starts_with($field, $prefix)) {
+                    throw new \InvalidArgumentException(
+                        "FormConfig '{$this->key}': field name '{$field}' is reserved. " .
+                        'Names beginning with "' . implode('" or "', Consts::RESERVED_FIELD_PREFIXES) . '" ' .
+                        "are used by the plugin's own hidden inputs and would silently overwrite each other. " .
+                        'Rename the field.'
+                    );
+                }
+            }
         }
     }
 

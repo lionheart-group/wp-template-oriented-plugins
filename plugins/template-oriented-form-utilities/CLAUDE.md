@@ -108,3 +108,40 @@ directory, which is the layout WordPress expects on upload.
   re-run `git mv .github/skills .claude/skills` and delete the stray `.github/skills/` if so.
 - Public API docs live in `docs/` (settings reference, page templates, AJAX/headless guides) —
   update them alongside any change to `Structure/` or `Helpers/Form.php` public methods
+
+## Naming conventions for plugin-owned identifiers
+
+- **Hidden form field names use `__tofu_`** (double underscore): the nonce, uploaded-file claims,
+  the template override, the reCAPTCHA/Turnstile tokens. These share a namespace with the fields a
+  form declares, so they get the more distinctive prefix.
+- **Everything else uses `_tofu_`** (single): the `_tofu_key` query parameter, the
+  `_tofu_session_key` cookie, element IDs (`_tofu_form_%s`), and nonce *actions*. None of these can
+  collide with a form's field names, and renaming them has real cost — the cookie ends live
+  sessions, the query parameter breaks in-flight form URLs.
+- **Both prefixes are reserved for field names.** `Consts::RESERVED_FIELD_PREFIXES` drives a guard
+  in `FormConfig`'s constructor that throws if `allows`/`rules`/`names`/`messages`/`records`
+  declares a field under either. Without it the collision is silent: PHP keeps only the last value
+  for a repeated name and the plugin's input renders last, so the form's own value disappears.
+- **Renaming any of these is a breaking change for AJAX/headless clients**, which post the field
+  names directly. The nonce endpoint returns `field_name` and `token_field_name` so well-behaved
+  clients follow automatically, but the docs under `docs/ajax/` also show the literals — update
+  them, and add a transitional fallback that reads the old name for one release.
+
+## Hook conventions
+
+The plugin fires seven hooks (`docs/hooks/index.md`). When adding to them:
+
+- **Hook names are never renamed or removed**, for the same reason validation rule labels aren't —
+  a site's callback silently stops running after an update.
+- **Config describes what a form *is*; a hook describes what the site *does* when a form does
+  something.** Per-form, typed, validated at registration → a `Structure/` property. Wanted by an
+  unrelated plugin, or cross-cutting → a hook.
+- **Pass mutable objects (`Mail`, `ValidatorFactory`) to `do_action`; reserve `apply_filters` for
+  scalars and arrays.** `Structure/` objects are `readonly`, so a filter can't mutate them, and
+  `apply_filters()` returns `mixed`, which PHPStan level 5 flags at every call site.
+- **Every filter needs a type guard that falls back to the unfiltered value** — a faulty callback
+  must never take a live form down.
+- Put hooks in `processInput()` / `processConfirm()`, not `actionInput()` / `actionConfirm()`: the
+  `process*` pair is shared with `Init/RestEndpoint`, so hooks placed there cover AJAX forms too.
+- `tests/bootstrap.php` implements a real mini hook registry (priorities + `accepted_args`);
+  `BaseTestCase` resets it between tests. New hooks are expected to come with tests.

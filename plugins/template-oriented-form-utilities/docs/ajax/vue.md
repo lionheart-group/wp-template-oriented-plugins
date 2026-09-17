@@ -317,7 +317,7 @@ async function handleSubmit() {
     const token = await executeRecaptcha('submit');
 
     const body = new FormData(/* your form ref */);
-    body.append('_tofu_recaptcha_token', token);
+    body.append('__tofu_recaptcha_token', token);
 
     const data = await submit('input', body);
     if (data.success) emit('success', { next: data.next });

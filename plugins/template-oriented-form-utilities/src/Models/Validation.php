@@ -4,6 +4,7 @@ namespace TofuPlugin\Models;
 
 use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Uploader;
+use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Validation\GettextTranslator;
 use TofuPlugin\Validation\ValidatorFactory;
 
@@ -61,6 +62,18 @@ class Validation
         }
 
         $factory = new ValidatorFactory(new GettextTranslator($customMessages));
+
+        /**
+         * Fires after the validator factory is built, before any rule is parsed.
+         *
+         * Register custom rules with $factory->addRule('name', new MyRule()), or
+         * override a built-in one. An override replaces that label for every form on
+         * the site, so narrow the change with $config->key where that matters.
+         *
+         * @param ValidatorFactory $factory The factory for this validation run.
+         * @param FormConfig       $config  The form's configuration.
+         */
+        do_action('tofu_register_validation_rules', $factory, $form->config);
 
         $validation = $factory->make($targetValues, $form->config->validation->rules)
             ->setAliases($form->config->validation->names)

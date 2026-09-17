@@ -602,7 +602,9 @@ class Form
     public static function generateNonceField(string $key, string $action): string
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $key);
-        return wp_nonce_field($action, $nonceKey, false, false);
+        $nonceAction = sprintf(Consts::NONCE_ACTION_FORMAT, $key, $action);
+
+        return wp_nonce_field($nonceAction, $nonceKey, false, false);
     }
 
     /**
@@ -612,7 +614,11 @@ class Form
      */
     public static function hidden(string $key, string $action): string
     {
-        return self::recaptchaHidden($key) . self::generateNonceField($key, $action);
+        $form = self::get($key);
+
+        return self::recaptchaHidden($key)
+            . self::generateNonceField($key, $action)
+            . $form->templateOverrideHidden();
     }
 
     /**
@@ -650,11 +656,11 @@ class Form
     }
 
     /**
-     * Override the input/confirm/result URLs for this visitor's session.
+     * Override the input/confirm/result URLs for this visitor.
      *
-     * Call while rendering the input page, before Form::formOpen(), e.g.
-     * with paths derived from get_permalink() so the same registered form
-     * can be embedded on many pages:
+     * Call while rendering a page, before Form::formOpen(), e.g. with paths
+     * derived from get_permalink() so the same registered form can be
+     * embedded on many pages:
      *
      * <code>
      * Form::setTemplate('contact', new TemplateConfig(
@@ -663,6 +669,12 @@ class Form
      *     resultPath: get_permalink() . 'thanks/',
      * ));
      * </code>
+     *
+     * This does not write to the session or issue a cookie by itself — only
+     * an actual form submission does, so calling this on every page load
+     * (even one a visitor never submits anything on) does not prevent that
+     * page being served from a full-page cache. See "Dynamic Overrides" in
+     * docs/settings/templateconfig.md for the mechanism.
      *
      * @param string $key
      * @param TemplateConfig $template

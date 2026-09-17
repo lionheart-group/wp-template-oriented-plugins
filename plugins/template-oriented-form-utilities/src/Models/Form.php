@@ -15,6 +15,7 @@ use TofuPlugin\Models\Record;
 use TofuPlugin\Structure\FormConfig;
 use TofuPlugin\Models\Validation;
 use TofuPlugin\Structure\MailAddress;
+use TofuPlugin\Structure\MailRecipientsConfig;
 use TofuPlugin\Structure\ReCAPTCHAConfig;
 use TofuPlugin\Structure\TemplateConfig;
 use TofuPlugin\Structure\TurnstileConfig;
@@ -284,14 +285,19 @@ class Form
     }
 
     /**
-     * Override the input/confirm/result URLs for this visitor's session.
+     * Override the input/confirm/result URLs for this visitor, in memory.
      *
-     * Call from a theme template while rendering the input page, before
+     * Call from a theme template while rendering a page, before
      * Form::formOpen() — typically with paths derived from get_permalink()
-     * so the same registered form can be embedded on many pages. The
-     * override is persisted to the session and therefore survives the
-     * input POST, which is handled entirely inside the plugin and never
-     * re-runs theme code.
+     * so the same registered form can be embedded on many pages.
+     *
+     * This does NOT write to the session or issue a cookie by itself — doing
+     * so unconditionally on every GET (including pages a visitor never
+     * submits) would put a Set-Cookie on those responses and stop full-page
+     * caches serving them. Instead, Form::formClose() embeds the override in
+     * a hidden field, and it is only persisted to the session once the
+     * visitor actually submits the form — see
+     * applyTemplateOverrideFromPost(), called from processInput().
      *
      * Cross-host absolute URLs are rejected: the static TemplateConfig
      * remains in effect and a warning is logged, since wp_safe_redirect()
@@ -314,7 +320,85 @@ class Form
         }
 
         $this->templateOverride = $template;
-        $this->storeSession($this->flushValue);
+    }
+
+    /**
+     * Encode the current template override, if any, as a hidden input field.
+     *
+     * Embedded by Form::formClose() so the override set via setTemplate()
+     * while rendering the input page survives the POST that follows —
+     * applyTemplateOverrideFromPost() reads it back and persists it to the
+     * session, which is the mechanism that lets setTemplate() itself stay
+     * cookie-free. Returns '' when no override is set, so ordinary
+     * static-template forms render no extra markup at all.
+     *
+     * @return string
+     */
+    public function templateOverrideHidden(): string
+    {
+        if ($this->templateOverride === null) {
+            return '';
+        }
+
+        $encoded = base64_encode(json_encode([
+            'inputPath' => $this->templateOverride->inputPath,
+            'resultPath' => $this->templateOverride->resultPath,
+            'confirmPath' => $this->templateOverride->confirmPath,
+        ]));
+
+        return sprintf(
+            '<input type="hidden" name="%s" value="%s" />',
+            Consts::TEMPLATE_OVERRIDE_INPUT_NAME,
+            esc_attr($encoded)
+        );
+    }
+
+    /**
+     * Restore a template override carried across the input POST by the
+     * hidden field templateOverrideHidden() emits, and — via setTemplate()
+     * — apply the same cross-host validation a direct call would.
+     *
+     * Silently does nothing when the field is absent, malformed, or fails
+     * validation: this is client-supplied data with no cryptographic
+     * binding to the page it was rendered on, exactly like the rest of a
+     * submission's POST body, so a forged value must degrade to "the static
+     * TemplateConfig is used" rather than a fatal error.
+     *
+     * @param array $post
+     * @return void
+     */
+    protected function applyTemplateOverrideFromPost(array $post): void
+    {
+        $encoded = $post[Consts::TEMPLATE_OVERRIDE_INPUT_NAME] ?? null;
+        if (!is_string($encoded) || $encoded === '') {
+            return;
+        }
+
+        $decoded = base64_decode($encoded, true);
+        if ($decoded === false) {
+            return;
+        }
+
+        $data = json_decode($decoded, true);
+        if (
+            !is_array($data)
+            || !isset($data['inputPath'], $data['resultPath'])
+            || !is_string($data['inputPath'])
+            || !is_string($data['resultPath'])
+        ) {
+            return;
+        }
+
+        $confirmPath = $data['confirmPath'] ?? null;
+        if ($confirmPath !== null && !is_string($confirmPath)) {
+            return;
+        }
+
+        $this->setTemplate(new TemplateConfig(
+            inputPath: $data['inputPath'],
+            resultPath: $data['resultPath'],
+            confirmPath: $confirmPath,
+        ));
     }
 
     /**
@@ -380,26 +464,48 @@ class Form
     /**
      * Verify nonce field.
      *
-     * @param string $action The nonce action ('input' or 'confirm').
-     * @param array  $post   POST data to read the nonce from. Defaults to $_POST.
+     * @param string  $action       The full nonce action, which includes the form
+     *                              key — see Consts::NONCE_ACTION_FORMAT and
+     *                              Consts::REST_NONCE_ACTION_FORMAT.
+     * @param array   $post         POST data to read the nonce from. Defaults to $_POST.
+     * @param ?string $legacyAction Transitional fallback action, accepted when the
+     *                              primary one fails. See below.
      * @return bool
      */
-    public function verifyNonceField(string $action, array $post = []): bool
+    public function verifyNonceField(string $action, array $post = [], ?string $legacyAction = null): bool
     {
         $nonceKey = sprintf(Consts::NONCE_FORMAT, $this->config->key);
+        $legacyNonceKey = sprintf(Consts::LEGACY_NONCE_FORMAT, $this->config->key);
 
         if (empty($post)) {
             $post = $_POST;
         }
 
-        $nonce = $post[$nonceKey] ?? null;
+        // The legacy key is transitional — see LEGACY_NONCE_FORMAT.
+        $nonce = $post[$nonceKey] ?? $post[$legacyNonceKey] ?? null;
 
         // If nonce is missing or not a string, return false
         if (empty($nonce) || !is_string($nonce)) {
             return false;
         }
 
-        return wp_verify_nonce(sanitize_text_field(wp_unslash($nonce)), $action);
+        $nonce = sanitize_text_field(wp_unslash($nonce));
+
+        if (wp_verify_nonce($nonce, $action)) {
+            return true;
+        }
+
+        // Transitional: the redirect flow used to mint nonces against a bare
+        // 'input'/'confirm' action, so a visitor who loaded a form page before
+        // this plugin was updated carries one of those. Rejecting it would
+        // answer their submission with a 403. WordPress nonces last at most
+        // 24 hours, so this fallback can be dropped a release after it ships —
+        // see issues/2026-09-17-13-58-21.md.
+        if ($legacyAction !== null && wp_verify_nonce($nonce, $legacyAction)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -410,7 +516,9 @@ class Form
      */
     public function actionInput(): void
     {
-        if ($this->verifyNonceField('input') === false) {
+        $nonceAction = sprintf(Consts::NONCE_ACTION_FORMAT, $this->config->key, 'input');
+
+        if ($this->verifyNonceField($nonceAction, [], 'input') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
@@ -446,6 +554,11 @@ class Form
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
 
+        // Restore a per-page template override carried from the input-page
+        // GET by the hidden field templateOverrideHidden() emits. This is
+        // the one point it gets persisted — see setTemplate()'s docblock.
+        $this->applyTemplateOverrideFromPost($post);
+
         // Validate fields
         $validation = new Validation();
         $validation->validate($this, $post, $files);
@@ -458,6 +571,14 @@ class Form
         $this->storeSession();
 
         if ($this->errors->hasErrors()) {
+            /**
+             * Fires when a submission fails validation or a bot check.
+             *
+             * @param array      $errors Field name => error messages.
+             * @param FormConfig $config The form's configuration.
+             */
+            do_action('tofu_validation_failed', $this->errors->toArray(), $this->config);
+
             return ['success' => false, 'errors' => $this->errors->toArray(), 'next' => 'input'];
         }
 
@@ -489,8 +610,11 @@ class Form
             $post = $_POST;
         }
 
-        // Verification type and sanitize input
-        $token = $post[Consts::RECAPTCHA_TOKEN_INPUT_NAME] ?? '';
+        // Verification type and sanitize input. The legacy field name is
+        // transitional — see Consts::LEGACY_RECAPTCHA_TOKEN_INPUT_NAME.
+        $token = $post[Consts::RECAPTCHA_TOKEN_INPUT_NAME]
+            ?? $post[Consts::LEGACY_RECAPTCHA_TOKEN_INPUT_NAME]
+            ?? '';
         if (empty($token) || !is_string($token)) {
             $this->errors->addError(
                 Consts::RECAPTCHA_TOKEN_INPUT_NAME,
@@ -527,8 +651,11 @@ class Form
             $post = $_POST;
         }
 
-        // Verification type and sanitize input
-        $token = $post[Consts::TURNSTILE_TOKEN_INPUT_NAME] ?? '';
+        // Verification type and sanitize input. The legacy field name is
+        // transitional — see Consts::LEGACY_TURNSTILE_TOKEN_INPUT_NAME.
+        $token = $post[Consts::TURNSTILE_TOKEN_INPUT_NAME]
+            ?? $post[Consts::LEGACY_TURNSTILE_TOKEN_INPUT_NAME]
+            ?? '';
         if (empty($token) || !is_string($token)) {
             $this->errors->addError(
                 Consts::TURNSTILE_TOKEN_INPUT_NAME,
@@ -576,7 +703,9 @@ class Form
      */
     public function actionConfirm(bool $skipVerify = false): void
     {
-        if ($skipVerify === false && $this->verifyNonceField('confirm') === false) {
+        $nonceAction = sprintf(Consts::NONCE_ACTION_FORMAT, $this->config->key, 'confirm');
+
+        if ($skipVerify === false && $this->verifyNonceField($nonceAction, [], 'confirm') === false) {
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
@@ -672,6 +801,21 @@ class Form
                 $mail->addAttachment($uploadedFile->fileName, $uploadedFile->tempName);
             }
 
+            /**
+             * Fires just before each email is dispatched, once per configured recipient.
+             *
+             * $mail is mutable — call addHeader(), addAttachment(), addBcc() and so on
+             * to adjust the message. Note that addTo()/addCc()/addBcc() construct a
+             * MailAddress, which throws InvalidArgumentException on a malformed
+             * address rather than skipping the send.
+             *
+             * @param Mail                 $mail      The message about to be sent.
+             * @param MailRecipientsConfig $recipient The recipient config it was built from.
+             * @param array                $values    Submitted field values.
+             * @param FormConfig           $config    The form's configuration.
+             */
+            do_action('tofu_pre_send_mail', $mail, $recipient, $values, $this->config);
+
             if (!$mail->send()) {
                 Logger::error('Failed to send email', $mail->toArray());
                 return ['success' => false, 'errors' => [], 'next' => 'error'];
@@ -679,11 +823,28 @@ class Form
         }
 
         // Save form data to database (non-fatal — do not abort on failure)
+        $recordId = false;
         if ($this->config->saveToDatabase) {
             // Strip internal/unlisted fields: always intersect with $allows so
             // only fields the form owner explicitly declared can be persisted.
             // When $allows is empty this intentionally produces an empty payload.
             $allowedValues = array_intersect_key($values, array_flip($this->config->validation->allows));
+
+            /**
+             * Filters the values about to be persisted to wp_tofu_records.
+             *
+             * Deliberately applied AFTER the $allows intersection above, so a
+             * callback can only add values the server already knows (IP, user
+             * agent, post ID) — it can never be used to slip unvetted user input
+             * past the mass-assignment guard.
+             *
+             * @param array      $allowedValues Values to persist, already filtered by $allows.
+             * @param FormConfig $config        The form's configuration.
+             */
+            $filteredValues = apply_filters('tofu_record_values', $allowedValues, $this->config);
+            if (is_array($filteredValues)) {
+                $allowedValues = $filteredValues;
+            }
 
             $recordId = Record::saveRecord(
                 $this->config->key,
@@ -696,6 +857,23 @@ class Form
                 Logger::info('Record saved successfully', ['form_key' => $this->config->key, 'record_id' => $recordId]);
             }
         }
+
+        /**
+         * Fires once a submission has been fully processed — every email dispatched
+         * and, when saveToDatabase is enabled, the record persisted.
+         *
+         * Fires for the redirect flow and the REST/AJAX flow alike, since both share
+         * processConfirm(). It sits after the flushValue idempotency guard at the top
+         * of this method, so a double submit does not fire it twice.
+         *
+         * Uploaded files are still on disk here; they are deleted immediately below.
+         *
+         * @param array                  $values   Submitted field values.
+         * @param UploadedFileCollection $files    Uploaded files, still present on disk.
+         * @param int|false              $recordId Inserted record ID, or false when nothing was saved.
+         * @param FormConfig             $config   The form's configuration.
+         */
+        do_action('tofu_form_submitted', $values, $this->files, $recordId, $this->config);
 
         // Delete temporary uploaded files
         foreach ($this->files->getAllFiles() as $uploadedFile) {
@@ -765,6 +943,22 @@ class Form
             default:
                 $redirectUrl = null;
                 break;
+        }
+
+        /**
+         * Filters the URL the form is about to redirect to.
+         *
+         * A non-string or empty return value is ignored and the configured URL is
+         * used, so a faulty callback cannot take a live form down. wp_safe_redirect()
+         * below still enforces the same-host guarantee.
+         *
+         * @param string|null $redirectUrl Resolved URL, or null when not configured.
+         * @param string      $action      One of 'input', 'confirm' or 'result'.
+         * @param FormConfig  $config      The form's configuration.
+         */
+        $filteredUrl = apply_filters('tofu_redirect_url', $redirectUrl, $action, $this->config);
+        if (is_string($filteredUrl) && $filteredUrl !== '') {
+            $redirectUrl = $filteredUrl;
         }
 
         if ($redirectUrl === null) {

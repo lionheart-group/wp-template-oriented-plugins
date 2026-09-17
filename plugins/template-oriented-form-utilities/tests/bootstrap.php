@@ -329,26 +329,144 @@ if (!function_exists('get_locale')) {
     }
 }
 
-if (!function_exists('apply_filters')) {
-    function apply_filters(string $tag, $value, ...$args) {
-        return $value;
+// Nonce stubs. The value encodes the action it was minted for, which is the
+// whole point under test: a nonce must not verify against an action it was not
+// created for — including another form's, since the form key is part of the
+// action (Consts::NONCE_ACTION_FORMAT).
+if (!function_exists('wp_create_nonce')) {
+    function wp_create_nonce(string $action = '-1'): string {
+        return 'nonce:' . $action;
     }
 }
 
-if (!function_exists('do_action')) {
-    function do_action(string $tag, ...$args): void {
+if (!function_exists('wp_verify_nonce')) {
+    function wp_verify_nonce($nonce, string $action = '-1') {
+        return $nonce === 'nonce:' . $action ? 1 : false;
     }
 }
+
+if (!function_exists('wp_nonce_field')) {
+    function wp_nonce_field(string $action = '-1', string $name = '_wpnonce', bool $referer = true, bool $display = true): string {
+        $field = sprintf(
+            '<input type="hidden" name="%s" value="%s" />',
+            $name,
+            wp_create_nonce($action)
+        );
+
+        if ($display) {
+            echo $field;
+        }
+
+        return $field;
+    }
+}
+
+// Stubs needed to drive Form::processConfirm() — the mail/record/cleanup path —
+// end to end. wp_mail() records every call in $GLOBALS['__tofu_wp_mail_calls'] so
+// tests can assert on what was actually dispatched, mirroring the setcookie()
+// mock in bootstrap-helpers.php.
+$GLOBALS['__tofu_wp_mail_calls'] = [];
+
+if (!function_exists('is_email')) {
+    function is_email(string $email) {
+        return preg_match('/^[^@\s]+@[^@\s]+\.[^@\s]+$/', $email) === 1 ? $email : false;
+    }
+}
+
+if (!function_exists('sanitize_email')) {
+    function sanitize_email(string $email): string {
+        return trim($email);
+    }
+}
+
+if (!function_exists('wp_mail')) {
+    function wp_mail($to, string $subject, string $message, $headers = '', $attachments = []): bool {
+        $GLOBALS['__tofu_wp_mail_calls'][] = [
+            'to' => $to,
+            'subject' => $subject,
+            'message' => $message,
+            'headers' => $headers,
+            'attachments' => $attachments,
+        ];
+        return $GLOBALS['__tofu_wp_mail_result'] ?? true;
+    }
+}
+
+if (!function_exists('wp_delete_file')) {
+    function wp_delete_file(string $file): void {
+    }
+}
+
+// Form::redirect() ends in wp_safe_redirect() + exit. Record the target and
+// throw so a test can assert on it, following the wp_die() stub above.
+if (!function_exists('wp_safe_redirect')) {
+    function wp_safe_redirect(string $location, int $status = 302, string $doing_it_wrong = 'WordPress'): bool {
+        $GLOBALS['__tofu_redirects'][] = $location;
+        throw new \RuntimeException('wp_safe_redirect called: ' . $location);
+    }
+}
+
+// Minimal hook registry. The previous stubs were inert (apply_filters returned
+// $value untouched and add_filter dropped the callback), which made the hooks
+// the plugin fires impossible to assert on. This is just enough of WordPress's
+// behaviour to test them: registration, priority ordering and $accepted_args.
+//
+// BaseTestCase resets $GLOBALS['__tofu_hooks'] between tests — a callback left
+// registered by one test would otherwise fire in every later one.
+$GLOBALS['__tofu_hooks'] = [];
 
 if (!function_exists('add_filter')) {
     function add_filter(string $tag, callable $callback, int $priority = 10, int $accepted_args = 1): bool {
+        $GLOBALS['__tofu_hooks'][$tag][$priority][] = [
+            'callback' => $callback,
+            'accepted_args' => $accepted_args,
+        ];
         return true;
+    }
+}
+
+if (!function_exists('apply_filters')) {
+    function apply_filters(string $tag, $value, ...$args) {
+        $hooks = $GLOBALS['__tofu_hooks'][$tag] ?? [];
+        if ($hooks === []) {
+            return $value;
+        }
+
+        ksort($hooks);
+
+        foreach ($hooks as $callbacks) {
+            foreach ($callbacks as $hook) {
+                // WordPress passes $accepted_args parameters, the filtered value
+                // always being the first one.
+                $params = array_slice(array_merge([$value], $args), 0, $hook['accepted_args']);
+                $value = ($hook['callback'])(...$params);
+            }
+        }
+
+        return $value;
     }
 }
 
 if (!function_exists('add_action')) {
     function add_action(string $tag, callable $callback, int $priority = 10, int $accepted_args = 1): bool {
-        return true;
+        return add_filter($tag, $callback, $priority, $accepted_args);
+    }
+}
+
+if (!function_exists('do_action')) {
+    function do_action(string $tag, ...$args): void {
+        $hooks = $GLOBALS['__tofu_hooks'][$tag] ?? [];
+        if ($hooks === []) {
+            return;
+        }
+
+        ksort($hooks);
+
+        foreach ($hooks as $callbacks) {
+            foreach ($callbacks as $hook) {
+                ($hook['callback'])(...array_slice($args, 0, $hook['accepted_args']));
+            }
+        }
     }
 }
 

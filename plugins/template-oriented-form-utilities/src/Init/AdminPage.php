@@ -21,6 +21,25 @@ class AdminPage
     }
 
     /**
+     * Resolve the capability required to view recorded submissions.
+     *
+     * Used both to register the menu and to guard the page itself — filtering only
+     * one of the two would show a menu entry that dies on click, or hide a page that
+     * is still reachable by URL.
+     */
+    private static function capability(): string
+    {
+        /**
+         * Filters the capability required to view TOFU submission records.
+         *
+         * @param string $capability Defaults to 'manage_options'.
+         */
+        $capability = apply_filters('tofu_admin_page_capability', 'manage_options');
+
+        return is_string($capability) && $capability !== '' ? $capability : 'manage_options';
+    }
+
+    /**
      * Register the TOFU top-level admin menu page.
      */
     public static function addMenuPage(): void
@@ -28,7 +47,7 @@ class AdminPage
         add_menu_page(
             page_title: __('TOFU Records', 'template-oriented-form-utilities'),
             menu_title: __('TOFU', 'template-oriented-form-utilities'),
-            capability: 'manage_options',
+            capability: self::capability(),
             menu_slug:  'tofu-records',
             callback:   [static::class, 'renderPage'],
             icon_url:   'dashicons-feedback',
@@ -41,7 +60,7 @@ class AdminPage
      */
     public static function renderPage(): void
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can(self::capability())) {
             wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'template-oriented-form-utilities'));
         }
 
