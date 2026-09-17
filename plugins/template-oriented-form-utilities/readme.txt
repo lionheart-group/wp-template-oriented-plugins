@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.0.7
+Stable tag: 0.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -108,11 +108,42 @@ OR…
       translation since it was added in 0.0.4, so translators never received it. It is in the
       .pot now, with Japanese supplied.
     - Tested against WordPress 7.1.
+* v0.1.0
+    - Added: seven actions and filters, so code outside a form's own configuration can react to
+      submissions and extend validation — `tofu_form_submitted`,
+      `tofu_register_validation_rules`, `tofu_pre_send_mail`, `tofu_validation_failed`,
+      `tofu_redirect_url`, `tofu_record_values` and `tofu_admin_page_capability`. They fire for
+      the redirect and AJAX flows alike. See docs/hooks/index.md.
+    - Added: a named custom validation rule can now be registered site-wide, via the
+      `tofu_register_validation_rules` action. The validator factory was previously unreachable,
+      so this was not possible without editing the plugin.
+    - Fixed: `Form::setTemplate()` no longer writes to the session, and so no longer sends a
+      `Set-Cookie`, when a page is merely rendered. A theme calling it for each of its registered
+      forms on every page load was issuing one cookie per form on every response — including
+      pages with no form on them — which stops server and CDN page caches serving anything
+      cached. The override is now carried to the following POST in a hidden field and persisted
+      only when the visitor actually submits.
+    - Fixed: at most one session cookie is issued per response. A single response can save the
+      session more than once, and each save sent its own redundant `Set-Cookie`.
+    - Fixed: database migrations now run when the plugin is updated. The plugin listened for
+      `upgrade_process_complete`, which WordPress does not define — the hook is
+      `upgrader_process_complete` — so migrations had only ever run on activation. A site that
+      installed before a migration was added and updated since never received it; updating to
+      this version applies anything outstanding. Migrations are tracked in `wp_tofu_migrate` and
+      already-applied ones are skipped, so there is nothing to do by hand.
+    - Fixed: a submission nonce is now bound to the form it was issued for. The redirect flow
+      minted its nonce against a bare `input`/`confirm` action, so a nonce issued for one form
+      verified against every other one; only the field name distinguished them, and a field name
+      is a label the sender controls. The REST flow already did this.
+    - Changed: the plugin's own hidden field names now all use a `__tofu_` prefix, and a form may
+      no longer declare a field name starting with `_tofu_` or `__tofu_` — `FormConfig` throws at
+      registration instead of letting the collision silently drop the form's value. Breaking for
+      AJAX/headless clients that hardcode those names; see the upgrade notice.
 
 
 == Upgrade Notice ==
 
-= Unreleased =
+= 0.1.0 =
 **The plugin's own hidden form fields have moved to a `__tofu_` prefix, and the field
 names a form declares may no longer start with `_tofu_` or `__tofu_`.**
 

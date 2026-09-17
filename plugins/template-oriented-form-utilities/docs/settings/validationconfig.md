@@ -49,6 +49,25 @@ $validation = new ValidationConfig(
 | `after` | `?Closure` | No | `null` | Custom callback function for additional validation logic. |
 | `records` | `string[]` | No | `[]` | Fields to persist when [`FormConfig::$saveToDatabase`](./formconfig.md) is `true`. Sits alongside `allows` for easy comparison — an empty array (default) persists every field in `allows`; a non-empty array is a further filter, so only the named fields end up in the encrypted `wp_tofu_records` payload. Fields absent from `allows` are silently skipped. Use this to exclude sensitive fields (passwords, tokens) from the saved record without touching validation rules. |
 
+## Reserved field names
+
+A field name may not begin with `_tofu_` or `__tofu_`. Those prefixes belong to the hidden inputs
+the plugin renders itself — the nonce, uploaded-file claims, the per-page template override, and
+the reCAPTCHA/Turnstile tokens.
+
+Registering a form that declares one throws an `InvalidArgumentException` naming the offending
+field. The check covers `allows`, `records`, and the keys of `rules`, `names` and `messages`:
+
+```php
+// InvalidArgumentException: FormConfig 'contact': field name '__tofu_token' is reserved.
+allows: ['name', '__tofu_token'],
+```
+
+The guard exists because the collision would otherwise be invisible. `Form::formClose()` renders
+its inputs after yours, and PHP keeps only the last value when two inputs share a name — so your
+field's value would be dropped with no error anywhere. Any other name is fine; only the prefix is
+reserved, so `tofu_order` or `my_tofu_field` are perfectly valid.
+
 ## Writing rules
 
 Rules are given per field, either as a pipe-delimited string or as an array:
