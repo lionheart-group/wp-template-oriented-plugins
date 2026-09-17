@@ -42,6 +42,13 @@ final class Consts
     public const UPLOADED_FILES_INPUT_NAME = '__tofu_uploaded_files';
 
     /**
+     * Hidden input field name carrying a Form::setTemplate() override from
+     * the input-page GET through to the following POST, so it can be
+     * persisted to the session only once a submission actually happens.
+     */
+    public const TEMPLATE_OVERRIDE_INPUT_NAME = '__tofu_template_override';
+
+    /**
      * Percentage for garbage collection.
      */
     public const GARBAGE_COLLECTION_PERCENTAGE = 10;

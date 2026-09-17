@@ -11,6 +11,15 @@ that address, so by default the browser gets a 404 the moment the plugin redirec
 that URL to real content is entirely a theme concern; this page walks through the three common ways
 to do it.
 
+> **Caching:** calling `Form::setTemplate()` while rendering a page — as every example below does,
+> unconditionally, before the step switch — does not by itself write to the session or issue a
+> cookie. Only an actual form submission does. This holds even if a shared include calls it for
+> several registered forms on every page load, including pages that show none of them: nothing is
+> written until a visitor actually submits one. So these pages remain servable from a full-page
+> cache (Varnish, nginx `fastcgi_cache`, WP Rocket, a CDN) for a visitor who never submits anything
+> — see the "Dynamic Overrides" section of [TemplateConfig](../settings/templateconfig.md) for the
+> mechanism.
+
 ## The Problem, Concretely
 
 A traditional TOFU setup registers three *real* WordPress pages — `/contact/`, `/contact/confirm/`,

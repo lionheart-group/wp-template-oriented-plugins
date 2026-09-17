@@ -285,14 +285,19 @@ class Form
     }
 
     /**
-     * Override the input/confirm/result URLs for this visitor's session.
+     * Override the input/confirm/result URLs for this visitor, in memory.
      *
-     * Call from a theme template while rendering the input page, before
+     * Call from a theme template while rendering a page, before
      * Form::formOpen() — typically with paths derived from get_permalink()
-     * so the same registered form can be embedded on many pages. The
-     * override is persisted to the session and therefore survives the
-     * input POST, which is handled entirely inside the plugin and never
-     * re-runs theme code.
+     * so the same registered form can be embedded on many pages.
+     *
+     * This does NOT write to the session or issue a cookie by itself — doing
+     * so unconditionally on every GET (including pages a visitor never
+     * submits) would put a Set-Cookie on those responses and stop full-page
+     * caches serving them. Instead, Form::formClose() embeds the override in
+     * a hidden field, and it is only persisted to the session once the
+     * visitor actually submits the form — see
+     * applyTemplateOverrideFromPost(), called from processInput().
      *
      * Cross-host absolute URLs are rejected: the static TemplateConfig
      * remains in effect and a warning is logged, since wp_safe_redirect()
@@ -315,7 +320,85 @@ class Form
         }
 
         $this->templateOverride = $template;
-        $this->storeSession($this->flushValue);
+    }
+
+    /**
+     * Encode the current template override, if any, as a hidden input field.
+     *
+     * Embedded by Form::formClose() so the override set via setTemplate()
+     * while rendering the input page survives the POST that follows —
+     * applyTemplateOverrideFromPost() reads it back and persists it to the
+     * session, which is the mechanism that lets setTemplate() itself stay
+     * cookie-free. Returns '' when no override is set, so ordinary
+     * static-template forms render no extra markup at all.
+     *
+     * @return string
+     */
+    public function templateOverrideHidden(): string
+    {
+        if ($this->templateOverride === null) {
+            return '';
+        }
+
+        $encoded = base64_encode(json_encode([
+            'inputPath' => $this->templateOverride->inputPath,
+            'resultPath' => $this->templateOverride->resultPath,
+            'confirmPath' => $this->templateOverride->confirmPath,
+        ]));
+
+        return sprintf(
+            '<input type="hidden" name="%s" value="%s" />',
+            Consts::TEMPLATE_OVERRIDE_INPUT_NAME,
+            esc_attr($encoded)
+        );
+    }
+
+    /**
+     * Restore a template override carried across the input POST by the
+     * hidden field templateOverrideHidden() emits, and — via setTemplate()
+     * — apply the same cross-host validation a direct call would.
+     *
+     * Silently does nothing when the field is absent, malformed, or fails
+     * validation: this is client-supplied data with no cryptographic
+     * binding to the page it was rendered on, exactly like the rest of a
+     * submission's POST body, so a forged value must degrade to "the static
+     * TemplateConfig is used" rather than a fatal error.
+     *
+     * @param array $post
+     * @return void
+     */
+    protected function applyTemplateOverrideFromPost(array $post): void
+    {
+        $encoded = $post[Consts::TEMPLATE_OVERRIDE_INPUT_NAME] ?? null;
+        if (!is_string($encoded) || $encoded === '') {
+            return;
+        }
+
+        $decoded = base64_decode($encoded, true);
+        if ($decoded === false) {
+            return;
+        }
+
+        $data = json_decode($decoded, true);
+        if (
+            !is_array($data)
+            || !isset($data['inputPath'], $data['resultPath'])
+            || !is_string($data['inputPath'])
+            || !is_string($data['resultPath'])
+        ) {
+            return;
+        }
+
+        $confirmPath = $data['confirmPath'] ?? null;
+        if ($confirmPath !== null && !is_string($confirmPath)) {
+            return;
+        }
+
+        $this->setTemplate(new TemplateConfig(
+            inputPath: $data['inputPath'],
+            resultPath: $data['resultPath'],
+            confirmPath: $confirmPath,
+        ));
     }
 
     /**
@@ -446,6 +529,11 @@ class Form
         // Reset values and errors from any previous attempt
         $this->values = new FieldValueCollection();
         $this->errors = new ValidationErrorCollection();
+
+        // Restore a per-page template override carried from the input-page
+        // GET by the hidden field templateOverrideHidden() emits. This is
+        // the one point it gets persisted — see setTemplate()'s docblock.
+        $this->applyTemplateOverrideFromPost($post);
 
         // Validate fields
         $validation = new Validation();

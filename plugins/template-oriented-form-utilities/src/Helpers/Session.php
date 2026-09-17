@@ -54,18 +54,37 @@ class Session
     }
 
     /**
+     * Whether the session cookie has already been issued in this request.
+     *
+     * A single response can call save() more than once — e.g. a no-confirm-
+     * step submission runs processInput() then processConfirm() inline, or a
+     * page embeds several dynamically-templated forms via Form::setTemplate().
+     * Each call would otherwise send its own Set-Cookie header carrying the
+     * same value, which is redundant and, per one browser's cookie jar,
+     * unnecessarily muddies which write "won".
+     *
+     * @var bool
+     */
+    protected static bool $cookieIssued = false;
+
+    /**
      * The session key to store data under, minting and sending one if the
      * browser does not have it yet.
      *
      * The only place a session cookie is issued. It is called when session
      * data is actually being persisted, which is the first moment there is
-     * anything for the key to point at.
+     * anything for the key to point at. Issues at most once per request —
+     * see $cookieIssued.
      *
      * @return string
      */
     protected static function issueSessionId(): string
     {
         $value = self::readSessionId() ?? \wp_generate_password(32, false, false);
+
+        if (static::$cookieIssued) {
+            return $value;
+        }
 
         setcookie(
             Consts::SESSION_COOKIE_KEY,
@@ -79,6 +98,8 @@ class Session
                 'samesite' => static::$corsMode ? 'None' : 'Lax',
             ], fn ($v) => $v !== null)
         );
+
+        static::$cookieIssued = true;
 
         return $value;
     }
