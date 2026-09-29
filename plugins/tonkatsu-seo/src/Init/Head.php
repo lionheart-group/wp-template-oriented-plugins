@@ -72,7 +72,18 @@ class Head
             return $parts;
         }
 
-        $resolver = static::resolver();
+        return self::titleParts(static::resolver(), $parts);
+    }
+
+    /**
+     * The title parts for a given Resolver (see filterTitleParts()).
+     *
+     * @param Resolver             $resolver
+     * @param array<string, mixed> $parts
+     * @return array<string, mixed>
+     */
+    public static function titleParts(Resolver $resolver, array $parts): array
+    {
         $title = $resolver->title();
         $siteName = $resolver->site->siteName;
 
@@ -93,8 +104,93 @@ class Head
         if ($siteName !== null && isset($parts['site'])) {
             $parts['site'] = $siteName;
         }
+        if ($resolver->site->includeParentTitles) {
+            $parts = self::insertParentTitles($parts, self::parentTitles($resolver->context));
+        }
 
         return $parts;
+    }
+
+    /**
+     * Titles of a singular page's ancestors, nearest parent first.
+     *
+     * Read from the breadcrumb trail, which holds the ancestors followed by
+     * the page itself.
+     *
+     * @param Context $context
+     * @return string[]
+     */
+    public static function parentTitles(Context $context): array
+    {
+        if (!$context->isSingular() || $context->breadcrumbs === []) {
+            return [];
+        }
+
+        $trail = $context->breadcrumbs;
+        $last = end($trail);
+        if ($context->url !== null && ($last['url'] ?? null) === $context->url) {
+            array_pop($trail);
+        }
+
+        return array_reverse(array_column($trail, 'name'));
+    }
+
+    /**
+     * Insert parent titles before the site part (after the page number).
+     *
+     * @param array<string, mixed> $parts
+     * @param string[]             $parentTitles
+     * @return array<string, mixed>
+     */
+    private static function insertParentTitles(array $parts, array $parentTitles): array
+    {
+        if ($parentTitles === []) {
+            return $parts;
+        }
+
+        $parents = [];
+        foreach (array_values($parentTitles) as $i => $parentTitle) {
+            $parents['toro_parent_' . ($i + 1)] = $parentTitle;
+        }
+
+        $position = array_search('site', array_keys($parts), true);
+        if ($position === false) {
+            return $parts + $parents;
+        }
+
+        return array_slice($parts, 0, $position, true) + $parents + array_slice($parts, $position, null, true);
+    }
+
+    /**
+     * The `<title>` a singular page or the front page outputs, as text.
+     *
+     * Builds the same parts as `wp_get_document_title()` and runs them
+     * through TORO's title logic and core's `document_title` filters, so the
+     * admin screens show the finished string without loading the page. Other
+     * code on `document_title_parts` is not applied: it reads the current
+     * request, which on an admin screen is not the page being shown.
+     *
+     * @param Resolver $resolver
+     * @return string
+     */
+    public static function documentTitle(Resolver $resolver): string
+    {
+        $context = $resolver->context;
+        $siteName = get_bloginfo('name', 'display');
+
+        if ($context->isFront()) {
+            $parts = ['title' => $siteName, 'tagline' => get_bloginfo('description', 'display')];
+        } else {
+            $parts = ['title' => (string) $context->title, 'site' => $siteName];
+        }
+
+        $title = implode(' ' . Seo::getSite()->separator . ' ', array_filter(self::titleParts($resolver, $parts)));
+
+        /** This filter is documented in wp-includes/general-template.php */
+        $filtered = apply_filters('document_title', $title);
+
+        // Core's own callbacks escape the title for HTML; decode it back to text.
+        return html_entity_decode(is_string($filtered) ? $filtered : $title, ENT_QUOTES, 'UTF-8');
     }
 
     /**

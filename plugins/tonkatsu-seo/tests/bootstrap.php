@@ -260,6 +260,13 @@ if (!function_exists('remove_action')) {
     }
 }
 
+// Options a test sets, e.g. $GLOBALS['__toro_test_options']['blog_public'] = '0';
+if (!function_exists('get_option')) {
+    function get_option(string $option, $default = false) {
+        return $GLOBALS['__toro_test_options'][$option] ?? $default;
+    }
+}
+
 if (!function_exists('wp_sitemaps_get_server')) {
     function wp_sitemaps_get_server() {
         return null;

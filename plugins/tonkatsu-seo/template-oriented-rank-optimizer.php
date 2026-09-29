@@ -34,9 +34,11 @@ define('TORO_PLUGIN_FILE', __FILE__);
 // Load autoloader
 require_once __DIR__ . '/vendor/autoload.php';
 
+use ToroPlugin\Init\AdminColumns;
 use ToroPlugin\Init\AdminPage;
 use ToroPlugin\Init\Conflict;
 use ToroPlugin\Init\Head;
+use ToroPlugin\Init\SearchVisibilityNotice;
 use ToroPlugin\Init\Sitemap;
 
 /**
@@ -72,7 +74,11 @@ add_action('plugins_loaded', function () {
 
     Head::register();
     Sitemap::register();
+    AdminColumns::register();
 });
 
 // Register the read-only admin page (Tools → SEO (TORO))
 AdminPage::register();
+
+// Warn while "Discourage search engines" is on (Settings → Reading)
+SearchVisibilityNotice::register();

@@ -55,6 +55,98 @@ class HeadTest extends BaseTestCase
     // Title
     // ------------------------------------------------------------------
 
+    public function testDocumentTitleJoinsThePartsWithTheSeparator(): void
+    {
+        $this->assertSame('About | Example Site', Head::documentTitle(Resolver::fromContext($this->aboutPage())));
+
+        Seo::setSite(new SiteConfig(siteName: 'Example', separator: '–'));
+        Seo::registerPage('company/about', new PageConfig(title: 'About us'));
+
+        $this->assertSame('About us – Example', Head::documentTitle(Resolver::fromContext($this->aboutPage())));
+    }
+
+    /**
+     * Core's document_title callbacks return HTML (wptexturize, esc_html);
+     * the admin screens want the text a visitor sees.
+     */
+    public function testDocumentTitleIsDecodedAfterTheDocumentTitleFilter(): void
+    {
+        add_filter('document_title', fn ($title) => htmlspecialchars('“' . $title . '” &', ENT_QUOTES));
+
+        $this->assertSame('“About | Example Site” &', Head::documentTitle(Resolver::fromContext($this->aboutPage())));
+    }
+
+    public function testDocumentTitleIgnoresANonStringFilterResult(): void
+    {
+        add_filter('document_title', fn () => null);
+
+        $this->assertSame('About | Example Site', Head::documentTitle(Resolver::fromContext($this->aboutPage())));
+    }
+
+    public function testParentTitlesAreOffByDefault(): void
+    {
+        $this->assertSame('About | Example Site', Head::documentTitle(Resolver::fromContext($this->aboutPage())));
+    }
+
+    public function testParentTitlesGoBetweenTheTitleAndTheSite(): void
+    {
+        Seo::setSite(new SiteConfig(includeParentTitles: true));
+
+        $this->assertSame('About | Company | Example Site', Head::documentTitle(Resolver::fromContext($this->aboutPage())));
+    }
+
+    public function testParentTitlesFollowTheConfiguredTitleAndThePageNumber(): void
+    {
+        Seo::setSite(new SiteConfig(includeParentTitles: true));
+        Seo::registerPage('company/about', new PageConfig(title: 'About us'));
+        $this->useContext($this->aboutPage());
+
+        $this->assertSame(
+            ['title' => 'About us', 'page' => 'Page 2', 'toro_parent_1' => 'Company', 'site' => 'Example Site'],
+            Head::filterTitleParts(['title' => 'About', 'page' => 'Page 2', 'site' => 'Example Site'])
+        );
+    }
+
+    public function testParentTitlesAreNearestFirst(): void
+    {
+        $context = new Context(
+            type: Context::TYPE_SINGULAR,
+            path: 'company/team/staff',
+            url: 'https://example.com/company/team/staff/',
+            object: $this->makePost(),
+            postType: 'page',
+            title: 'Staff',
+            breadcrumbs: [
+                ['name' => 'Company', 'url' => 'https://example.com/company/'],
+                ['name' => 'Team', 'url' => 'https://example.com/company/team/'],
+                ['name' => 'Staff', 'url' => 'https://example.com/company/team/staff/'],
+            ],
+        );
+
+        $this->assertSame(['Team', 'Company'], Head::parentTitles($context));
+    }
+
+    public function testTopLevelPagesAndArchivesHaveNoParentTitles(): void
+    {
+        $topLevel = new Context(
+            type: Context::TYPE_SINGULAR,
+            url: 'https://example.com/company/',
+            title: 'Company',
+            breadcrumbs: [['name' => 'Company', 'url' => 'https://example.com/company/']],
+        );
+        $archive = new Context(
+            type: Context::TYPE_TAXONOMY,
+            url: 'https://example.com/category/child/',
+            breadcrumbs: [
+                ['name' => 'Parent', 'url' => 'https://example.com/category/parent/'],
+                ['name' => 'Child', 'url' => 'https://example.com/category/child/'],
+            ],
+        );
+
+        $this->assertSame([], Head::parentTitles($topLevel));
+        $this->assertSame([], Head::parentTitles($archive));
+    }
+
     public function testTitlePartsAreLeftAloneWhenNothingIsConfigured(): void
     {
         $this->useContext($this->aboutPage());

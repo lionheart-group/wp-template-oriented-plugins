@@ -74,6 +74,16 @@ even if it is reached through another URL. Everything else uses the request URI.
 it resolves to. It is read-only. The capability required to see it is `manage_options`, filterable
 with [`toro_admin_page_capability`](hooks/index.md#toro_admin_page_capability).
 
+**Pages** gets **SEO title**, **Description** and **Robots** columns showing what every page
+outputs, registered or not: the finished `<title>` (separator and site name included) and meta
+description, as a visitor's browser receives them. A note marks values that came from a fallback
+(the page title, the site name, the site-wide default description) or that are not output. Add other post types with
+[`toro_admin_column_post_types`](hooks/index.md#toro_admin_column_post_types).
+
+While **Settings → Reading → Discourage search engines** is checked, core outputs every page as
+`noindex, nofollow` and turns the sitemaps off. The robots columns say so, and a warning is shown
+on the dashboard, the TORO page and the list screens with SEO columns.
+
 ## Other SEO plugins
 
 While Rank Math, Yoast SEO, All in One SEO or SEOPress is active, TORO hooks nothing on the front

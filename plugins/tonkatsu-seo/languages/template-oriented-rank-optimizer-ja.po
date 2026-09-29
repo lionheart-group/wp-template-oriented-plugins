@@ -191,3 +191,51 @@ msgstr "（WordPressのサイトタイトル）"
 #, php-format
 msgid "TORO is not outputting any SEO tags or sitemap changes because %s is active. Deactivate it to let TORO take over."
 msgstr "%s が有効化されているため、TOROはSEOタグの出力とサイトマップの調整を行っていません。TOROに切り替えるには、そのプラグインを無効化してください。"
+
+#: src/Init/AdminColumns.php
+msgid "SEO title"
+msgstr "SEOタイトル"
+
+#: src/Init/AdminColumns.php
+msgid "From the site name"
+msgstr "サイト名から生成"
+
+#: src/Init/AdminColumns.php
+msgid "From the page title"
+msgstr "ページタイトルから生成"
+
+#: src/Init/AdminColumns.php
+msgid "Search engines discouraged"
+msgstr "検索エンジンでの表示を制限中"
+
+#: src/Init/SearchVisibilityNotice.php
+msgid "Search engines are discouraged from indexing this site."
+msgstr "「検索エンジンがサイトをインデックスしないようにする」が有効になっています。"
+
+#: src/Init/SearchVisibilityNotice.php
+msgid "Every page is output as noindex and the XML sitemaps are disabled, whatever the SEO settings say. Uncheck the setting before the site goes live."
+msgstr "SEOの設定にかかわらず、すべてのページが noindex で出力され、XMLサイトマップも無効になります。サイトを公開する前に設定を解除してください。"
+
+#: src/Init/SearchVisibilityNotice.php
+msgid "Reading Settings"
+msgstr "表示設定"
+
+#: src/Init/AdminPage.php
+msgid "Pages without a registration are listed with their values on the Pages screen."
+msgstr "登録していないページの値は、固定ページ一覧で確認できます。"
+
+#: src/Init/AdminPage.php
+msgid "Pages"
+msgstr "固定ページ一覧"
+
+#: src/Init/AdminColumns.php
+msgid "Not output"
+msgstr "出力されません"
+
+#: src/Init/AdminColumns.php
+msgid "Site default"
+msgstr "サイト共通の設定"
+
+#: src/Init/AdminPage.php
+msgid "Parent titles in child page titles"
+msgstr "子ページのタイトルに親ページを含める"

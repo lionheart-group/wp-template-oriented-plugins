@@ -77,6 +77,14 @@ class SiteConfig
          * @var SitemapConfig
          */
         public readonly SitemapConfig $sitemap = new SitemapConfig(),
+
+        /**
+         * Add the parent pages' titles to a child page's `<title>`, nearest
+         * parent first: `Child | Parent | Site`.
+         *
+         * @var bool
+         */
+        public readonly bool $includeParentTitles = false,
     )
     {
         if ($this->siteName !== null && trim($this->siteName) === '') {

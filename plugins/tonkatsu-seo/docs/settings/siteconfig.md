@@ -35,6 +35,7 @@ add_action('init', function () {
 | `locale` | `?string` | No | `null` | `og:locale` in `ll_TT` form (`ja_JP`). `null` derives it from `get_locale()`; WordPress's `ja` becomes `ja_JP`. |
 | `organization` | `?OrganizationConfig` | No | `null` | See [OrganizationConfig](organizationconfig.md). `null` outputs no `Organization` node. |
 | `sitemap` | `SitemapConfig` | No | `new SitemapConfig()` | See [SitemapConfig](sitemapconfig.md). |
+| `includeParentTitles` | `bool` | No | `false` | Add the parent pages' titles to a child page's `<title>`, nearest first: `Staff \| About \| Example`. The page's own part still follows the usual priority (post values, PageConfig, post title); parents use their post titles. Pages only (hierarchical singular), not `og:title`. |
 
 ## Notes
 

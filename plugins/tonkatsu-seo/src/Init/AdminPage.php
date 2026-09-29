@@ -4,6 +4,7 @@ namespace ToroPlugin\Init;
 
 use ToroPlugin\Consts;
 use ToroPlugin\Helpers\Seo;
+use ToroPlugin\Helpers\Visibility;
 use ToroPlugin\Models\Context;
 use ToroPlugin\Models\Resolver;
 use ToroPlugin\Structure\ArchiveConfig;
@@ -37,7 +38,7 @@ class AdminPage
      * one of the two would show a menu entry that dies on click, or hide a page that
      * is still reachable by URL.
      */
-    private static function capability(): string
+    public static function capability(): string
     {
         /**
          * Filters the capability required to view the TORO admin page.
@@ -74,6 +75,7 @@ class AdminPage
 
         $site = Seo::getSite();
         $front = Resolver::fromContext(new Context(type: Context::TYPE_FRONT, url: home_url('/')));
+        $searchEnginesDiscouraged = Visibility::searchEnginesDiscouraged();
         ?>
         <div class="wrap">
             <h1><?php echo esc_html__('SEO Settings (TORO)', 'template-oriented-rank-optimizer'); ?></h1>
@@ -100,6 +102,16 @@ class AdminPage
                     <tr>
                         <th scope="row"><?php echo esc_html__('Separator', 'template-oriented-rank-optimizer'); ?></th>
                         <td><code><?php echo esc_html($site->separator); ?></code></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php echo esc_html__('Parent titles in child page titles', 'template-oriented-rank-optimizer'); ?></th>
+                        <td>
+                            <?php
+                            echo esc_html($site->includeParentTitles
+                                ? __('Enabled', 'template-oriented-rank-optimizer')
+                                : __('Disabled', 'template-oriented-rank-optimizer'));
+                            ?>
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row"><?php echo esc_html__('Default description', 'template-oriented-rank-optimizer'); ?></th>
@@ -159,6 +171,10 @@ class AdminPage
 
             <h2><?php echo esc_html__('Registered pages', 'template-oriented-rank-optimizer'); ?></h2>
             <p class="description"><?php echo esc_html__('Values as each page outputs them: the toro_post_values filter, the page configuration and the fallbacks, already resolved.', 'template-oriented-rank-optimizer'); ?></p>
+            <p class="description">
+                <?php echo esc_html__('Pages without a registration are listed with their values on the Pages screen.', 'template-oriented-rank-optimizer'); ?>
+                <a href="<?php echo esc_url(admin_url('edit.php?post_type=page')); ?>"><?php echo esc_html__('Pages', 'template-oriented-rank-optimizer'); ?></a>
+            </p>
 
             <table class="wp-list-table widefat fixed striped">
                 <thead>
@@ -179,7 +195,10 @@ class AdminPage
                     <?php else : ?>
                         <?php foreach (array_keys(Seo::getPages()) as $path) :
                             $path = (string) $path;
-                            $values = Resolver::fromContext(Context::forPath($path))->toArray();
+                            $context = Context::forPath($path);
+                            $resolver = Resolver::fromContext($context);
+                            $values = $resolver->toArray();
+                            $cells = AdminColumns::cells($resolver, $context, $searchEnginesDiscouraged);
                         ?>
                             <tr>
                                 <td>
@@ -188,10 +207,10 @@ class AdminPage
                                         <br><span class="description"><?php echo esc_html__('(front page)', 'template-oriented-rank-optimizer'); ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo esc_html(self::display($values['title'])); ?></td>
-                                <td><?php echo esc_html(self::display($values['description'])); ?></td>
+                                <td><?php echo AdminColumns::cellHtml($cells[AdminColumns::COLUMN_TITLE]); ?></td>
+                                <td><?php echo AdminColumns::cellHtml($cells[AdminColumns::COLUMN_DESCRIPTION]); ?></td>
                                 <td style="word-break:break-all;"><?php echo esc_html(self::display($values['canonical'])); ?></td>
-                                <td><code><?php echo esc_html(self::robots($values['noindex'], $values['nofollow'])); ?></code></td>
+                                <td><?php echo AdminColumns::cellHtml($cells[AdminColumns::COLUMN_ROBOTS]); ?></td>
                                 <td style="word-break:break-all;"><?php echo esc_html(self::display($values['og_image'])); ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -248,7 +267,13 @@ class AdminPage
                             <td><code><?php echo esc_html($name); ?></code></td>
                             <td><?php echo esc_html(self::display($config->title)); ?></td>
                             <td><?php echo esc_html(self::display($config->description)); ?></td>
-                            <td><code><?php echo esc_html(self::robots($config->noindex, false)); ?></code></td>
+                            <td>
+                                <?php if (Visibility::searchEnginesDiscouraged()) : ?>
+                                    <?php echo esc_html(self::robots(true, true)); ?><br><?php echo AdminColumns::badgeHtml(AdminColumns::searchEnginesDiscouragedBadge()); ?>
+                                <?php else : ?>
+                                    <?php echo esc_html(self::robots($config->noindex, false)); ?>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -280,7 +305,7 @@ class AdminPage
      * @param bool $nofollow
      * @return string
      */
-    protected static function robots(bool $noindex, bool $nofollow): string
+    public static function robots(bool $noindex, bool $nofollow): string
     {
         return ($noindex ? 'noindex' : 'index') . ', ' . ($nofollow ? 'nofollow' : 'follow');
     }

@@ -191,3 +191,51 @@ msgstr ""
 #, php-format
 msgid "TORO is not outputting any SEO tags or sitemap changes because %s is active. Deactivate it to let TORO take over."
 msgstr ""
+
+#: src/Init/AdminColumns.php
+msgid "SEO title"
+msgstr ""
+
+#: src/Init/AdminColumns.php
+msgid "From the site name"
+msgstr ""
+
+#: src/Init/AdminColumns.php
+msgid "From the page title"
+msgstr ""
+
+#: src/Init/AdminColumns.php
+msgid "Search engines discouraged"
+msgstr ""
+
+#: src/Init/SearchVisibilityNotice.php
+msgid "Search engines are discouraged from indexing this site."
+msgstr ""
+
+#: src/Init/SearchVisibilityNotice.php
+msgid "Every page is output as noindex and the XML sitemaps are disabled, whatever the SEO settings say. Uncheck the setting before the site goes live."
+msgstr ""
+
+#: src/Init/SearchVisibilityNotice.php
+msgid "Reading Settings"
+msgstr ""
+
+#: src/Init/AdminPage.php
+msgid "Pages without a registration are listed with their values on the Pages screen."
+msgstr ""
+
+#: src/Init/AdminPage.php
+msgid "Pages"
+msgstr ""
+
+#: src/Init/AdminColumns.php
+msgid "Not output"
+msgstr ""
+
+#: src/Init/AdminColumns.php
+msgid "Site default"
+msgstr ""
+
+#: src/Init/AdminPage.php
+msgid "Parent titles in child page titles"
+msgstr ""

@@ -198,6 +198,26 @@ add_filter( 'toro_admin_page_capability', fn () => 'edit_pages' );
 
 ---
 
+### `toro_admin_column_post_types`
+
+Filters the post types whose list screen shows the **SEO title**, **Description** and **Robots**
+columns. The columns show the values each post actually outputs, fallbacks included, and the
+"Discourage search engines" warning is also shown on these screens.
+
+```php
+apply_filters( 'toro_admin_column_post_types', string[] $postTypes );
+```
+
+Defaults to `['page']`. A non-array return value falls back to that default; entries that are not
+non-empty strings are dropped. The columns are shown to users who can view the TORO admin page
+(see `toro_admin_page_capability`).
+
+```php
+add_filter( 'toro_admin_column_post_types', fn ( $postTypes ) => [ ...$postTypes, 'post' ] );
+```
+
+---
+
 ## Core filters TORO uses
 
 TORO integrates through core's own hooks rather than replacing its output, so these still work for
