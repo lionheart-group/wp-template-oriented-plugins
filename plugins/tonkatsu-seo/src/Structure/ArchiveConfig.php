@@ -1,6 +1,6 @@
 <?php
 
-namespace ToroPlugin\Structure;
+namespace TonkatsuPlugin\Structure;
 
 /**
  * Archive configuration class.
@@ -8,7 +8,7 @@ namespace ToroPlugin\Structure;
  * SEO values for a post type archive (`Seo::registerArchive()`) or for every
  * term archive of a taxonomy (`Seo::registerTaxonomy()`).
  *
- * @package ToroPlugin\Structure
+ * @package TonkatsuPlugin\Structure
  */
 class ArchiveConfig
 {

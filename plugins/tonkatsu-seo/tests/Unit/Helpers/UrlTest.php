@@ -1,9 +1,9 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Helpers;
+namespace TonkatsuPlugin\Tests\Unit\Helpers;
 
-use ToroPlugin\Helpers\Url;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Helpers\Url;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class UrlTest extends BaseTestCase
 {

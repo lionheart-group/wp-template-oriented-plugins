@@ -1,4 +1,4 @@
-# TORO (Template-Oriented Rank Optimizer)
+# TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility)
 
 WordPress plugin (PHP 8.1+, GPLv3+) that outputs SEO metadata — title, meta description,
 canonical, robots, OGP, Twitter Card, JSON-LD — and adjusts core's `/wp-sitemap.xml`. Replaces Rank
@@ -7,9 +7,9 @@ Math. All configuration lives in theme PHP, registered on `init` into an in-memo
 *viewer*, see below). Sibling of TOFU (`../template-oriented-form-utilities/`) and follows its
 conventions.
 
-**Namespace:** `ToroPlugin\` (PSR-4, mapped to `src/`)
-**Entry point:** `template-oriented-rank-optimizer.php`
-**Theme guard:** `class_exists('ToroPlugin\Helpers\Seo')`
+**Namespace:** `TonkatsuPlugin\` (PSR-4, mapped to `src/`)
+**Entry point:** `tonkatsu-seo.php`
+**Theme guard:** `class_exists('TonkatsuPlugin\Helpers\Seo')`
 
 For the public API (SiteConfig/PageConfig/ArchiveConfig, the resolution order, hooks) **do not
 re-derive it here — read `docs/index.md` and the pages it links to.** This file only covers
@@ -21,19 +21,19 @@ architecture, conventions, and dev workflow.
 
 ```
 functions.php (on `init`)
-    └── ToroPlugin\Helpers\Seo::setSite() / registerPage() / registerArchive() / registerTaxonomy()
+    └── TonkatsuPlugin\Helpers\Seo::setSite() / registerPage() / registerArchive() / registerTaxonomy()
             (static in-memory registry of Structure/ objects)
 
 request
     └── Models\Context::fromQuery()      — request type, queried object, path, own URL (WP edge)
-            └── Models\Resolver::fromContext() — gathers registry + toro_post_values (WP edge)
+            └── Models\Resolver::fromContext() — gathers registry + tonkatsu_post_values (WP edge)
                     └── Resolver methods — pure priority logic (title, description, canonical, …)
                             └── Init\Head — core filters + one wp_head block
 ```
 
 The plugin bootstrap hooks `plugins_loaded`: `Init\Conflict::detect()` first (another SEO plugin
 active → only an admin notice), otherwise `Init\Head::register()` and `Init\Sitemap::register()`.
-It cannot run in the main file's body because Yoast (`wordpress-seo`) loads after TORO
+It cannot run in the main file's body because Yoast (`wordpress-seo`) loads after TONKATSU
 alphabetically. `plugins_loaded` still precedes `init`, which `Sitemap::deferCoreServer()` needs.
 
 ### `src/` layout
@@ -48,7 +48,7 @@ alphabetically. `plugins_loaded` still precedes `init`, which `Sitemap::deferCor
 
 ### Resolution order
 
-`toro_post_values` > `PageConfig` by path > `ArchiveConfig` > what WordPress holds (excerpt, term
+`tonkatsu_post_values` > `PageConfig` by path > `ArchiveConfig` > what WordPress holds (excerpt, term
 description, featured image, permalink) > `SiteConfig` defaults. First **non-empty** value wins, so
 `false` never overrides — noindex/nofollow can only be added. Search and 404 are always noindex and
 never look up a `PageConfig`. Documented in full in `docs/index.md`; keep the two in sync.
@@ -73,14 +73,17 @@ composer build        # check, then assemble build/ via scripts/build-release.ph
 php scripts/build-release.php --zip   # build and also produce build/<slug>-<version>.zip
 ```
 
-`build-release.php` copies an **allow-list** (`src/`, `languages/` plus the three root files) into
-`build/` and regenerates a classmap autoloader. Adapted from TOFU's.
+`build-release.php` copies an **allow-list** (`src/`, `assets/` plus the root files, including
+`composer.json`) into `build/` and regenerates a classmap autoloader. Adapted from TOFU's.
 
-Translations: `languages/template-oriented-rank-optimizer.pot` and `-ja.po` are maintained by hand
-(no wp-cli here); after editing the `.po`, recompile with
-`msgfmt -o languages/template-oriented-rank-optimizer-ja.mo languages/template-oriented-rank-optimizer-ja.po`.
-`TranslationCatalogueTest` fails if a `__()` literal in `src/` is missing from the `.pot` or the ja
-`.po`, or if the `.mo` is stale.
+Translations: none are bundled. WordPress.org serves them from translate.wordpress.org by slug
+(`tonkatsu-seo`), so there is no `languages/` directory and no `load_plugin_textdomain()`.
+`TextDomainTest` fails if a translation call in `src/` does not pass the literal `'tonkatsu-seo'`.
+
+Admin notices are limited to the screens they concern (WordPress.org guideline 11): the
+other-SEO-plugin notice to Plugins and the TONKATSU page, the search-visibility warning to the
+TONKATSU page and the list screens with SEO columns. Admin CSS lives in `assets/css/admin.css`,
+enqueued — never printed inline.
 
 ## Coding conventions
 
@@ -99,7 +102,7 @@ Translations: `languages/template-oriented-rank-optimizer.pot` and `-ja.po` are 
   (`Head::isUrlProperty()`), `esc_html()` in the admin page
 - JSON-LD uses `Consts::JSON_LD_FLAGS`. `JSON_HEX_TAG` is required: with `JSON_UNESCAPED_SLASHES` a
   `</script>` inside any value would otherwise close the script element
-- URLs from config and from `toro_post_values` must pass `Helpers\Url::isValid()` (http/https or
+- URLs from config and from `tonkatsu_post_values` must pass `Helpers\Url::isValid()` (http/https or
   root-relative only — no `javascript:`)
 
 ## Hook conventions

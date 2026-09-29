@@ -1,12 +1,12 @@
 <?php
 
-namespace ToroPlugin\Init;
+namespace TonkatsuPlugin\Init;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Helpers\Url;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Helpers\Url;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Everything TORO puts in <head>.
+ * Everything TONKATSU puts in <head>.
  *
  * The title, the robots meta and the singular canonical go through core's
  * own filters, so they cooperate with the theme and other plugins; the rest
@@ -150,7 +150,7 @@ class Head
 
         $parents = [];
         foreach (array_values($parentTitles) as $i => $parentTitle) {
-            $parents['toro_parent_' . ($i + 1)] = $parentTitle;
+            $parents['tonkatsu_parent_' . ($i + 1)] = $parentTitle;
         }
 
         $position = array_search('site', array_keys($parts), true);
@@ -165,7 +165,7 @@ class Head
      * The `<title>` a singular page or the front page outputs, as text.
      *
      * Builds the same parts as `wp_get_document_title()` and runs them
-     * through TORO's title logic and core's `document_title` filters, so the
+     * through TONKATSU's title logic and core's `document_title` filters, so the
      * admin screens show the finished string without loading the page. Other
      * code on `document_title_parts` is not applied: it reads the current
      * request, which on an admin screen is not the page being shown.
@@ -270,7 +270,7 @@ class Head
         }
 
         // Every value is escaped where it is printed.
-        echo "<!-- TORO -->\n";
+        echo "<!-- TONKATSU -->\n";
 
         if ($description !== null) {
             printf('<meta name="description" content="%s" />' . "\n", esc_attr($description));
@@ -293,7 +293,7 @@ class Head
             wp_print_inline_script_tag($jsonLd, ['type' => 'application/ld+json']);
         }
 
-        echo "<!-- /TORO -->\n";
+        echo "<!-- /TONKATSU -->\n";
     }
 
     /**
@@ -348,7 +348,7 @@ class Head
     }
 
     /**
-     * The OGP and Twitter Card tags, after the `toro_og_tags` filter.
+     * The OGP and Twitter Card tags, after the `tonkatsu_og_tags` filter.
      *
      * @param Resolver $resolver
      * @return array<array-key, mixed> Property => content, or a list of contents.
@@ -380,13 +380,13 @@ class Head
          * @param array   $tags
          * @param Context $context
          */
-        $filtered = apply_filters('toro_og_tags', $tags, $resolver->context);
+        $filtered = apply_filters('tonkatsu_og_tags', $tags, $resolver->context);
 
         return is_array($filtered) ? $filtered : $tags;
     }
 
     /**
-     * The JSON-LD `@graph`, after the `toro_json_ld` filter.
+     * The JSON-LD `@graph`, after the `tonkatsu_json_ld` filter.
      *
      * @param Resolver $resolver
      * @return array<array-key, mixed>
@@ -478,7 +478,7 @@ class Head
          * @param array   $graph
          * @param Context $context
          */
-        $filtered = apply_filters('toro_json_ld', $graph, $resolver->context);
+        $filtered = apply_filters('tonkatsu_json_ld', $graph, $resolver->context);
 
         return is_array($filtered) ? array_values($filtered) : $graph;
     }

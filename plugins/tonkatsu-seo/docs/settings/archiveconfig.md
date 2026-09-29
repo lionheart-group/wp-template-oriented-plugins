@@ -5,11 +5,11 @@ SEO values for a post type archive, or for every term archive of a taxonomy.
 ## Usage
 
 ```php
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Structure\ArchiveConfig;
 
 add_action('init', function () {
-    if (!class_exists('ToroPlugin\Helpers\Seo')) {
+    if (!class_exists('TonkatsuPlugin\Helpers\Seo')) {
         return;
     }
 

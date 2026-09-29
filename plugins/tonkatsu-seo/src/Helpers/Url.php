@@ -1,6 +1,6 @@
 <?php
 
-namespace ToroPlugin\Helpers;
+namespace TonkatsuPlugin\Helpers;
 
 /**
  * URL checks shared by the Structure/ constructors and the Resolver.

@@ -56,82 +56,17 @@ if (!class_exists('WP_Post')) {
     }
 }
 
-/**
- * Minimal gettext catalogue read straight from languages/*.po.
- *
- * Reads the .po rather than the compiled .mo so the source of truth in the
- * repository is what gets tested, and so a stale .mo cannot mask a missing
- * translation.
- *
- * @return array<string, string> Keyed by msgid, or "context\4msgid".
- */
-function toro_test_load_translations(string $locale): array {
-    static $cache = [];
-
-    if (isset($cache[$locale])) {
-        return $cache[$locale];
-    }
-
-    $language = explode('_', $locale)[0];
-    $path = dirname(__DIR__) . '/languages/template-oriented-rank-optimizer-' . $language . '.po';
-
-    $catalogue = [];
-    if (is_file($path)) {
-        $field = null;
-        $buffer = ['msgctxt' => '', 'msgid' => '', 'msgstr' => ''];
-
-        $flush = static function () use (&$buffer, &$catalogue): void {
-            if ($buffer['msgid'] !== '' && $buffer['msgstr'] !== '') {
-                $key = $buffer['msgctxt'] !== ''
-                    ? $buffer['msgctxt'] . "\4" . $buffer['msgid']
-                    : $buffer['msgid'];
-                $catalogue[$key] = $buffer['msgstr'];
-            }
-            $buffer = ['msgctxt' => '', 'msgid' => '', 'msgstr' => ''];
-        };
-
-        foreach (file($path, FILE_IGNORE_NEW_LINES) as $line) {
-            $line = trim($line);
-
-            if ($line === '' || $line[0] === '#') {
-                if ($line === '') {
-                    $flush();
-                    $field = null;
-                }
-                continue;
-            }
-
-            if (preg_match('/^(msgctxt|msgid|msgstr)\s+"(.*)"$/s', $line, $m) === 1) {
-                $field = $m[1];
-                $buffer[$field] = stripcslashes($m[2]);
-                continue;
-            }
-
-            // Continuation line of the previous field.
-            if ($field !== null && preg_match('/^"(.*)"$/s', $line, $m) === 1) {
-                $buffer[$field] .= stripcslashes($m[1]);
-            }
-        }
-
-        $flush();
-    }
-
-    return $cache[$locale] = $catalogue;
-}
-
 if (!function_exists('get_locale')) {
     // Tests can steer the resolved locale by setting this global directly,
-    // e.g. $GLOBALS['__toro_test_locale'] = 'ja';
+    // e.g. $GLOBALS['__tonkatsu_test_locale'] = 'ja';
     function get_locale(): string {
-        return $GLOBALS['__toro_test_locale'] ?? 'en_US';
+        return $GLOBALS['__tonkatsu_test_locale'] ?? 'en_US';
     }
 }
 
 if (!function_exists('__')) {
     function __($text, $domain = 'default') {
-        $catalogue = toro_test_load_translations(get_locale());
-
-        return $catalogue[$text] ?? $text;
+        return $text;
     }
 }
 
@@ -178,7 +113,7 @@ if (!function_exists('wp_die')) {
 
 if (!function_exists('home_url')) {
     function home_url(string $path = '', $scheme = null): string {
-        $url = $GLOBALS['__toro_test_home_url'] ?? 'https://example.com';
+        $url = $GLOBALS['__tonkatsu_test_home_url'] ?? 'https://example.com';
         return rtrim($url, '/') . '/' . ltrim($path, '/');
     }
 }
@@ -193,13 +128,13 @@ if (!function_exists('get_bloginfo')) {
 // priority ordering and $accepted_args — enough to assert on the filters the
 // plugin applies.
 //
-// BaseTestCase resets $GLOBALS['__toro_hooks'] between tests — a callback left
+// BaseTestCase resets $GLOBALS['__tonkatsu_hooks'] between tests — a callback left
 // registered by one test would otherwise fire in every later one.
-$GLOBALS['__toro_hooks'] = [];
+$GLOBALS['__tonkatsu_hooks'] = [];
 
 if (!function_exists('add_filter')) {
     function add_filter(string $tag, callable $callback, int $priority = 10, int $accepted_args = 1): bool {
-        $GLOBALS['__toro_hooks'][$tag][$priority][] = [
+        $GLOBALS['__tonkatsu_hooks'][$tag][$priority][] = [
             'callback' => $callback,
             'accepted_args' => $accepted_args,
         ];
@@ -209,7 +144,7 @@ if (!function_exists('add_filter')) {
 
 if (!function_exists('apply_filters')) {
     function apply_filters(string $tag, $value, ...$args) {
-        $hooks = $GLOBALS['__toro_hooks'][$tag] ?? [];
+        $hooks = $GLOBALS['__tonkatsu_hooks'][$tag] ?? [];
         if ($hooks === []) {
             return $value;
         }
@@ -237,7 +172,7 @@ if (!function_exists('add_action')) {
 
 if (!function_exists('has_action')) {
     function has_action(string $tag, $callback = false) {
-        foreach ($GLOBALS['__toro_hooks'][$tag] ?? [] as $priority => $callbacks) {
+        foreach ($GLOBALS['__tonkatsu_hooks'][$tag] ?? [] as $priority => $callbacks) {
             foreach ($callbacks as $hook) {
                 if ($hook['callback'] === $callback) {
                     return $priority;
@@ -250,9 +185,9 @@ if (!function_exists('has_action')) {
 
 if (!function_exists('remove_action')) {
     function remove_action(string $tag, $callback, int $priority = 10): bool {
-        foreach ($GLOBALS['__toro_hooks'][$tag][$priority] ?? [] as $i => $hook) {
+        foreach ($GLOBALS['__tonkatsu_hooks'][$tag][$priority] ?? [] as $i => $hook) {
             if ($hook['callback'] === $callback) {
-                unset($GLOBALS['__toro_hooks'][$tag][$priority][$i]);
+                unset($GLOBALS['__tonkatsu_hooks'][$tag][$priority][$i]);
                 return true;
             }
         }
@@ -260,15 +195,15 @@ if (!function_exists('remove_action')) {
     }
 }
 
-// Options a test sets, e.g. $GLOBALS['__toro_test_options']['blog_public'] = '0';
+// Options a test sets, e.g. $GLOBALS['__tonkatsu_test_options']['blog_public'] = '0';
 if (!function_exists('get_option')) {
     function get_option(string $option, $default = false) {
-        return $GLOBALS['__toro_test_options'][$option] ?? $default;
+        return $GLOBALS['__tonkatsu_test_options'][$option] ?? $default;
     }
 }
 
 // Minimal stand-ins for core's sitemap classes. A test registers a provider
-// with $GLOBALS['__toro_test_sitemap_server']->registry->providers['posts'] = ...;
+// with $GLOBALS['__tonkatsu_test_sitemap_server']->registry->providers['posts'] = ...;
 if (!class_exists('WP_Sitemaps_Provider')) {
     abstract class WP_Sitemaps_Provider {
         abstract public function get_url_list($page_num, $object_subtype = '');
@@ -298,15 +233,15 @@ if (!class_exists('WP_Sitemaps')) {
 
 if (!function_exists('wp_sitemaps_get_server')) {
     function wp_sitemaps_get_server() {
-        return $GLOBALS['__toro_test_sitemap_server'] ??= new WP_Sitemaps();
+        return $GLOBALS['__tonkatsu_test_sitemap_server'] ??= new WP_Sitemaps();
     }
 }
 
-// Permalinks a test sets, e.g. $GLOBALS['__toro_test_permalinks'][12] = 'https://example.com/a/';
+// Permalinks a test sets, e.g. $GLOBALS['__tonkatsu_test_permalinks'][12] = 'https://example.com/a/';
 if (!function_exists('get_permalink')) {
     function get_permalink($post = 0, $leavename = false) {
         $id = is_object($post) ? $post->ID : (int) $post;
-        return $GLOBALS['__toro_test_permalinks'][$id] ?? false;
+        return $GLOBALS['__tonkatsu_test_permalinks'][$id] ?? false;
     }
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace ToroPlugin;
+namespace TonkatsuPlugin;
 
 final class Consts
 {
@@ -10,13 +10,13 @@ final class Consts
     public const DEFAULT_SEPARATOR = '|';
 
     /**
-     * Admin page slug (Tools → SEO (TORO)).
+     * Admin page slug (Tools → SEO (TONKATSU)).
      */
-    public const ADMIN_PAGE_SLUG = 'toro-seo';
+    public const ADMIN_PAGE_SLUG = 'tonkatsu-seo';
 
     /**
      * Capability required to view the admin page when the
-     * `toro_admin_page_capability` filter returns nothing usable.
+     * `tonkatsu_admin_page_capability` filter returns nothing usable.
      */
     public const DEFAULT_CAPABILITY = 'manage_options';
 
@@ -48,7 +48,7 @@ final class Consts
     public const JSON_LD_FLAGS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG;
 
     /**
-     * SEO plugins TORO stands down for, keyed by a constant each defines.
+     * SEO plugins TONKATSU stands down for, keyed by a constant each defines.
      *
      * @var array<string, string>
      */

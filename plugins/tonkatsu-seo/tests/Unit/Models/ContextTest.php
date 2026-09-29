@@ -1,9 +1,9 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Models;
+namespace TonkatsuPlugin\Tests\Unit\Models;
 
-use ToroPlugin\Models\Context;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class ContextTest extends BaseTestCase
 {

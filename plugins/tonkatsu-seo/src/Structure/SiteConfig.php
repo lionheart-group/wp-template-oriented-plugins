@@ -1,16 +1,16 @@
 <?php
 
-namespace ToroPlugin\Structure;
+namespace TonkatsuPlugin\Structure;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Url;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Url;
 
 /**
  * Site configuration class.
  *
  * Site-wide defaults. Register once with `Seo::setSite()`, on `init`.
  *
- * @package ToroPlugin\Structure
+ * @package TonkatsuPlugin\Structure
  */
 class SiteConfig
 {

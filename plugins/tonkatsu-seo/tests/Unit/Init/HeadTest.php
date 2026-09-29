@@ -1,15 +1,15 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Init;
+namespace TonkatsuPlugin\Tests\Unit\Init;
 
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Init\Head;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
-use ToroPlugin\Structure\OrganizationConfig;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Init\Head;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
+use TonkatsuPlugin\Structure\OrganizationConfig;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class HeadTest extends BaseTestCase
 {
@@ -102,7 +102,7 @@ class HeadTest extends BaseTestCase
         $this->useContext($this->aboutPage());
 
         $this->assertSame(
-            ['title' => 'About us', 'page' => 'Page 2', 'toro_parent_1' => 'Company', 'site' => 'Example Site'],
+            ['title' => 'About us', 'page' => 'Page 2', 'tonkatsu_parent_1' => 'Company', 'site' => 'Example Site'],
             Head::filterTitleParts(['title' => 'About', 'page' => 'Page 2', 'site' => 'Example Site'])
         );
     }
@@ -271,7 +271,7 @@ class HeadTest extends BaseTestCase
         $resolver = $this->useContext($context);
         $received = null;
 
-        add_filter('toro_og_tags', function ($tags, $ctx) use (&$received) {
+        add_filter('tonkatsu_og_tags', function ($tags, $ctx) use (&$received) {
             $received = $ctx;
             $tags['og:image'] = ['https://example.com/a.png', 'https://example.com/b.png'];
             unset($tags['og:locale']);
@@ -290,7 +290,7 @@ class HeadTest extends BaseTestCase
         $resolver = $this->useContext($this->aboutPage());
         $defaults = Head::ogTags($resolver);
 
-        add_filter('toro_og_tags', fn () => 'broken');
+        add_filter('tonkatsu_og_tags', fn () => 'broken');
 
         $this->assertSame($defaults, Head::ogTags($resolver));
     }
@@ -340,7 +340,7 @@ class HeadTest extends BaseTestCase
     {
         $resolver = $this->useContext($this->aboutPage());
 
-        add_filter('toro_json_ld', function ($graph) {
+        add_filter('tonkatsu_json_ld', function ($graph) {
             $graph[] = ['@type' => 'LocalBusiness', 'name' => 'Example Shop'];
             return $graph;
         });
@@ -353,7 +353,7 @@ class HeadTest extends BaseTestCase
         $resolver = $this->useContext($this->aboutPage());
         $defaults = Head::jsonLd($resolver);
 
-        add_filter('toro_json_ld', fn () => null);
+        add_filter('tonkatsu_json_ld', fn () => null);
 
         $this->assertSame($defaults, Head::jsonLd($resolver));
     }
@@ -406,7 +406,7 @@ class HeadTest extends BaseTestCase
     public function testRenderPrintsListValuesOnceEach(): void
     {
         $this->useContext($this->aboutPage());
-        add_filter('toro_og_tags', fn ($tags) => array_merge($tags, [
+        add_filter('tonkatsu_og_tags', fn ($tags) => array_merge($tags, [
             'og:image' => ['https://example.com/a.png', 'https://example.com/b.png'],
             'og:bad'   => [['nested']],
         ]));
@@ -439,7 +439,7 @@ class HeadTest extends BaseTestCase
     public function testRenderOmitsJsonLdWhenTheFilterEmptiesIt(): void
     {
         $this->useContext($this->aboutPage());
-        add_filter('toro_json_ld', fn () => []);
+        add_filter('tonkatsu_json_ld', fn () => []);
 
         $this->assertStringNotContainsString('application/ld+json', $this->render());
     }

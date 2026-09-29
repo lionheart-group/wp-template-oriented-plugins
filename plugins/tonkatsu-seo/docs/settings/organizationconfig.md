@@ -6,8 +6,8 @@ referenced as the `WebSite` node's `publisher`.
 ## Usage
 
 ```php
-use ToroPlugin\Structure\OrganizationConfig;
-use ToroPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Structure\OrganizationConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
 
 new SiteConfig(
     organization: new OrganizationConfig(

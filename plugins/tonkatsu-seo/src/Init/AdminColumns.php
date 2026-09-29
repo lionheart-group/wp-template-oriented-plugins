@@ -1,11 +1,11 @@
 <?php
 
-namespace ToroPlugin\Init;
+namespace TonkatsuPlugin\Init;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Visibility;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Visibility;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -21,9 +21,9 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class AdminColumns
 {
-    public const COLUMN_TITLE = 'toro_title';
-    public const COLUMN_DESCRIPTION = 'toro_description';
-    public const COLUMN_ROBOTS = 'toro_robots';
+    public const COLUMN_TITLE = 'tonkatsu_title';
+    public const COLUMN_DESCRIPTION = 'tonkatsu_description';
+    public const COLUMN_ROBOTS = 'tonkatsu_robots';
 
     /**
      * Badge tones: a supplementary note, or something worth a second look.
@@ -50,7 +50,6 @@ class AdminColumns
     public static function register(): void
     {
         add_action('admin_init', [static::class, 'addHooks']);
-        add_action('admin_head', [static::class, 'printStyles']);
     }
 
     /**
@@ -80,7 +79,7 @@ class AdminColumns
          *
          * @param string[] $postTypes Defaults to ['page'].
          */
-        $postTypes = apply_filters('toro_admin_column_post_types', self::DEFAULT_POST_TYPES);
+        $postTypes = apply_filters('tonkatsu_admin_column_post_types', self::DEFAULT_POST_TYPES);
 
         if (!is_array($postTypes)) {
             return self::DEFAULT_POST_TYPES;
@@ -98,9 +97,9 @@ class AdminColumns
     public static function addColumns(array $columns): array
     {
         $ours = [
-            self::COLUMN_TITLE       => __('SEO title', 'template-oriented-rank-optimizer'),
-            self::COLUMN_DESCRIPTION => __('Description', 'template-oriented-rank-optimizer'),
-            self::COLUMN_ROBOTS      => __('Robots', 'template-oriented-rank-optimizer'),
+            self::COLUMN_TITLE       => __('SEO title', 'tonkatsu-seo'),
+            self::COLUMN_DESCRIPTION => __('Description', 'tonkatsu-seo'),
+            self::COLUMN_ROBOTS      => __('Robots', 'tonkatsu-seo'),
         ];
 
         $position = array_search('title', array_keys($columns), true);
@@ -161,7 +160,7 @@ class AdminColumns
     /**
      * The values to show, with a badge saying where a fallback came from.
      *
-     * Shared with the TORO admin page so both screens say the same thing.
+     * Shared with the TONKATSU admin page so both screens say the same thing.
      *
      * @param Resolver $resolver
      * @param Context  $context
@@ -175,8 +174,8 @@ class AdminColumns
         $titleBadge = null;
         if ($resolver->title() === null) {
             $titleBadge = self::badge(self::TONE_INFO, $context->isFront()
-                ? __('From the site name', 'template-oriented-rank-optimizer')
-                : __('From the page title', 'template-oriented-rank-optimizer'));
+                ? __('From the site name', 'tonkatsu-seo')
+                : __('From the page title', 'tonkatsu-seo'));
         }
 
         // The finished meta description, noting a site-wide default or no output
@@ -184,9 +183,9 @@ class AdminColumns
         $descriptionBadge = null;
         if ($description === null || trim($description) === '') {
             $description = '—';
-            $descriptionBadge = self::badge(self::TONE_WARNING, __('Not output', 'template-oriented-rank-optimizer'));
+            $descriptionBadge = self::badge(self::TONE_WARNING, __('Not output', 'tonkatsu-seo'));
         } elseif ($description === $resolver->site->defaultDescription) {
-            $descriptionBadge = self::badge(self::TONE_INFO, __('Site default', 'template-oriented-rank-optimizer'));
+            $descriptionBadge = self::badge(self::TONE_INFO, __('Site default', 'tonkatsu-seo'));
         }
 
         if ($searchEnginesDiscouraged) {
@@ -215,13 +214,13 @@ class AdminColumns
     }
 
     /**
-     * The badge for "Discourage search engines", shared with the TORO page.
+     * The badge for "Discourage search engines", shared with the TONKATSU page.
      *
      * @return array{tone: string, label: string}
      */
     public static function searchEnginesDiscouragedBadge(): array
     {
-        return self::badge(self::TONE_WARNING, __('Search engines discouraged', 'template-oriented-rank-optimizer'));
+        return self::badge(self::TONE_WARNING, __('Search engines discouraged', 'tonkatsu-seo'));
     }
 
     /**
@@ -247,11 +246,11 @@ class AdminColumns
     {
         $tone = $badge['tone'] === self::TONE_WARNING ? self::TONE_WARNING : self::TONE_INFO;
 
-        return sprintf('<span class="toro-badge toro-badge--%s">%s</span>', esc_attr($tone), esc_html($badge['label']));
+        return sprintf('<span class="tonkatsu-badge tonkatsu-badge--%s">%s</span>', esc_attr($tone), esc_html($badge['label']));
     }
 
     /**
-     * The TORO page, or a list screen with SEO columns.
+     * The TONKATSU page, or a list screen with SEO columns.
      *
      * @param string $screenId
      * @param string $screenBase
@@ -268,41 +267,23 @@ class AdminColumns
     }
 
     /**
-     * Badge styles, on the screens that show badges only.
+     * Enqueue the badge styles on the screens that show badges.
+     *
+     * Hooked by AdminPage::register(), which runs even while another SEO
+     * plugin is active: the TONKATSU screen shows badges in that case too.
      */
-    public static function printStyles(): void
+    public static function enqueueStyles(): void
     {
         $screen = get_current_screen();
-        if ($screen === null) {
+        if ($screen === null || !self::isSeoScreen($screen->id, $screen->base, $screen->post_type)) {
             return;
         }
 
-        if (!self::isSeoScreen($screen->id, $screen->base, $screen->post_type)) {
-            return;
-        }
-        ?>
-        <style>
-            .toro-badge {
-                display: inline-block;
-                margin-top: 4px;
-                padding: 0 8px;
-                border: 1px solid;
-                border-radius: 10px;
-                font-size: 11px;
-                line-height: 18px;
-                white-space: nowrap;
-            }
-            .toro-badge--info {
-                border-color: #c3c4c7;
-                background: #f6f7f7;
-                color: #50575e;
-            }
-            .toro-badge--warning {
-                border-color: #dba617;
-                background: #fcf9e8;
-                color: #6b4e00;
-            }
-        </style>
-        <?php
+        wp_enqueue_style(
+            'tonkatsu-seo-admin',
+            plugins_url('assets/css/admin.css', TONKATSU_PLUGIN_FILE),
+            [],
+            TONKATSU_VERSION
+        );
     }
 }

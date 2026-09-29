@@ -1,9 +1,9 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Structure;
+namespace TonkatsuPlugin\Tests\Unit\Structure;
 
-use ToroPlugin\Structure\OrganizationConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Structure\OrganizationConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class OrganizationConfigTest extends BaseTestCase
 {

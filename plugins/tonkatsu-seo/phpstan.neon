@@ -11,7 +11,3 @@ parameters:
         maximumNumberOfProcesses: 1
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false
-    ignoreErrors:
-        # Plugin-specific constants
-        - '#Constant TORO_PLUGIN_FILE not found\.#'
-        - '#Constant TORO_PLUGIN_DIR not found\.#'

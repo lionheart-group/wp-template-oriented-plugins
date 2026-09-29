@@ -1,9 +1,9 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Structure;
+namespace TonkatsuPlugin\Tests\Unit\Structure;
 
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class PageConfigTest extends BaseTestCase
 {

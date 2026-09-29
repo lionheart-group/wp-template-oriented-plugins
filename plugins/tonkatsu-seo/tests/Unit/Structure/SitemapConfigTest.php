@@ -1,9 +1,9 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Structure;
+namespace TonkatsuPlugin\Tests\Unit\Structure;
 
-use ToroPlugin\Structure\SitemapConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Structure\SitemapConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class SitemapConfigTest extends BaseTestCase
 {

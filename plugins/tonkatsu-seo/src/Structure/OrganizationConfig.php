@@ -1,8 +1,8 @@
 <?php
 
-namespace ToroPlugin\Structure;
+namespace TonkatsuPlugin\Structure;
 
-use ToroPlugin\Helpers\Url;
+use TonkatsuPlugin\Helpers\Url;
 
 /**
  * Organization configuration class.
@@ -10,7 +10,7 @@ use ToroPlugin\Helpers\Url;
  * Output as the `Organization` node of the JSON-LD graph, and referenced as
  * the `WebSite` node's publisher.
  *
- * @package ToroPlugin\Structure
+ * @package TonkatsuPlugin\Structure
  */
 class OrganizationConfig
 {

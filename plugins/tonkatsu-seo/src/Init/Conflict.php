@@ -1,8 +1,8 @@
 <?php
 
-namespace ToroPlugin\Init;
+namespace TonkatsuPlugin\Init;
 
-use ToroPlugin\Consts;
+use TonkatsuPlugin\Consts;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Detects another active SEO plugin.
  *
  * Two plugins printing canonicals, robots metas and OGP tags leave search
- * engines to pick between them, so while one is active TORO outputs
+ * engines to pick between them, so while one is active TONKATSU outputs
  * nothing and shows an admin notice instead.
  */
 class Conflict
@@ -22,7 +22,7 @@ class Conflict
      * The name of the first active conflicting plugin, or null.
      *
      * Call on `plugins_loaded` or later: before that, plugins loading after
-     * TORO have not defined their constants yet.
+     * TONKATSU have not defined their constants yet.
      *
      * @param array<string, string> $plugins Constant => plugin name.
      * @return ?string
@@ -47,7 +47,19 @@ class Conflict
     }
 
     /**
-     * Tell the people who can fix it why TORO is doing nothing.
+     * The Plugins screen, where the other plugin can be deactivated, and
+     * the TONKATSU screen. The notice stays off every other admin screen.
+     *
+     * @param string $screenId
+     * @return bool
+     */
+    public static function shouldShowOn(string $screenId): bool
+    {
+        return in_array($screenId, ['plugins', 'tools_page_' . Consts::ADMIN_PAGE_SLUG], true);
+    }
+
+    /**
+     * Tell the people who can fix it why TONKATSU is doing nothing.
      */
     public static function renderNotice(): void
     {
@@ -56,11 +68,16 @@ class Conflict
             return;
         }
 
+        $screen = get_current_screen();
+        if ($screen === null || !self::shouldShowOn($screen->id)) {
+            return;
+        }
+
         printf(
             '<div class="notice notice-warning"><p>%s</p></div>',
             esc_html(sprintf(
                 /* translators: %s: name of the other SEO plugin, e.g. "Rank Math SEO" */
-                __('TORO is not outputting any SEO tags or sitemap changes because %s is active. Deactivate it to let TORO take over.', 'template-oriented-rank-optimizer'),
+                __('TONKATSU is not outputting any SEO tags or sitemap changes because %s is active. Deactivate it to let TONKATSU take over.', 'tonkatsu-seo'),
                 $plugin
             ))
         );

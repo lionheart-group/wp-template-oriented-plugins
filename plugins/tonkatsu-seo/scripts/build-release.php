@@ -16,14 +16,14 @@
 
 $root  = dirname(__DIR__);
 $build = $root . '/build';
-$slug  = 'template-oriented-rank-optimizer';
+$slug  = 'tonkatsu-seo';
 
 /** Directories copied wholesale. */
-$directories = ['src', 'languages'];
+$directories = ['src', 'assets'];
 
 /** Individual files copied to the archive root. */
 $files = [
-    'template-oriented-rank-optimizer.php',
+    'tonkatsu-seo.php',
     'index.php',
     'readme.txt',
     // Used to generate the autoloader below, and shipped alongside vendor/.

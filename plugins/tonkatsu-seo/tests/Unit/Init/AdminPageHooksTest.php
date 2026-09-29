@@ -1,9 +1,9 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Init;
+namespace TonkatsuPlugin\Tests\Unit\Init;
 
-use ToroPlugin\Init\AdminPage;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Init\AdminPage;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class AdminPageHooksTest extends BaseTestCase
 {
@@ -21,7 +21,7 @@ class AdminPageHooksTest extends BaseTestCase
 
     public function testFilterCanLowerTheRequiredCapability(): void
     {
-        add_filter('toro_admin_page_capability', fn () => 'edit_pages');
+        add_filter('tonkatsu_admin_page_capability', fn () => 'edit_pages');
 
         $this->assertSame('edit_pages', $this->capability());
     }
@@ -49,7 +49,7 @@ class AdminPageHooksTest extends BaseTestCase
      */
     public function testUnusableFilterReturnFallsBackToManageOptions(mixed $return): void
     {
-        add_filter('toro_admin_page_capability', fn () => $return);
+        add_filter('tonkatsu_admin_page_capability', fn () => $return);
 
         $this->assertSame('manage_options', $this->capability());
     }

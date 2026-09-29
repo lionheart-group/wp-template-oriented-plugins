@@ -1,8 +1,8 @@
 <?php
 
-namespace ToroPlugin\Init;
+namespace TonkatsuPlugin\Init;
 
-use ToroPlugin\Helpers\Visibility;
+use TonkatsuPlugin\Helpers\Visibility;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -12,7 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Warn while "Discourage search engines from indexing this site" is on.
  *
- * The setting overrides everything TORO resolves: every page is noindex and
+ * The setting overrides everything TONKATSU resolves: every page is noindex and
  * the sitemaps are off. It is right on a staging site and a costly mistake
  * on a live one, so it is flagged on the screens where SEO is checked.
  */
@@ -42,15 +42,16 @@ class SearchVisibilityNotice
 
         printf(
             '<div class="notice notice-warning"><p><strong>%s</strong></p><p>%s <a href="%s">%s</a></p></div>',
-            esc_html__('Search engines are discouraged from indexing this site.', 'template-oriented-rank-optimizer'),
-            esc_html__('Every page is output as noindex and the XML sitemaps are disabled, whatever the SEO settings say. Uncheck the setting before the site goes live.', 'template-oriented-rank-optimizer'),
+            esc_html__('Search engines are discouraged from indexing this site.', 'tonkatsu-seo'),
+            esc_html__('Every page is output as noindex and the XML sitemaps are disabled, whatever the SEO settings say. Uncheck the setting before the site goes live.', 'tonkatsu-seo'),
             esc_url(admin_url('options-reading.php')),
-            esc_html__('Reading Settings', 'template-oriented-rank-optimizer')
+            esc_html__('Reading Settings', 'tonkatsu-seo')
         );
     }
 
     /**
-     * Dashboard, the TORO page, and the list screens with SEO columns.
+     * The TONKATSU page and the list screens with SEO columns — the screens
+     * that show SEO values — rather than the whole admin.
      *
      * @param string $screenId
      * @param string $screenBase
@@ -59,6 +60,6 @@ class SearchVisibilityNotice
      */
     public static function shouldShowOn(string $screenId, string $screenBase, string $postType): bool
     {
-        return $screenId === 'dashboard' || AdminColumns::isSeoScreen($screenId, $screenBase, $postType);
+        return AdminColumns::isSeoScreen($screenId, $screenBase, $postType);
     }
 }

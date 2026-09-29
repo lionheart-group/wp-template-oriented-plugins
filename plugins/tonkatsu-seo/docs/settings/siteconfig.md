@@ -5,11 +5,11 @@ Site-wide defaults. Register once with `Seo::setSite()`, in the `init` action.
 ## Usage
 
 ```php
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Structure\SiteConfig;
 
 add_action('init', function () {
-    if (!class_exists('ToroPlugin\Helpers\Seo')) {
+    if (!class_exists('TonkatsuPlugin\Helpers\Seo')) {
         return;
     }
 
@@ -41,7 +41,7 @@ add_action('init', function () {
 
 - Invalid values throw `InvalidArgumentException` from the constructor, on `init` — where you are
   looking — rather than producing broken markup later.
-- Register it at an `init` priority below 20 (the default 10 is fine). TORO moves core's sitemap
+- Register it at an `init` priority below 20 (the default 10 is fine). TONKATSU moves core's sitemap
   bootstrap to `init` 20 so that it sees this configuration.
 - Calling `Seo::setSite()` a second time replaces the first configuration.
 - Without `Seo::setSite()` the defaults above apply.

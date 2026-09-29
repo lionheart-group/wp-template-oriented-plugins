@@ -1,8 +1,8 @@
 <?php
 
-namespace ToroPlugin\Models;
+namespace TonkatsuPlugin\Models;
 
-use ToroPlugin\Helpers\Seo;
+use TonkatsuPlugin\Helpers\Seo;
 
 /**
  * What is being rendered: the request type, the queried object, and the

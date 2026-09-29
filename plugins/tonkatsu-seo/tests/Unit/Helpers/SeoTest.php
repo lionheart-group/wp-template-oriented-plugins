@@ -1,12 +1,12 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Helpers;
+namespace TonkatsuPlugin\Tests\Unit\Helpers;
 
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Structure\ArchiveConfig;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class SeoTest extends BaseTestCase
 {

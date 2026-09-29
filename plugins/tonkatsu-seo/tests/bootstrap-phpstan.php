@@ -18,3 +18,16 @@ if (!defined('WP_CONTENT_DIR')) {
 if (!defined('WP_DEBUG')) {
     define('WP_DEBUG', true);
 }
+
+// Plugin constants, defined by tonkatsu-seo.php at runtime
+if (!defined('TONKATSU_VERSION')) {
+    define('TONKATSU_VERSION', '0.0.0');
+}
+
+if (!defined('TONKATSU_PLUGIN_DIR')) {
+    define('TONKATSU_PLUGIN_DIR', dirname(__DIR__) . '/');
+}
+
+if (!defined('TONKATSU_PLUGIN_FILE')) {
+    define('TONKATSU_PLUGIN_FILE', dirname(__DIR__) . '/tonkatsu-seo.php');
+}

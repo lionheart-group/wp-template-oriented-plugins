@@ -1,14 +1,14 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Models;
+namespace TonkatsuPlugin\Tests\Unit\Models;
 
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
-use ToroPlugin\Structure\ArchiveConfig;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
+use TonkatsuPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class ResolverTest extends BaseTestCase
 {
@@ -42,7 +42,7 @@ class ResolverTest extends BaseTestCase
      */
     private function filterReturns(mixed $values): void
     {
-        add_filter('toro_post_values', fn () => $values);
+        add_filter('tonkatsu_post_values', fn () => $values);
     }
 
     // ------------------------------------------------------------------
@@ -221,7 +221,7 @@ class ResolverTest extends BaseTestCase
     }
 
     // ------------------------------------------------------------------
-    // toro_post_values: fallbacks
+    // tonkatsu_post_values: fallbacks
     // ------------------------------------------------------------------
 
     /**
@@ -277,7 +277,7 @@ class ResolverTest extends BaseTestCase
     public function testFilterReceivesTheQueriedPost(): void
     {
         $received = null;
-        add_filter('toro_post_values', function ($values, $post) use (&$received) {
+        add_filter('tonkatsu_post_values', function ($values, $post) use (&$received) {
             $received = $post;
             return $values;
         }, 10, 2);
@@ -291,7 +291,7 @@ class ResolverTest extends BaseTestCase
     public function testFilterDoesNotRunWithoutAPost(): void
     {
         $calls = 0;
-        add_filter('toro_post_values', function ($values) use (&$calls) {
+        add_filter('tonkatsu_post_values', function ($values) use (&$calls) {
             $calls++;
             return ['title' => 'Should not apply'];
         });
@@ -341,14 +341,14 @@ class ResolverTest extends BaseTestCase
      */
     public function testLocaleIsDerivedFromWordPress(string $wpLocale, string $expected): void
     {
-        $GLOBALS['__toro_test_locale'] = $wpLocale;
+        $GLOBALS['__tonkatsu_test_locale'] = $wpLocale;
 
         $this->assertSame($expected, Resolver::fromContext($this->singular())->locale());
     }
 
     public function testConfiguredLocaleWins(): void
     {
-        $GLOBALS['__toro_test_locale'] = 'en_US';
+        $GLOBALS['__tonkatsu_test_locale'] = 'en_US';
         Seo::setSite(new SiteConfig(locale: 'ja_JP'));
 
         $this->assertSame('ja_JP', Resolver::fromContext($this->singular())->locale());

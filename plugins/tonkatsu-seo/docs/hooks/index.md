@@ -1,6 +1,6 @@
 # Hooks
 
-TORO applies a small number of WordPress filters so that code outside the theme's configuration — a
+TONKATSU applies a small number of WordPress filters so that code outside the theme's configuration — a
 custom-field plugin, an mu-plugin, a theme's `functions.php` — can supply values that live in post
 data, and extend the output.
 
@@ -33,13 +33,13 @@ without them.
 
 ## Filters
 
-### `toro_post_values`
+### `tonkatsu_post_values`
 
 Supplies per-post SEO values, typically read from custom fields. Values returned here take
 precedence over every configuration object.
 
 ```php
-apply_filters( 'toro_post_values', array $values, WP_Post $post );
+apply_filters( 'tonkatsu_post_values', array $values, WP_Post $post );
 ```
 
 `$values` starts empty; return the keys you want to set.
@@ -63,7 +63,7 @@ runs, outside the main query, for `get_canonical_url`, for each **registered** p
 built, and on the admin page. Keep it cheap and free of side effects.
 
 ```php
-add_filter( 'toro_post_values', function ( $values, $post ) {
+add_filter( 'tonkatsu_post_values', function ( $values, $post ) {
     $description = get_post_meta( $post->ID, 'seo_description', true );
     if ( is_string( $description ) ) {
         $values['description'] = $description;
@@ -78,7 +78,7 @@ add_filter( 'toro_post_values', function ( $values, $post ) {
 Reading values Rank Math left behind, while migrating:
 
 ```php
-add_filter( 'toro_post_values', function ( $values, $post ) {
+add_filter( 'tonkatsu_post_values', function ( $values, $post ) {
     $robots = (array) get_post_meta( $post->ID, 'rank_math_robots', true );
 
     return array_merge( $values, [
@@ -92,12 +92,12 @@ add_filter( 'toro_post_values', function ( $values, $post ) {
 }, 10, 2 );
 ```
 
-### `toro_og_tags`
+### `tonkatsu_og_tags`
 
 Filters the Open Graph and Twitter Card tags just before they are printed.
 
 ```php
-apply_filters( 'toro_og_tags', array $tags, Context $context );
+apply_filters( 'tonkatsu_og_tags', array $tags, Context $context );
 ```
 
 `$tags` is keyed by property. Keys starting with `twitter:` are printed with `name="…"`, everything
@@ -105,10 +105,10 @@ else with `property="…"`. A value may be a string, or a list of strings to pri
 entry. Empty and non-scalar values are skipped. A non-array return value keeps the defaults.
 
 ```php
-add_filter( 'toro_og_tags', function ( $tags, $context ) {
+add_filter( 'tonkatsu_og_tags', function ( $tags, $context ) {
     $tags['fb:app_id'] = '1234567890';
 
-    if ( $context->type === \ToroPlugin\Models\Context::TYPE_SINGULAR ) {
+    if ( $context->type === \TonkatsuPlugin\Models\Context::TYPE_SINGULAR ) {
         $tags['article:published_time'] = get_the_date( 'c', $context->post() );
     }
 
@@ -119,12 +119,12 @@ add_filter( 'toro_og_tags', function ( $tags, $context ) {
 `Context` is read-only; use `$context->type` (one of the `Context::TYPE_*` constants),
 `$context->path`, `$context->post()` and so on to decide what to add.
 
-### `toro_json_ld`
+### `tonkatsu_json_ld`
 
 Filters the nodes of the JSON-LD `@graph`.
 
 ```php
-apply_filters( 'toro_json_ld', array $graph, Context $context );
+apply_filters( 'tonkatsu_json_ld', array $graph, Context $context );
 ```
 
 `$graph` is a list of nodes: `WebSite` always, `Organization` when `SiteConfig::$organization` is
@@ -132,7 +132,7 @@ set, and `BreadcrumbList` for pages of a hierarchical post type and for archives
 remove nodes. Return `[]` to print no JSON-LD at all; a non-array return value keeps the defaults.
 
 ```php
-add_filter( 'toro_json_ld', function ( $graph, $context ) {
+add_filter( 'tonkatsu_json_ld', function ( $graph, $context ) {
     if ( $context->path === 'access' ) {
         $graph[] = [
             '@type'   => 'LocalBusiness',
@@ -152,12 +152,12 @@ add_filter( 'toro_json_ld', function ( $graph, $context ) {
 The graph is encoded with `JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG`, so a
 value containing `</script>` cannot end the script element early.
 
-### `toro_sitemap_excluded_post_ids`
+### `tonkatsu_sitemap_excluded_post_ids`
 
 Filters the post IDs removed from a post type's sitemap.
 
 ```php
-apply_filters( 'toro_sitemap_excluded_post_ids', int[] $ids, string $postType );
+apply_filters( 'tonkatsu_sitemap_excluded_post_ids', int[] $ids, string $postType );
 ```
 
 `$ids` already holds the registered pages that resolve to `noindex`. Only registered pages are
@@ -166,7 +166,7 @@ add others here. Non-positive and non-integer entries are dropped; a non-array r
 the defaults.
 
 ```php
-add_filter( 'toro_sitemap_excluded_post_ids', function ( $ids, $post_type ) {
+add_filter( 'tonkatsu_sitemap_excluded_post_ids', function ( $ids, $post_type ) {
     if ( 'news' !== $post_type ) {
         return $ids;
     }
@@ -181,49 +181,49 @@ add_filter( 'toro_sitemap_excluded_post_ids', function ( $ids, $post_type ) {
 }, 10, 2 );
 ```
 
-### `toro_admin_page_capability`
+### `tonkatsu_admin_page_capability`
 
-Filters the capability required to view **Tools → SEO (TORO)**.
+Filters the capability required to view **Tools → SEO (TONKATSU)**.
 
 ```php
-apply_filters( 'toro_admin_page_capability', string $capability );
+apply_filters( 'tonkatsu_admin_page_capability', string $capability );
 ```
 
 Defaults to `manage_options`. A non-string or empty return value falls back to that default. The
 filter governs both the menu entry and the page itself.
 
 ```php
-add_filter( 'toro_admin_page_capability', fn () => 'edit_pages' );
+add_filter( 'tonkatsu_admin_page_capability', fn () => 'edit_pages' );
 ```
 
 ---
 
-### `toro_admin_column_post_types`
+### `tonkatsu_admin_column_post_types`
 
 Filters the post types whose list screen shows the **SEO title**, **Description** and **Robots**
 columns. The columns show the values each post actually outputs, fallbacks included, and the
 "Discourage search engines" warning is also shown on these screens.
 
 ```php
-apply_filters( 'toro_admin_column_post_types', string[] $postTypes );
+apply_filters( 'tonkatsu_admin_column_post_types', string[] $postTypes );
 ```
 
 Defaults to `['page']`. A non-array return value falls back to that default; entries that are not
-non-empty strings are dropped. The columns are shown to users who can view the TORO admin page
-(see `toro_admin_page_capability`).
+non-empty strings are dropped. The columns are shown to users who can view the TONKATSU admin page
+(see `tonkatsu_admin_page_capability`).
 
 ```php
-add_filter( 'toro_admin_column_post_types', fn ( $postTypes ) => [ ...$postTypes, 'post' ] );
+add_filter( 'tonkatsu_admin_column_post_types', fn ( $postTypes ) => [ ...$postTypes, 'post' ] );
 ```
 
 ---
 
-## Core filters TORO uses
+## Core filters TONKATSU uses
 
-TORO integrates through core's own hooks rather than replacing its output, so these still work for
-the theme and other plugins, and run alongside TORO's callbacks (at priority 10 unless noted):
+TONKATSU integrates through core's own hooks rather than replacing its output, so these still work for
+the theme and other plugins, and run alongside TONKATSU's callbacks (at priority 10 unless noted):
 
-| Core hook | What TORO does |
+| Core hook | What TONKATSU does |
 |---|---|
 | `document_title_parts` | Replaces `title` (and `site`, when `SiteConfig::$siteName` is set). |
 | `document_title_separator` | Returns `SiteConfig::$separator`. |
@@ -241,7 +241,7 @@ Deliberate omissions, so that the boundary stays predictable:
 | | Why |
 |---|---|
 | Filtering `SiteConfig` / `PageConfig` / `ArchiveConfig` | The configuration already lives in your own theme code; a filter would let unrelated code rewrite it invisibly. Change the code. |
-| Filtering the final title string | Use core's `document_title_parts` / `pre_get_document_title`, which TORO already cooperates with. |
+| Filtering the final title string | Use core's `document_title_parts` / `pre_get_document_title`, which TONKATSU already cooperates with. |
 | Filtering robots directives | Use core's `wp_robots`. |
 | Turning off the conflict check | Two SEO plugins printing two canonicals is never what anyone wants. Deactivate the other one. |
 

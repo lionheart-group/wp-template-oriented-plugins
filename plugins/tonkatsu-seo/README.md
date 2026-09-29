@@ -1,6 +1,6 @@
-# TORO
+# TONKATSU
 
-Template-Oriented Rank Optimizer
+Template-Oriented No-database Knowledge-graph & Tag Setup Utility
 
 ## Description
 
@@ -10,28 +10,28 @@ It is a sibling of [TOFU](https://github.com/lionheart-group/template-oriented-f
 
 ## Installation
 
-1. Upload the plugin files to the `/wp-content/plugins/template-oriented-rank-optimizer` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/tonkatsu-seo` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Deactivate any other SEO plugin (Rank Math, Yoast SEO, All in One SEO, SEOPress). While one is active, TORO outputs nothing and shows an admin notice.
+3. Deactivate any other SEO plugin (Rank Math, Yoast SEO, All in One SEO, SEOPress). While one is active, TONKATSU outputs nothing and shows an admin notice.
 
 ## Usage
 
 1. Register the site settings in your theme on `init`.
 2. Register per-page, per-archive and per-taxonomy values as needed.
-3. Use the `toro_post_values` filter for values that come from post data (custom fields).
+3. Use the `tonkatsu_post_values` filter for values that come from post data (custom fields).
 
 ```php
 add_action('init', function () {
-    if (!class_exists('ToroPlugin\Helpers\Seo')) {
+    if (!class_exists('TonkatsuPlugin\Helpers\Seo')) {
         return;
     }
 
-    \ToroPlugin\Helpers\Seo::setSite(new \ToroPlugin\Structure\SiteConfig(
+    \TonkatsuPlugin\Helpers\Seo::setSite(new \TonkatsuPlugin\Structure\SiteConfig(
         defaultDescription: 'Example Inc. makes widgets.',
         defaultOgImage: get_theme_file_uri('images/ogp.png'),
     ));
 
-    \ToroPlugin\Helpers\Seo::registerPage('company', new \ToroPlugin\Structure\PageConfig(
+    \TonkatsuPlugin\Helpers\Seo::registerPage('company', new \TonkatsuPlugin\Structure\PageConfig(
         title: '会社概要',
         description: 'Example Inc. の会社概要です。',
     ));

@@ -1,16 +1,16 @@
 {
-    "name": "lionheart-group/template-oriented-rank-optimizer",
-    "description": "Template-Oriented Rank Optimizer",
+    "name": "lionheart-group/tonkatsu-seo",
+    "description": "Template-Oriented No-database Knowledge-graph & Tag Setup Utility",
     "type": "library",
     "license": "GPL-3.0-or-later",
     "autoload": {
         "psr-4": {
-            "ToroPlugin\\": "src/"
+            "TonkatsuPlugin\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ToroPlugin\\Tests\\": "tests/"
+            "TonkatsuPlugin\\Tests\\": "tests/"
         }
     },
     "authors": [

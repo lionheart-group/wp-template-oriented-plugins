@@ -1,8 +1,8 @@
-# TORO (Template-Oriented Rank Optimizer) documentation
+# TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility) documentation
 
 ## Settings
 
-TORO is configured in your WordPress theme's `functions.php` (on `init`) using the following settings:
+TONKATSU is configured in your WordPress theme's `functions.php` (on `init`) using the following settings:
 
 - [SiteConfig](settings/siteconfig.md) — site-wide defaults, registered with `Seo::setSite()`
   - [OrganizationConfig](settings/organizationconfig.md)
@@ -16,12 +16,12 @@ Here's a complete example showing all of them together:
 
 ## How values are resolved
 
-For every request TORO works out one value per field, taking the first **non-empty** one in this
+For every request TONKATSU works out one value per field, taking the first **non-empty** one in this
 order:
 
 | # | Source | Applies to |
 |---|---|---|
-| 1 | [`toro_post_values`](hooks/index.md#toro_post_values) filter | The queried post (singulars, a static front page, the posts page) |
+| 1 | [`tonkatsu_post_values`](hooks/index.md#tonkatsu_post_values) filter | The queried post (singulars, a static front page, the posts page) |
 | 2 | `PageConfig` registered for the request's path | Any request except search results and 404s |
 | 3 | `ArchiveConfig` | Post type archives (`registerArchive`), term archives (`registerTaxonomy`), the posts page (`registerArchive('post', …)`) |
 | 4 | What WordPress already holds | A post's hand-written excerpt (description), featured image (og:image), permalink (canonical); a term's description |
@@ -50,14 +50,14 @@ page.
 For singular requests the path is taken from the post's permalink, so the lookup follows the post
 even if it is reached through another URL. Everything else uses the request URI.
 
-## What TORO outputs
+## What TONKATSU outputs
 
 - `<title>` — through `document_title_parts` / `document_title_separator`, so the theme keeps
   `add_theme_support('title-tag')` and nothing else changes. The configured title replaces the
   *title part*; WordPress still appends the page number and the site name.
 - `<meta name="robots">` — through core's `wp_robots`.
-- `<link rel="canonical">` — core prints it for singular requests (TORO filters
-  `get_canonical_url`); TORO prints it for everything else except search results, 404s and date
+- `<link rel="canonical">` — core prints it for singular requests (TONKATSU filters
+  `get_canonical_url`); TONKATSU prints it for everything else except search results, 404s and date
   archives.
 - `<meta name="description">`, Open Graph (`og:site_name`, `og:title`, `og:description`,
   `og:type`, `og:url`, `og:image`, `og:locale`), Twitter Card (`twitter:card`, `twitter:site`) and
@@ -70,36 +70,36 @@ even if it is reached through another URL. Everything else uses the request URI.
 
 ## Admin page
 
-**Tools → SEO (TORO)** lists what the theme registered and, for every registered page, the values
+**Tools → SEO (TONKATSU)** lists what the theme registered and, for every registered page, the values
 it resolves to. It is read-only. The capability required to see it is `manage_options`, filterable
-with [`toro_admin_page_capability`](hooks/index.md#toro_admin_page_capability).
+with [`tonkatsu_admin_page_capability`](hooks/index.md#tonkatsu_admin_page_capability).
 
 **Pages** gets **SEO title**, **Description** and **Robots** columns showing what every page
 outputs, registered or not: the finished `<title>` (separator and site name included) and meta
 description, as a visitor's browser receives them. A note marks values that came from a fallback
 (the page title, the site name, the site-wide default description) or that are not output. Add other post types with
-[`toro_admin_column_post_types`](hooks/index.md#toro_admin_column_post_types).
+[`tonkatsu_admin_column_post_types`](hooks/index.md#tonkatsu_admin_column_post_types).
 
 While **Settings → Reading → Discourage search engines** is checked, core outputs every page as
 `noindex, nofollow` and turns the sitemaps off. The robots columns say so, and a warning is shown
-on the dashboard, the TORO page and the list screens with SEO columns.
+on the TONKATSU page and the list screens with SEO columns.
 
 ## Other SEO plugins
 
-While Rank Math, Yoast SEO, All in One SEO or SEOPress is active, TORO hooks nothing on the front
-end and shows an admin notice instead. Two plugins printing canonicals and robots metas leave
+While Rank Math, Yoast SEO, All in One SEO or SEOPress is active, TONKATSU hooks nothing on the front
+end and shows an admin notice on the Plugins screen and the TONKATSU page instead. Two plugins printing canonicals and robots metas leave
 search engines to choose between them.
 
 ## Migrating from Rank Math
 
-Rank Math keeps its settings in the database; TORO keeps them in code. Before deactivating Rank
+Rank Math keeps its settings in the database; TONKATSU keeps them in code. Before deactivating Rank
 Math, carry across:
 
-| Rank Math | TORO |
+| Rank Math | TONKATSU |
 |---|---|
 | Titles & Meta → Global → separator | `SiteConfig::$separator` |
 | Titles & Meta → Local SEO → name / logo / social profiles | `OrganizationConfig` |
 | Titles & Meta → Social Meta → Twitter username | `SiteConfig::$twitterSite` |
 | Titles & Meta → Global → OpenGraph thumbnail | `SiteConfig::$defaultOgImage` |
-| Per-page title / description / robots set in the editor | `Seo::registerPage()`, or `toro_post_values` reading your own custom fields |
+| Per-page title / description / robots set in the editor | `Seo::registerPage()`, or `tonkatsu_post_values` reading your own custom fields |
 | Sitemap settings | `SitemapConfig` (core's `/wp-sitemap.xml` replaces `/sitemap_index.xml` — update the URL in Search Console) |

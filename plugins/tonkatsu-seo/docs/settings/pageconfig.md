@@ -6,11 +6,11 @@ SEO values for one URL path. Register with `Seo::registerPage()`, or several at 
 ## Usage
 
 ```php
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Structure\PageConfig;
 
 add_action('init', function () {
-    if (!class_exists('ToroPlugin\Helpers\Seo')) {
+    if (!class_exists('TonkatsuPlugin\Helpers\Seo')) {
         return;
     }
 
@@ -46,11 +46,11 @@ return [
 
 ```php
 add_action('init', function () {
-    if (!class_exists('ToroPlugin\Helpers\Seo')) {
+    if (!class_exists('TonkatsuPlugin\Helpers\Seo')) {
         return;
     }
 
-    \ToroPlugin\Helpers\Seo::registerPages(require get_theme_file_path('inc/seo-pages.php'));
+    \TonkatsuPlugin\Helpers\Seo::registerPages(require get_theme_file_path('inc/seo-pages.php'));
 });
 ```
 
@@ -74,7 +74,7 @@ have the right type too: `'noindex' => 'yes'` is rejected rather than coerced.
 - Paths are relative to the home URL; slashes, query strings and percent-encoding do not matter.
   `''` or `/` is the front page. See [Paths](../index.md#paths).
 - For singular requests the path comes from the post's permalink. Changing a page's slug
-  therefore detaches it from its `PageConfig` — use `toro_post_values` for values that should
+  therefore detaches it from its `PageConfig` — use `tonkatsu_post_values` for values that should
   follow the post rather than the URL.
 - Registering the same path twice calls `wp_die()` — also when spelled differently
   (`/about/` and `about`).

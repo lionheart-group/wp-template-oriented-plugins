@@ -1,13 +1,13 @@
 <?php
 
-namespace ToroPlugin\Init;
+namespace TonkatsuPlugin\Init;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Helpers\Visibility;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
-use ToroPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Helpers\Visibility;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
+use TonkatsuPlugin\Structure\ArchiveConfig;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -29,6 +29,7 @@ class AdminPage
     public static function register(): void
     {
         add_action('admin_menu', [static::class, 'addMenuPage']);
+        add_action('admin_enqueue_scripts', [AdminColumns::class, 'enqueueStyles']);
     }
 
     /**
@@ -41,11 +42,11 @@ class AdminPage
     public static function capability(): string
     {
         /**
-         * Filters the capability required to view the TORO admin page.
+         * Filters the capability required to view the TONKATSU admin page.
          *
          * @param string $capability Defaults to 'manage_options'.
          */
-        $capability = apply_filters('toro_admin_page_capability', Consts::DEFAULT_CAPABILITY);
+        $capability = apply_filters('tonkatsu_admin_page_capability', Consts::DEFAULT_CAPABILITY);
 
         return is_string($capability) && $capability !== '' ? $capability : Consts::DEFAULT_CAPABILITY;
     }
@@ -56,8 +57,8 @@ class AdminPage
     public static function addMenuPage(): void
     {
         add_management_page(
-            page_title: __('SEO Settings (TORO)', 'template-oriented-rank-optimizer'),
-            menu_title: __('SEO (TORO)', 'template-oriented-rank-optimizer'),
+            page_title: __('SEO Settings (TONKATSU)', 'tonkatsu-seo'),
+            menu_title: __('SEO (TONKATSU)', 'tonkatsu-seo'),
             capability: self::capability(),
             menu_slug:  Consts::ADMIN_PAGE_SLUG,
             callback:   [static::class, 'renderPage'],
@@ -70,7 +71,7 @@ class AdminPage
     public static function renderPage(): void
     {
         if (!current_user_can(self::capability())) {
-            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'template-oriented-rank-optimizer'));
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'tonkatsu-seo'));
         }
 
         $site = Seo::getSite();
@@ -78,59 +79,59 @@ class AdminPage
         $searchEnginesDiscouraged = Visibility::searchEnginesDiscouraged();
         ?>
         <div class="wrap">
-            <h1><?php echo esc_html__('SEO Settings (TORO)', 'template-oriented-rank-optimizer'); ?></h1>
+            <h1><?php echo esc_html__('SEO Settings (TONKATSU)', 'tonkatsu-seo'); ?></h1>
 
-            <p><?php echo esc_html__('This screen is read-only. TORO is configured in the theme\'s PHP code, and nothing is stored in the database.', 'template-oriented-rank-optimizer'); ?></p>
+            <p><?php echo esc_html__('This screen is read-only. TONKATSU is configured in the theme\'s PHP code, and nothing is stored in the database.', 'tonkatsu-seo'); ?></p>
 
-            <h2><?php echo esc_html__('Site', 'template-oriented-rank-optimizer'); ?></h2>
+            <h2><?php echo esc_html__('Site', 'tonkatsu-seo'); ?></h2>
 
             <?php if (!Seo::hasSite()) : ?>
-                <p><?php echo esc_html__('The theme has not registered a SiteConfig, so the defaults below are in use.', 'template-oriented-rank-optimizer'); ?></p>
+                <p><?php echo esc_html__('The theme has not registered a SiteConfig, so the defaults below are in use.', 'tonkatsu-seo'); ?></p>
             <?php endif; ?>
 
             <table class="form-table" role="presentation">
                 <tbody>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Site name', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Site name', 'tonkatsu-seo'); ?></th>
                         <td>
                             <?php echo esc_html($front->siteName()); ?>
                             <?php if ($site->siteName === null) : ?>
-                                <span class="description"><?php echo esc_html__('(WordPress site title)', 'template-oriented-rank-optimizer'); ?></span>
+                                <span class="description"><?php echo esc_html__('(WordPress site title)', 'tonkatsu-seo'); ?></span>
                             <?php endif; ?>
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Separator', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Separator', 'tonkatsu-seo'); ?></th>
                         <td><code><?php echo esc_html($site->separator); ?></code></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Parent titles in child page titles', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Parent titles in child page titles', 'tonkatsu-seo'); ?></th>
                         <td>
                             <?php
                             echo esc_html($site->includeParentTitles
-                                ? __('Enabled', 'template-oriented-rank-optimizer')
-                                : __('Disabled', 'template-oriented-rank-optimizer'));
+                                ? __('Enabled', 'tonkatsu-seo')
+                                : __('Disabled', 'tonkatsu-seo'));
                             ?>
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Default description', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Default description', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::display($site->defaultDescription)); ?></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Default OG image', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Default OG image', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::display($site->defaultOgImage)); ?></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Twitter account', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Twitter account', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::display($site->twitterSite)); ?></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Locale', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Locale', 'tonkatsu-seo'); ?></th>
                         <td><code><?php echo esc_html($front->locale()); ?></code></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Organization', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Organization', 'tonkatsu-seo'); ?></th>
                         <td>
                             <?php if ($site->organization === null) : ?>
                                 —
@@ -145,52 +146,52 @@ class AdminPage
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Sitemap', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Sitemap', 'tonkatsu-seo'); ?></th>
                         <td>
                             <?php
                             echo esc_html($site->sitemap->enabled
-                                ? __('Enabled', 'template-oriented-rank-optimizer')
-                                : __('Disabled', 'template-oriented-rank-optimizer'));
+                                ? __('Enabled', 'tonkatsu-seo')
+                                : __('Disabled', 'tonkatsu-seo'));
                             ?>
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Excluded providers', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Excluded providers', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::displayList($site->sitemap->excludeProviders)); ?></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Excluded post types', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Excluded post types', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::displayList($site->sitemap->excludePostTypes)); ?></td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Excluded taxonomies', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Excluded taxonomies', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::displayList($site->sitemap->excludeTaxonomies)); ?></td>
                     </tr>
                 </tbody>
             </table>
 
-            <h2><?php echo esc_html__('Registered pages', 'template-oriented-rank-optimizer'); ?></h2>
-            <p class="description"><?php echo esc_html__('Values as each page outputs them: the toro_post_values filter, the page configuration and the fallbacks, already resolved.', 'template-oriented-rank-optimizer'); ?></p>
+            <h2><?php echo esc_html__('Registered pages', 'tonkatsu-seo'); ?></h2>
+            <p class="description"><?php echo esc_html__('Values as each page outputs them: the tonkatsu_post_values filter, the page configuration and the fallbacks, already resolved.', 'tonkatsu-seo'); ?></p>
             <p class="description">
-                <?php echo esc_html__('Pages without a registration are listed with their values on the Pages screen.', 'template-oriented-rank-optimizer'); ?>
-                <a href="<?php echo esc_url(admin_url('edit.php?post_type=page')); ?>"><?php echo esc_html__('Pages', 'template-oriented-rank-optimizer'); ?></a>
+                <?php echo esc_html__('Pages without a registration are listed with their values on the Pages screen.', 'tonkatsu-seo'); ?>
+                <a href="<?php echo esc_url(admin_url('edit.php?post_type=page')); ?>"><?php echo esc_html__('Pages', 'tonkatsu-seo'); ?></a>
             </p>
 
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
-                        <th scope="col" style="width:160px"><?php echo esc_html__('Path', 'template-oriented-rank-optimizer'); ?></th>
-                        <th scope="col"><?php echo esc_html__('Title', 'template-oriented-rank-optimizer'); ?></th>
-                        <th scope="col"><?php echo esc_html__('Description', 'template-oriented-rank-optimizer'); ?></th>
-                        <th scope="col"><?php echo esc_html__('Canonical', 'template-oriented-rank-optimizer'); ?></th>
-                        <th scope="col" style="width:140px"><?php echo esc_html__('Robots', 'template-oriented-rank-optimizer'); ?></th>
-                        <th scope="col"><?php echo esc_html__('OG image', 'template-oriented-rank-optimizer'); ?></th>
+                        <th scope="col" style="width:160px"><?php echo esc_html__('Path', 'tonkatsu-seo'); ?></th>
+                        <th scope="col"><?php echo esc_html__('Title', 'tonkatsu-seo'); ?></th>
+                        <th scope="col"><?php echo esc_html__('Description', 'tonkatsu-seo'); ?></th>
+                        <th scope="col"><?php echo esc_html__('Canonical', 'tonkatsu-seo'); ?></th>
+                        <th scope="col" style="width:140px"><?php echo esc_html__('Robots', 'tonkatsu-seo'); ?></th>
+                        <th scope="col"><?php echo esc_html__('OG image', 'tonkatsu-seo'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (Seo::getPages() === []) : ?>
                         <tr>
-                            <td colspan="6"><?php echo esc_html__('No pages are registered.', 'template-oriented-rank-optimizer'); ?></td>
+                            <td colspan="6"><?php echo esc_html__('No pages are registered.', 'tonkatsu-seo'); ?></td>
                         </tr>
                     <?php else : ?>
                         <?php foreach (array_keys(Seo::getPages()) as $path) :
@@ -204,7 +205,7 @@ class AdminPage
                                 <td>
                                     <code><?php echo esc_html('/' . $path . ($path !== '' ? '/' : '')); ?></code>
                                     <?php if ($path === '') : ?>
-                                        <br><span class="description"><?php echo esc_html__('(front page)', 'template-oriented-rank-optimizer'); ?></span>
+                                        <br><span class="description"><?php echo esc_html__('(front page)', 'tonkatsu-seo'); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td><?php echo wp_kses(AdminColumns::cellHtml($cells[AdminColumns::COLUMN_TITLE]), AdminColumns::ALLOWED_HTML); ?></td>
@@ -218,21 +219,21 @@ class AdminPage
                 </tbody>
             </table>
 
-            <h2><?php echo esc_html__('Post type archives', 'template-oriented-rank-optimizer'); ?></h2>
+            <h2><?php echo esc_html__('Post type archives', 'tonkatsu-seo'); ?></h2>
             <?php
             self::renderArchiveTable(
                 Seo::getArchives(),
-                __('Post type', 'template-oriented-rank-optimizer'),
-                __('No post type archives are registered.', 'template-oriented-rank-optimizer')
+                __('Post type', 'tonkatsu-seo'),
+                __('No post type archives are registered.', 'tonkatsu-seo')
             );
             ?>
 
-            <h2><?php echo esc_html__('Taxonomies', 'template-oriented-rank-optimizer'); ?></h2>
+            <h2><?php echo esc_html__('Taxonomies', 'tonkatsu-seo'); ?></h2>
             <?php
             self::renderArchiveTable(
                 Seo::getTaxonomies(),
-                __('Taxonomy', 'template-oriented-rank-optimizer'),
-                __('No taxonomies are registered.', 'template-oriented-rank-optimizer')
+                __('Taxonomy', 'tonkatsu-seo'),
+                __('No taxonomies are registered.', 'tonkatsu-seo')
             );
             ?>
         </div>
@@ -251,9 +252,9 @@ class AdminPage
             <thead>
                 <tr>
                     <th scope="col" style="width:160px"><?php echo esc_html($keyLabel); ?></th>
-                    <th scope="col"><?php echo esc_html__('Title', 'template-oriented-rank-optimizer'); ?></th>
-                    <th scope="col"><?php echo esc_html__('Description', 'template-oriented-rank-optimizer'); ?></th>
-                    <th scope="col" style="width:140px"><?php echo esc_html__('Robots', 'template-oriented-rank-optimizer'); ?></th>
+                    <th scope="col"><?php echo esc_html__('Title', 'tonkatsu-seo'); ?></th>
+                    <th scope="col"><?php echo esc_html__('Description', 'tonkatsu-seo'); ?></th>
+                    <th scope="col" style="width:140px"><?php echo esc_html__('Robots', 'tonkatsu-seo'); ?></th>
                 </tr>
             </thead>
             <tbody>

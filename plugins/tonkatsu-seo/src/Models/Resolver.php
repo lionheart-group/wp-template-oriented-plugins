@@ -1,20 +1,20 @@
 <?php
 
-namespace ToroPlugin\Models;
+namespace TonkatsuPlugin\Models;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Helpers\Url;
-use ToroPlugin\Structure\ArchiveConfig;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Helpers\Url;
+use TonkatsuPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
 
 /**
  * Computes the final SEO values for one Context.
  *
  * Priority, highest first — the first non-empty value wins:
  *
- *   1. `toro_post_values` filter (the queried post only)
+ *   1. `tonkatsu_post_values` filter (the queried post only)
  *   2. PageConfig registered for the context's path
  *   3. ArchiveConfig for the post type archive / taxonomy
  *   4. What WordPress already holds (excerpt, term description, featured
@@ -31,7 +31,7 @@ use ToroPlugin\Structure\SiteConfig;
 class Resolver
 {
     /**
-     * Keys read from the `toro_post_values` filter, and their type.
+     * Keys read from the `tonkatsu_post_values` filter, and their type.
      *
      * @var array<string, string>
      */
@@ -45,7 +45,7 @@ class Resolver
     ];
 
     /**
-     * Sanitized `toro_post_values`; only valid, non-empty keys survive.
+     * Sanitized `tonkatsu_post_values`; only valid, non-empty keys survive.
      *
      * @var array{title?: string, description?: string, og_image?: string, noindex?: true, nofollow?: true, canonical?: string}
      */
@@ -56,7 +56,7 @@ class Resolver
      * @param SiteConfig $site
      * @param ?PageConfig $page Registered for the context's path.
      * @param ?ArchiveConfig $archive For the context's post type archive or taxonomy.
-     * @param mixed $postValues Raw `toro_post_values` result; sanitized here.
+     * @param mixed $postValues Raw `tonkatsu_post_values` result; sanitized here.
      * @param string $homeUrl Makes root-relative URLs absolute.
      * @param string $fallbackSiteName `get_bloginfo('name')`.
      * @param string $fallbackLocale `get_locale()`.
@@ -108,7 +108,7 @@ class Resolver
     }
 
     /**
-     * Run the `toro_post_values` filter for a post.
+     * Run the `tonkatsu_post_values` filter for a post.
      *
      * @param \WP_Post $post
      * @return mixed Unsanitized; the constructor sanitizes it.
@@ -125,7 +125,7 @@ class Resolver
          * @param array    $values Empty; add the keys to override.
          * @param \WP_Post $post
          */
-        return apply_filters('toro_post_values', [], $post);
+        return apply_filters('tonkatsu_post_values', [], $post);
     }
 
     /**
@@ -338,7 +338,7 @@ class Resolver
     }
 
     /**
-     * Every resolved value, keyed like `toro_post_values`.
+     * Every resolved value, keyed like `tonkatsu_post_values`.
      *
      * @return array{title: ?string, description: ?string, canonical: ?string, noindex: bool, nofollow: bool, og_image: ?string, og_type: string, og_url: ?string}
      */

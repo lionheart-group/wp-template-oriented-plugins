@@ -1,6 +1,6 @@
 <?php
 
-namespace ToroPlugin\Helpers;
+namespace TonkatsuPlugin\Helpers;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -12,7 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * When "Discourage search engines from indexing this site" is checked, core
  * prints `noindex, nofollow` on every page and disables the sitemaps,
- * whatever TORO resolves. Admin screens use this to show the value that is
+ * whatever TONKATSU resolves. Admin screens use this to show the value that is
  * actually output, and to warn before a site goes live with it still on.
  */
 class Visibility

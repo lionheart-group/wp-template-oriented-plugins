@@ -1,14 +1,14 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Init;
+namespace TonkatsuPlugin\Tests\Unit\Init;
 
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Init\AdminColumns;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Init\AdminColumns;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class AdminColumnsTest extends BaseTestCase
 {
@@ -63,14 +63,14 @@ class AdminColumnsTest extends BaseTestCase
 
     public function testPostTypesCanBeFiltered(): void
     {
-        add_filter('toro_admin_column_post_types', fn () => ['page', 'post', '', 3]);
+        add_filter('tonkatsu_admin_column_post_types', fn () => ['page', 'post', '', 3]);
 
         $this->assertSame(['page', 'post'], AdminColumns::postTypes());
     }
 
     public function testUnusablePostTypesFilterFallsBackToPages(): void
     {
-        add_filter('toro_admin_column_post_types', fn () => 'post');
+        add_filter('tonkatsu_admin_column_post_types', fn () => 'post');
 
         $this->assertSame(['page'], AdminColumns::postTypes());
     }
@@ -162,7 +162,7 @@ class AdminColumnsTest extends BaseTestCase
     public function testCellHtmlEscapesValueAndBadge(): void
     {
         $this->assertSame(
-            '&lt;b&gt;<br><span class="toro-badge toro-badge--warning">&lt;i&gt;</span>',
+            '&lt;b&gt;<br><span class="tonkatsu-badge tonkatsu-badge--warning">&lt;i&gt;</span>',
             AdminColumns::cellHtml(['value' => '<b>', 'badge' => AdminColumns::badge(AdminColumns::TONE_WARNING, '<i>')])
         );
         $this->assertSame('plain', AdminColumns::cellHtml(['value' => 'plain', 'badge' => null]));
@@ -171,14 +171,14 @@ class AdminColumnsTest extends BaseTestCase
     public function testUnknownBadgeToneFallsBackToInfo(): void
     {
         $this->assertSame(
-            '<span class="toro-badge toro-badge--info">x</span>',
+            '<span class="tonkatsu-badge tonkatsu-badge--info">x</span>',
             AdminColumns::badgeHtml(['tone' => '" onmouseover="', 'label' => 'x'])
         );
     }
 
-    public function testSeoScreensAreTheToroPageAndColumnListScreens(): void
+    public function testSeoScreensAreTheTonkatsuPageAndColumnListScreens(): void
     {
-        $this->assertTrue(AdminColumns::isSeoScreen('tools_page_toro-seo', 'tools_page_toro-seo', ''));
+        $this->assertTrue(AdminColumns::isSeoScreen('tools_page_tonkatsu-seo', 'tools_page_tonkatsu-seo', ''));
         $this->assertTrue(AdminColumns::isSeoScreen('edit-page', 'edit', 'page'));
         $this->assertFalse(AdminColumns::isSeoScreen('edit-post', 'edit', 'post'));
         $this->assertFalse(AdminColumns::isSeoScreen('dashboard', 'dashboard', ''));

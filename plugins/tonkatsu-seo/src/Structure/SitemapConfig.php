@@ -1,14 +1,14 @@
 <?php
 
-namespace ToroPlugin\Structure;
+namespace TonkatsuPlugin\Structure;
 
 /**
  * Sitemap configuration class.
  *
- * Adjusts WordPress core's own sitemaps (`/wp-sitemap.xml`); TORO does not
+ * Adjusts WordPress core's own sitemaps (`/wp-sitemap.xml`); TONKATSU does not
  * generate a sitemap of its own.
  *
- * @package ToroPlugin\Structure
+ * @package TonkatsuPlugin\Structure
  */
 class SitemapConfig
 {

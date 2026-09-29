@@ -1,11 +1,11 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Structure;
+namespace TonkatsuPlugin\Tests\Unit\Structure;
 
-use ToroPlugin\Structure\OrganizationConfig;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Structure\SitemapConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Structure\OrganizationConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Structure\SitemapConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class SiteConfigTest extends BaseTestCase
 {

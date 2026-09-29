@@ -1,14 +1,14 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit;
+namespace TonkatsuPlugin\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Init\Head;
-use ToroPlugin\Init\Sitemap;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Init\Head;
+use TonkatsuPlugin\Init\Sitemap;
 
 /**
- * Base test case class for ToroPlugin tests
+ * Base test case class for TonkatsuPlugin tests
  */
 abstract class BaseTestCase extends TestCase
 {
@@ -50,13 +50,13 @@ abstract class BaseTestCase extends TestCase
      */
     private function reset(): void
     {
-        $GLOBALS['__toro_hooks'] = [];
+        $GLOBALS['__tonkatsu_hooks'] = [];
         unset(
-            $GLOBALS['__toro_test_locale'],
-            $GLOBALS['__toro_test_home_url'],
-            $GLOBALS['__toro_test_options'],
-            $GLOBALS['__toro_test_permalinks'],
-            $GLOBALS['__toro_test_sitemap_server']
+            $GLOBALS['__tonkatsu_test_locale'],
+            $GLOBALS['__tonkatsu_test_home_url'],
+            $GLOBALS['__tonkatsu_test_options'],
+            $GLOBALS['__tonkatsu_test_permalinks'],
+            $GLOBALS['__tonkatsu_test_sitemap_server']
         );
 
         $statics = [

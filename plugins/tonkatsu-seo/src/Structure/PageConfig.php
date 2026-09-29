@@ -1,8 +1,8 @@
 <?php
 
-namespace ToroPlugin\Structure;
+namespace TonkatsuPlugin\Structure;
 
-use ToroPlugin\Helpers\Url;
+use TonkatsuPlugin\Helpers\Url;
 
 /**
  * Page configuration class.
@@ -12,7 +12,7 @@ use ToroPlugin\Helpers\Url;
  * Empty strings are accepted and treated as "not set" when values are
  * resolved, so a definition file can carry placeholders.
  *
- * @package ToroPlugin\Structure
+ * @package TonkatsuPlugin\Structure
  */
 class PageConfig
 {

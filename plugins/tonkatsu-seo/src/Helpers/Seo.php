@@ -1,10 +1,10 @@
 <?php
 
-namespace ToroPlugin\Helpers;
+namespace TonkatsuPlugin\Helpers;
 
-use ToroPlugin\Structure\ArchiveConfig;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
 
 /**
  * The class themes call.
@@ -100,7 +100,7 @@ class Seo
         if (array_key_exists($key, self::$pages)) {
             wp_die(
                 sprintf('Page with path "%s" is already registered.', esc_html($key === '' ? '/' : $key)),
-                'TORO Page Registration Error',
+                'TONKATSU Page Registration Error',
                 ['response' => 500]
             );
         }
@@ -175,7 +175,7 @@ class Seo
         if (isset(self::$archives[$postType])) {
             wp_die(
                 sprintf('Archive for post type "%s" is already registered.', esc_html($postType)),
-                'TORO Archive Registration Error',
+                'TONKATSU Archive Registration Error',
                 ['response' => 500]
             );
         }
@@ -218,7 +218,7 @@ class Seo
         if (isset(self::$taxonomies[$taxonomy])) {
             wp_die(
                 sprintf('Taxonomy "%s" is already registered.', esc_html($taxonomy)),
-                'TORO Taxonomy Registration Error',
+                'TONKATSU Taxonomy Registration Error',
                 ['response' => 500]
             );
         }

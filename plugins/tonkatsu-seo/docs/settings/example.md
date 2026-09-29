@@ -6,16 +6,16 @@ Here's a complete example showing all configuration options:
 <?php
 // functions.php
 
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Structure\ArchiveConfig;
-use ToroPlugin\Structure\OrganizationConfig;
-use ToroPlugin\Structure\PageConfig;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Structure\SitemapConfig;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Structure\OrganizationConfig;
+use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Structure\SitemapConfig;
 
 add_action('init', function () {
     // Keep the theme working while the plugin is deactivated.
-    if (!class_exists('ToroPlugin\Helpers\Seo')) {
+    if (!class_exists('TonkatsuPlugin\Helpers\Seo')) {
         return;
     }
 
@@ -70,7 +70,7 @@ add_action('init', function () {
 });
 
 // Per-post values from custom fields
-add_filter('toro_post_values', function (array $values, WP_Post $post): array {
+add_filter('tonkatsu_post_values', function (array $values, WP_Post $post): array {
     if ($post->post_type !== 'news') {
         return $values;
     }
@@ -82,5 +82,5 @@ add_filter('toro_post_values', function (array $values, WP_Post $post): array {
 }, 10, 2);
 ```
 
-Empty values returned from `toro_post_values` are ignored, so the `get_post_meta()` calls above
+Empty values returned from `tonkatsu_post_values` are ignored, so the `get_post_meta()` calls above
 can return `''` / `false` for posts that have nothing set, and the lower levels apply.

@@ -1,11 +1,11 @@
 <?php
 
-namespace ToroPlugin\Init;
+namespace TonkatsuPlugin\Init;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Models\Context;
-use ToroPlugin\Models\Resolver;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\Resolver;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Adjusts WordPress core's sitemaps (`/wp-sitemap.xml`) from SitemapConfig
- * and the registered pages. TORO generates no sitemap of its own.
+ * and the registered pages. TONKATSU generates no sitemap of its own.
  */
 class Sitemap
 {
@@ -177,10 +177,10 @@ class Sitemap
      * IDs of $postType posts to leave out of the sitemap.
      *
      * Only registered pages are examined — each resolved in full, so both a
-     * PageConfig noindex and a `toro_post_values` noindex count. Checking
-     * `toro_post_values` for every post would mean running the filter over
+     * PageConfig noindex and a `tonkatsu_post_values` noindex count. Checking
+     * `tonkatsu_post_values` for every post would mean running the filter over
      * the entire post table on each sitemap request; posts outside the
-     * registry are added through `toro_sitemap_excluded_post_ids` instead.
+     * registry are added through `tonkatsu_sitemap_excluded_post_ids` instead.
      *
      * @param string $postType
      * @return int[]
@@ -209,7 +209,7 @@ class Sitemap
          * @param int[]  $ids
          * @param string $postType
          */
-        $filtered = apply_filters('toro_sitemap_excluded_post_ids', $ids, $postType);
+        $filtered = apply_filters('tonkatsu_sitemap_excluded_post_ids', $ids, $postType);
 
         return static::$excludedPostIds[$postType] = self::sanitizeIds(is_array($filtered) ? $filtered : $ids);
     }

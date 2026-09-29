@@ -1,13 +1,13 @@
 <?php
 
-namespace ToroPlugin\Tests\Unit\Init;
+namespace TonkatsuPlugin\Tests\Unit\Init;
 
-use ToroPlugin\Consts;
-use ToroPlugin\Helpers\Seo;
-use ToroPlugin\Init\Sitemap;
-use ToroPlugin\Structure\SiteConfig;
-use ToroPlugin\Structure\SitemapConfig;
-use ToroPlugin\Tests\Unit\BaseTestCase;
+use TonkatsuPlugin\Consts;
+use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Init\Sitemap;
+use TonkatsuPlugin\Structure\SiteConfig;
+use TonkatsuPlugin\Structure\SitemapConfig;
+use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
 class SitemapTest extends BaseTestCase
 {
@@ -98,11 +98,11 @@ class SitemapTest extends BaseTestCase
     public function testExcludedPostsAreRemovedFromCoresList(): void
     {
         $received = null;
-        add_filter('toro_sitemap_excluded_post_ids', function ($ids, $postType) use (&$received) {
+        add_filter('tonkatsu_sitemap_excluded_post_ids', function ($ids, $postType) use (&$received) {
             $received = $postType;
             return array_merge($ids, [12, '34', 12]);
         }, 10, 2);
-        $GLOBALS['__toro_test_permalinks'] = [
+        $GLOBALS['__tonkatsu_test_permalinks'] = [
             12 => 'https://example.com/contact/confirm/',
             34 => 'https://example.com/contact/result/',
         ];
@@ -125,7 +125,7 @@ class SitemapTest extends BaseTestCase
 
     public function testAListBuiltByAnotherCallbackIsLeftAlone(): void
     {
-        add_filter('toro_sitemap_excluded_post_ids', fn () => [12]);
+        add_filter('tonkatsu_sitemap_excluded_post_ids', fn () => [12]);
         $calls = [];
         $this->fakeProvider([], $calls);
 
@@ -136,7 +136,7 @@ class SitemapTest extends BaseTestCase
 
     public function testWithoutAProviderCoreIsLeftToBuildTheList(): void
     {
-        add_filter('toro_sitemap_excluded_post_ids', fn () => [12]);
+        add_filter('tonkatsu_sitemap_excluded_post_ids', fn () => [12]);
 
         $this->assertNull(Sitemap::filterPreUrlList(null, 'page', 1));
     }
@@ -158,7 +158,7 @@ class SitemapTest extends BaseTestCase
      */
     public function testUnusableExcludedIdsAreIgnored(mixed $return): void
     {
-        add_filter('toro_sitemap_excluded_post_ids', fn () => $return);
+        add_filter('tonkatsu_sitemap_excluded_post_ids', fn () => $return);
 
         $this->assertSame([], Sitemap::excludedPostIds('page'));
     }
@@ -170,13 +170,13 @@ class SitemapTest extends BaseTestCase
         Sitemap::deferCoreServer();
 
         $this->assertFalse(has_action('init', 'wp_sitemaps_get_server'));
-        $this->assertArrayHasKey(Consts::SITEMAP_INIT_PRIORITY, $GLOBALS['__toro_hooks']['init']);
+        $this->assertArrayHasKey(Consts::SITEMAP_INIT_PRIORITY, $GLOBALS['__tonkatsu_hooks']['init']);
     }
 
     public function testCoreServerIsLeftAloneWhenAlreadyRemoved(): void
     {
         Sitemap::deferCoreServer();
 
-        $this->assertArrayNotHasKey('init', $GLOBALS['__toro_hooks']);
+        $this->assertArrayNotHasKey('init', $GLOBALS['__tonkatsu_hooks']);
     }
 }
