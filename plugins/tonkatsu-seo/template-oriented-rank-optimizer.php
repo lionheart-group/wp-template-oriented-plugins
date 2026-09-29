@@ -2,14 +2,14 @@
 
 /**
  * @link https://www.lionheart.co.jp/
- * @since 0.1.0
+ * @since 0.0.1
  * @package Toro
  *
  * @wordpress-plugin
  * Plugin Name: TORO (Template-Oriented Rank Optimizer)
  * Plugin URI: https://github.com/lionheart-group/template-oriented-rank-optimizer
  * Description: Template-Oriented Rank Optimizer is a WordPress plugin that outputs SEO metadata, structured data and sitemap adjustments configured entirely in theme code.
- * Version: 0.1.0
+ * Version: 0.0.1
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-rank-optimizer
@@ -27,7 +27,7 @@ defined( 'ABSPATH' ) || exit;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('TORO_VERSION', '0.1.0');
+define('TORO_VERSION', '0.0.1');
 define('TORO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TORO_PLUGIN_FILE', __FILE__);
 

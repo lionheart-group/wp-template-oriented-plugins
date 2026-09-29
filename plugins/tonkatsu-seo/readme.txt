@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: seo, meta, open graph, json-ld, sitemap
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.0
+Stable tag: 0.0.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -56,5 +56,5 @@ No. It adjusts WordPress core's sitemap at /wp-sitemap.xml.
 
 == Changelog ==
 
-= 0.1.0 =
+= 0.0.1 =
 * Initial release.
