@@ -129,7 +129,7 @@ class Context
     )
     {
         if (!in_array($this->type, self::TYPES, true)) {
-            throw new \InvalidArgumentException("Context: unknown type '{$this->type}'.");
+            throw new \InvalidArgumentException(sprintf("Context: unknown type '%s'.", esc_html($this->type)));
         }
     }
 
@@ -412,7 +412,7 @@ class Context
      */
     private static function requestPath(string $home): string
     {
-        $uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
+        $uri = isset($_SERVER['REQUEST_URI']) ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])) : '';
 
         return self::relativePath(is_string($uri) ? $uri : '', $home);
     }

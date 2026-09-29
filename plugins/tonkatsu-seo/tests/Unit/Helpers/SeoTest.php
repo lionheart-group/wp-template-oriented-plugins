@@ -100,7 +100,7 @@ class SeoTest extends BaseTestCase
     public function testRegisterPagesRejectsUnknownKeys(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("PageConfig 'thanks'");
+        $this->expectExceptionMessage(esc_html("PageConfig 'thanks'"));
 
         Seo::registerPages(['thanks' => ['noIndex' => true]]);
     }

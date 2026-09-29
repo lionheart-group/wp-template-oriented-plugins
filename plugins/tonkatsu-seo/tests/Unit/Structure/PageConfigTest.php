@@ -70,7 +70,7 @@ class PageConfigTest extends BaseTestCase
     public function testFromArrayNamesTheLabelInErrors(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("PageConfig 'contact/thanks'");
+        $this->expectExceptionMessage(esc_html("PageConfig 'contact/thanks'"));
 
         PageConfig::fromArray(['og_image' => 'x'], 'contact/thanks');
     }
@@ -107,5 +107,16 @@ class PageConfigTest extends BaseTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         PageConfig::fromArray($values);
+    }
+
+    /**
+     * Messages reach WordPress's error page as HTML, so values are escaped.
+     */
+    public function testValuesInErrorMessagesAreEscaped(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('&lt;script&gt;');
+
+        new PageConfig(ogImage: '<script>');
     }
 }

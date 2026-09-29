@@ -129,8 +129,8 @@ class Seo
             if (!$config instanceof PageConfig) {
                 throw new \InvalidArgumentException(sprintf(
                     'Seo::registerPages(): "%s" must be a PageConfig or an array, got %s.',
-                    $path,
-                    get_debug_type($config)
+                    esc_html((string) $path),
+                    esc_html(get_debug_type($config))
                 ));
             }
 
@@ -263,7 +263,7 @@ class Seo
         $path = trim($path);
 
         if (preg_match('#^[a-z][a-z0-9+.\-]*://#i', $path) === 1) {
-            $path = (string) parse_url($path, PHP_URL_PATH);
+            $path = (string) wp_parse_url($path, PHP_URL_PATH);
         }
 
         $path = explode('#', $path, 2)[0];
@@ -284,7 +284,7 @@ class Seo
         $name = trim($name);
 
         if ($name === '') {
-            throw new \InvalidArgumentException("Seo: {$kind} name must not be empty.");
+            throw new \InvalidArgumentException(sprintf('Seo: %s name must not be empty.', esc_html($kind)));
         }
 
         return $name;

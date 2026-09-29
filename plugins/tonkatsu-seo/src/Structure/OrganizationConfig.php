@@ -49,18 +49,20 @@ class OrganizationConfig
         }
 
         if ($this->url !== null && !Url::isValid($this->url)) {
-            throw new \InvalidArgumentException("OrganizationConfig: url '{$this->url}' is not a valid URL.");
+            throw new \InvalidArgumentException(sprintf("OrganizationConfig: url '%s' is not a valid URL.", esc_html($this->url)));
         }
 
         if ($this->logo !== null && !Url::isValid($this->logo)) {
-            throw new \InvalidArgumentException("OrganizationConfig: logo '{$this->logo}' is not a valid URL.");
+            throw new \InvalidArgumentException(sprintf("OrganizationConfig: logo '%s' is not a valid URL.", esc_html($this->logo)));
         }
 
         foreach ($this->sameAs as $profile) {
             if (!is_string($profile) || !Url::isValid($profile)) {
                 throw new \InvalidArgumentException(
-                    'OrganizationConfig: every entry of sameAs must be a valid URL, got '
-                    . var_export($profile, true) . '.'
+                    sprintf(
+                        'OrganizationConfig: every entry of sameAs must be a valid URL, got %s.',
+                        esc_html(is_string($profile) ? "'{$profile}'" : get_debug_type($profile))
+                    )
                 );
             }
         }

@@ -75,11 +75,11 @@ class PageConfig
     )
     {
         if ($this->ogImage !== null && $this->ogImage !== '' && !Url::isValid($this->ogImage)) {
-            throw new \InvalidArgumentException("PageConfig: ogImage '{$this->ogImage}' is not a valid URL.");
+            throw new \InvalidArgumentException(sprintf("PageConfig: ogImage '%s' is not a valid URL.", esc_html($this->ogImage)));
         }
 
         if ($this->canonical !== null && $this->canonical !== '' && !Url::isValid($this->canonical)) {
-            throw new \InvalidArgumentException("PageConfig: canonical '{$this->canonical}' is not a valid URL.");
+            throw new \InvalidArgumentException(sprintf("PageConfig: canonical '%s' is not a valid URL.", esc_html($this->canonical)));
         }
     }
 
@@ -112,9 +112,9 @@ class PageConfig
         if ($unknown !== []) {
             throw new \InvalidArgumentException(sprintf(
                 '%s: unknown key(s) "%s". Allowed keys: %s.',
-                $prefix,
-                implode('", "', $unknown),
-                implode(', ', array_keys(self::FIELDS))
+                esc_html($prefix),
+                esc_html(implode('", "', $unknown)),
+                esc_html(implode(', ', array_keys(self::FIELDS)))
             ));
         }
 
@@ -127,10 +127,10 @@ class PageConfig
             if (!$valid) {
                 throw new \InvalidArgumentException(sprintf(
                     '%s: "%s" must be %s, got %s.',
-                    $prefix,
-                    $key,
+                    esc_html($prefix),
+                    esc_html((string) $key),
                     $expected === 'bool' ? 'a bool' : 'a string or null',
-                    get_debug_type($value)
+                    esc_html(get_debug_type($value))
                 ));
             }
         }

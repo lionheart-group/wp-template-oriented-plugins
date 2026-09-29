@@ -32,6 +32,14 @@ class AdminColumns
     public const TONE_WARNING = 'warning';
 
     /**
+     * Tags cellHtml() and badgeHtml() produce, for wp_kses() at output time.
+     */
+    public const ALLOWED_HTML = [
+        'br'   => [],
+        'span' => ['class' => true],
+    ];
+
+    /**
      * Post types that get the columns.
      */
     private const DEFAULT_POST_TYPES = ['page'];
@@ -120,7 +128,7 @@ class AdminColumns
             return;
         }
 
-        echo self::cellHtml($cells[$column]);
+        echo wp_kses(self::cellHtml($cells[$column]), self::ALLOWED_HTML);
     }
 
     /**

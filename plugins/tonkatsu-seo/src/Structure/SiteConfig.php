@@ -99,19 +99,22 @@ class SiteConfig
 
         if ($this->defaultOgImage !== null && !Url::isValid($this->defaultOgImage)) {
             throw new \InvalidArgumentException(
-                "SiteConfig: defaultOgImage '{$this->defaultOgImage}' is not a valid URL."
+                sprintf("SiteConfig: defaultOgImage '%s' is not a valid URL.", esc_html($this->defaultOgImage))
             );
         }
 
         if ($this->twitterSite !== null && preg_match('/^@[A-Za-z0-9_]{1,15}$/', $this->twitterSite) !== 1) {
             throw new \InvalidArgumentException(
-                "SiteConfig: twitterSite '{$this->twitterSite}' must be an account name starting with '@', e.g. '@example'."
+                sprintf(
+                    "SiteConfig: twitterSite '%s' must be an account name starting with '@', e.g. '@example'.",
+                    esc_html($this->twitterSite)
+                )
             );
         }
 
         if ($this->locale !== null && preg_match('/^[a-z]{2,3}_[A-Z]{2}$/', $this->locale) !== 1) {
             throw new \InvalidArgumentException(
-                "SiteConfig: locale '{$this->locale}' must be in 'll_TT' form, e.g. 'ja_JP'."
+                sprintf("SiteConfig: locale '%s' must be in 'll_TT' form, e.g. 'ja_JP'.", esc_html($this->locale))
             );
         }
     }

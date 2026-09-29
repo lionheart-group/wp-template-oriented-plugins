@@ -44,7 +44,7 @@ final class Url
             return false;
         }
 
-        $scheme = strtolower((string) parse_url($encoded, PHP_URL_SCHEME));
+        $scheme = strtolower((string) wp_parse_url($encoded, PHP_URL_SCHEME));
 
         return in_array($scheme, ['http', 'https'], true);
     }
@@ -67,7 +67,7 @@ final class Url
             return $url;
         }
 
-        $parts = parse_url($homeUrl);
+        $parts = wp_parse_url($homeUrl);
         if (!is_array($parts) || !isset($parts['scheme'], $parts['host'])) {
             return $url;
         }

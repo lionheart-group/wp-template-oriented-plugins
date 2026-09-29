@@ -187,7 +187,7 @@ class Head
         $title = implode(' ' . Seo::getSite()->separator . ' ', array_filter(self::titleParts($resolver, $parts)));
 
         /** This filter is documented in wp-includes/general-template.php */
-        $filtered = apply_filters('document_title', $title);
+        $filtered = apply_filters('document_title', $title); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter
 
         // Core's own callbacks escape the title for HTML; decode it back to text.
         return html_entity_decode(is_string($filtered) ? $filtered : $title, ENT_QUOTES, 'UTF-8');
@@ -255,19 +255,56 @@ class Head
     public static function render(): void
     {
         $resolver = static::resolver();
-        $lines = [];
 
         $description = $resolver->description();
-        if ($description !== null) {
-            $lines[] = sprintf('<meta name="description" content="%s" />', esc_attr($description));
-        }
 
         // Core prints the canonical of singular requests itself (rel_canonical()),
         // with filterCanonicalUrl() applied; everything else is left to us.
-        $canonical = $resolver->canonical();
-        if ($canonical !== null && !$resolver->context->isSingular()) {
-            $lines[] = sprintf('<link rel="canonical" href="%s" />', esc_url($canonical));
+        $canonical = $resolver->context->isSingular() ? null : $resolver->canonical();
+
+        $metaTags = self::metaTags($resolver);
+        $jsonLd = self::jsonLdScript($resolver);
+
+        if ($description === null && $canonical === null && $metaTags === [] && $jsonLd === null) {
+            return;
         }
+
+        // Every value is escaped where it is printed.
+        echo "<!-- TORO -->\n";
+
+        if ($description !== null) {
+            printf('<meta name="description" content="%s" />' . "\n", esc_attr($description));
+        }
+
+        if ($canonical !== null) {
+            printf('<link rel="canonical" href="%s" />' . "\n", esc_url($canonical));
+        }
+
+        foreach ($metaTags as [$attribute, $property, $value]) {
+            printf(
+                '<meta %s="%s" content="%s" />' . "\n",
+                esc_attr($attribute),
+                esc_attr($property),
+                self::isUrlProperty($property) ? esc_url($value) : esc_attr($value)
+            );
+        }
+
+        if ($jsonLd !== null) {
+            wp_print_inline_script_tag($jsonLd, ['type' => 'application/ld+json']);
+        }
+
+        echo "<!-- /TORO -->\n";
+    }
+
+    /**
+     * The OGP / Twitter Card meta tags to print, unescaped.
+     *
+     * @param Resolver $resolver
+     * @return list<array{0: string, 1: string, 2: string}> [attribute, property, value]
+     */
+    private static function metaTags(Resolver $resolver): array
+    {
+        $tags = [];
 
         foreach (static::ogTags($resolver) as $property => $values) {
             if (!is_string($property) || $property === '') {
@@ -281,32 +318,33 @@ class Head
                 if (!is_scalar($value) || (string) $value === '') {
                     continue;
                 }
-                $value = (string) $value;
-                $lines[] = sprintf(
-                    '<meta %s="%s" content="%s" />',
-                    $attribute,
-                    esc_attr($property),
-                    self::isUrlProperty($property) ? esc_url($value) : esc_attr($value)
-                );
+                $tags[] = [$attribute, $property, (string) $value];
             }
         }
 
+        return $tags;
+    }
+
+    /**
+     * The JSON-LD document, or null when there is nothing to print.
+     *
+     * Consts::JSON_LD_FLAGS includes JSON_HEX_TAG, so no value can close the
+     * script element early — wp_print_inline_script_tag() would print
+     * nothing at all if one did.
+     *
+     * @param Resolver $resolver
+     * @return ?string
+     */
+    private static function jsonLdScript(Resolver $resolver): ?string
+    {
         $graph = static::jsonLd($resolver);
-        if ($graph !== []) {
-            $json = wp_json_encode(
-                ['@context' => 'https://schema.org', '@graph' => $graph],
-                Consts::JSON_LD_FLAGS
-            );
-            if (is_string($json)) {
-                $lines[] = '<script type="application/ld+json">' . $json . '</script>';
-            }
+        if ($graph === []) {
+            return null;
         }
 
-        if ($lines === []) {
-            return;
-        }
+        $json = wp_json_encode(['@context' => 'https://schema.org', '@graph' => $graph], Consts::JSON_LD_FLAGS);
 
-        echo "<!-- TORO -->\n" . implode("\n", $lines) . "\n<!-- /TORO -->\n";
+        return is_string($json) ? $json : null;
     }
 
     /**

@@ -51,7 +51,13 @@ abstract class BaseTestCase extends TestCase
     private function reset(): void
     {
         $GLOBALS['__toro_hooks'] = [];
-        unset($GLOBALS['__toro_test_locale'], $GLOBALS['__toro_test_home_url'], $GLOBALS['__toro_test_options']);
+        unset(
+            $GLOBALS['__toro_test_locale'],
+            $GLOBALS['__toro_test_home_url'],
+            $GLOBALS['__toro_test_options'],
+            $GLOBALS['__toro_test_permalinks'],
+            $GLOBALS['__toro_test_sitemap_server']
+        );
 
         $statics = [
             [Seo::class, 'site', null],
@@ -60,6 +66,7 @@ abstract class BaseTestCase extends TestCase
             [Seo::class, 'taxonomies', []],
             [Head::class, 'resolver', null],
             [Sitemap::class, 'excludedPostIds', []],
+            [Sitemap::class, 'buildingUrlList', false],
         ];
 
         foreach ($statics as [$class, $property, $value]) {

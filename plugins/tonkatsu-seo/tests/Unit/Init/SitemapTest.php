@@ -55,25 +55,90 @@ class SitemapTest extends BaseTestCase
         $this->assertSame('broken', Sitemap::filterPostTypes('broken'));
     }
 
-    public function testQueryArgsAreUntouchedWithNothingToExclude(): void
+    /**
+     * Install a stand-in for core's sitemap server whose posts provider
+     * returns $entries, and record the calls it receives.
+     *
+     * @param list<array<string, string>> $entries
+     * @param array<int, array{int, string}> $calls
+     */
+    private function fakeProvider(array $entries, array &$calls): void
     {
-        $args = ['post_type' => 'page'];
+        wp_sitemaps_get_server()->registry->providers['posts'] = new class ($entries, $calls) extends \WP_Sitemaps_Provider {
+            /** @param list<array<string, string>> $entries */
+            public function __construct(private array $entries, private array &$calls)
+            {
+            }
 
-        $this->assertSame($args, Sitemap::filterPostsQueryArgs($args, 'page'));
+            /** @return list<array<string, string>> */
+            public function get_url_list($page_num, $object_subtype = ''): array
+            {
+                $this->calls[] = [$page_num, $object_subtype];
+
+                // Core applies wp_sitemaps_posts_pre_url_list inside get_url_list();
+                // calling back in must not recurse.
+                if (Sitemap::filterPreUrlList(null, $object_subtype, $page_num) !== null) {
+                    throw new \LogicException('filterPreUrlList() re-entered.');
+                }
+
+                return $this->entries;
+            }
+        };
     }
 
-    public function testExcludedIdsFilterIsMergedIntoTheQuery(): void
+    public function testCoreBuildsTheListWhenNothingIsExcluded(): void
+    {
+        $calls = [];
+        $this->fakeProvider([['loc' => 'https://example.com/a/']], $calls);
+
+        $this->assertNull(Sitemap::filterPreUrlList(null, 'page', 1));
+        $this->assertSame([], $calls);
+    }
+
+    public function testExcludedPostsAreRemovedFromCoresList(): void
     {
         $received = null;
         add_filter('toro_sitemap_excluded_post_ids', function ($ids, $postType) use (&$received) {
             $received = $postType;
             return array_merge($ids, [12, '34', 12]);
         }, 10, 2);
+        $GLOBALS['__toro_test_permalinks'] = [
+            12 => 'https://example.com/contact/confirm/',
+            34 => 'https://example.com/contact/result/',
+        ];
 
-        $args = Sitemap::filterPostsQueryArgs(['post_type' => 'page', 'post__not_in' => [5]], 'page');
+        $calls = [];
+        $this->fakeProvider([
+            ['loc' => 'https://example.com/'],
+            ['loc' => 'https://example.com/contact/'],
+            ['loc' => 'https://example.com/contact/confirm/', 'lastmod' => '2026-01-01T00:00:00+00:00'],
+            ['loc' => 'https://example.com/contact/result/'],
+        ], $calls);
 
+        $this->assertSame(
+            [['loc' => 'https://example.com/'], ['loc' => 'https://example.com/contact/']],
+            Sitemap::filterPreUrlList(null, 'page', 2)
+        );
         $this->assertSame('page', $received);
-        $this->assertSame([5, 12, 34], $args['post__not_in']);
+        $this->assertSame([[2, 'page']], $calls);
+    }
+
+    public function testAListBuiltByAnotherCallbackIsLeftAlone(): void
+    {
+        add_filter('toro_sitemap_excluded_post_ids', fn () => [12]);
+        $calls = [];
+        $this->fakeProvider([], $calls);
+
+        $list = [['loc' => 'https://example.com/other/']];
+        $this->assertSame($list, Sitemap::filterPreUrlList($list, 'page', 1));
+        $this->assertSame([], $calls);
+    }
+
+    public function testWithoutAProviderCoreIsLeftToBuildTheList(): void
+    {
+        add_filter('toro_sitemap_excluded_post_ids', fn () => [12]);
+
+        $this->assertNull(Sitemap::filterPreUrlList(null, 'page', 1));
     }
 
     /**

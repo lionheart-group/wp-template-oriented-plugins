@@ -26,6 +26,13 @@ class Sitemap
     protected static array $excludedPostIds = [];
 
     /**
+     * True while filterPreUrlList() asks core for the unfiltered list.
+     *
+     * @var bool
+     */
+    protected static bool $buildingUrlList = false;
+
+    /**
      * Register the hooks. Call once, before `init`.
      */
     public static function register(): void
@@ -36,7 +43,7 @@ class Sitemap
         add_filter('wp_sitemaps_add_provider', [static::class, 'filterProvider'], 10, 2);
         add_filter('wp_sitemaps_post_types', [static::class, 'filterPostTypes']);
         add_filter('wp_sitemaps_taxonomies', [static::class, 'filterTaxonomies']);
-        add_filter('wp_sitemaps_posts_query_args', [static::class, 'filterPostsQueryArgs'], 10, 2);
+        add_filter('wp_sitemaps_posts_pre_url_list', [static::class, 'filterPreUrlList'], 10, 3);
     }
 
     /**
@@ -116,25 +123,54 @@ class Sitemap
     /**
      * Keep noindex posts out of the post type's sitemap.
      *
-     * @param mixed $args WP_Query arguments.
+     * Core offers no hook that drops a single entry, and adding
+     * `post__not_in` to the query makes it hard to cache. Instead, core's own
+     * list is built as usual — every other filter, the front page entry and
+     * all — and the excluded posts are removed from it in PHP.
+     *
+     * The page count is still computed by core without the exclusion, so a
+     * page that held an excluded post lists a few URLs fewer than the limit.
+     *
+     * @param mixed $urlList  Null unless another callback built the list.
      * @param mixed $postType
+     * @param mixed $pageNum
      * @return mixed
      */
-    public static function filterPostsQueryArgs(mixed $args, mixed $postType = null): mixed
+    public static function filterPreUrlList(mixed $urlList, mixed $postType = null, mixed $pageNum = 1): mixed
     {
-        if (!is_array($args) || !is_string($postType)) {
-            return $args;
+        if ($urlList !== null || static::$buildingUrlList || !is_string($postType)) {
+            return $urlList;
         }
 
         $ids = static::excludedPostIds($postType);
         if ($ids === []) {
-            return $args;
+            return $urlList;
         }
 
-        $existing = isset($args['post__not_in']) && is_array($args['post__not_in']) ? $args['post__not_in'] : [];
-        $args['post__not_in'] = array_values(array_unique(array_merge(array_map('intval', $existing), $ids)));
+        $provider = wp_sitemaps_get_server()->registry->get_provider('posts');
+        if ($provider === null) {
+            return $urlList;
+        }
 
-        return $args;
+        $excluded = [];
+        foreach ($ids as $id) {
+            $permalink = get_permalink($id);
+            if (is_string($permalink)) {
+                $excluded[$permalink] = true;
+            }
+        }
+
+        static::$buildingUrlList = true;
+        try {
+            $list = $provider->get_url_list(is_numeric($pageNum) ? (int) $pageNum : 1, $postType);
+        } finally {
+            static::$buildingUrlList = false;
+        }
+
+        return array_values(array_filter(
+            $list,
+            static fn ($entry): bool => !(is_array($entry) && isset($entry['loc']) && isset($excluded[$entry['loc']]))
+        ));
     }
 
     /**

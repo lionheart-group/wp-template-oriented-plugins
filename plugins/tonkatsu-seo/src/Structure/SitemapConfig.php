@@ -54,7 +54,7 @@ class SitemapConfig
             foreach ($values as $value) {
                 if (!is_string($value) || trim($value) === '') {
                     throw new \InvalidArgumentException(
-                        "SitemapConfig: every entry of {$property} must be a non-empty string."
+                        sprintf('SitemapConfig: every entry of %s must be a non-empty string.', esc_html($property))
                     );
                 }
             }

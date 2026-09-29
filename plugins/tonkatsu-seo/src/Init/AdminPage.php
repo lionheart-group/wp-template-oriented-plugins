@@ -207,10 +207,10 @@ class AdminPage
                                         <br><span class="description"><?php echo esc_html__('(front page)', 'template-oriented-rank-optimizer'); ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo AdminColumns::cellHtml($cells[AdminColumns::COLUMN_TITLE]); ?></td>
-                                <td><?php echo AdminColumns::cellHtml($cells[AdminColumns::COLUMN_DESCRIPTION]); ?></td>
+                                <td><?php echo wp_kses(AdminColumns::cellHtml($cells[AdminColumns::COLUMN_TITLE]), AdminColumns::ALLOWED_HTML); ?></td>
+                                <td><?php echo wp_kses(AdminColumns::cellHtml($cells[AdminColumns::COLUMN_DESCRIPTION]), AdminColumns::ALLOWED_HTML); ?></td>
                                 <td style="word-break:break-all;"><?php echo esc_html(self::display($values['canonical'])); ?></td>
-                                <td><?php echo AdminColumns::cellHtml($cells[AdminColumns::COLUMN_ROBOTS]); ?></td>
+                                <td><?php echo wp_kses(AdminColumns::cellHtml($cells[AdminColumns::COLUMN_ROBOTS]), AdminColumns::ALLOWED_HTML); ?></td>
                                 <td style="word-break:break-all;"><?php echo esc_html(self::display($values['og_image'])); ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -269,7 +269,7 @@ class AdminPage
                             <td><?php echo esc_html(self::display($config->description)); ?></td>
                             <td>
                                 <?php if (Visibility::searchEnginesDiscouraged()) : ?>
-                                    <?php echo esc_html(self::robots(true, true)); ?><br><?php echo AdminColumns::badgeHtml(AdminColumns::searchEnginesDiscouragedBadge()); ?>
+                                    <?php echo esc_html(self::robots(true, true)); ?><br><?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::searchEnginesDiscouragedBadge()), AdminColumns::ALLOWED_HTML); ?>
                                 <?php else : ?>
                                     <?php echo esc_html(self::robots($config->noindex, false)); ?>
                                 <?php endif; ?>

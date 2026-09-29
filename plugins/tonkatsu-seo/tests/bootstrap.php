@@ -267,8 +267,82 @@ if (!function_exists('get_option')) {
     }
 }
 
+// Minimal stand-ins for core's sitemap classes. A test registers a provider
+// with $GLOBALS['__toro_test_sitemap_server']->registry->providers['posts'] = ...;
+if (!class_exists('WP_Sitemaps_Provider')) {
+    abstract class WP_Sitemaps_Provider {
+        abstract public function get_url_list($page_num, $object_subtype = '');
+    }
+}
+
+if (!class_exists('WP_Sitemaps_Registry')) {
+    class WP_Sitemaps_Registry {
+        /** @var array<string, WP_Sitemaps_Provider> */
+        public array $providers = [];
+
+        public function get_provider($name) {
+            return $this->providers[$name] ?? null;
+        }
+    }
+}
+
+if (!class_exists('WP_Sitemaps')) {
+    class WP_Sitemaps {
+        public WP_Sitemaps_Registry $registry;
+
+        public function __construct() {
+            $this->registry = new WP_Sitemaps_Registry();
+        }
+    }
+}
+
 if (!function_exists('wp_sitemaps_get_server')) {
     function wp_sitemaps_get_server() {
-        return null;
+        return $GLOBALS['__toro_test_sitemap_server'] ??= new WP_Sitemaps();
+    }
+}
+
+// Permalinks a test sets, e.g. $GLOBALS['__toro_test_permalinks'][12] = 'https://example.com/a/';
+if (!function_exists('get_permalink')) {
+    function get_permalink($post = 0, $leavename = false) {
+        $id = is_object($post) ? $post->ID : (int) $post;
+        return $GLOBALS['__toro_test_permalinks'][$id] ?? false;
+    }
+}
+
+if (!function_exists('wp_parse_url')) {
+    function wp_parse_url($url, $component = -1) {
+        return parse_url($url, $component);
+    }
+}
+
+// Keeps only the allowed tags and attributes — enough for the admin cells.
+if (!function_exists('wp_kses')) {
+    function wp_kses($content, $allowed_html, $allowed_protocols = []) {
+        return (string) preg_replace_callback('#</?([a-z]+)([^>]*)>#i', function ($m) use ($allowed_html) {
+            $tag = strtolower($m[1]);
+            if (!isset($allowed_html[$tag])) {
+                return '';
+            }
+            preg_match_all('#\\s([a-z-]+)="[^"]*"#i', $m[2], $attrs, PREG_SET_ORDER);
+            $kept = '';
+            foreach ($attrs as $attr) {
+                if (isset($allowed_html[$tag][strtolower($attr[1])])) {
+                    $kept .= $attr[0];
+                }
+            }
+            return str_starts_with($m[0], '</') ? "</{$tag}>" : "<{$tag}{$kept}>";
+        }, (string) $content);
+    }
+}
+
+// Same output shape as core's wp_get_inline_script_tag().
+if (!function_exists('wp_print_inline_script_tag')) {
+    function wp_print_inline_script_tag($data, $attributes = []) {
+        $attrs = '';
+        foreach ($attributes as $name => $value) {
+            $attrs .= sprintf(' %s="%s"', $name, esc_attr($value));
+        }
+        echo "<script{$attrs}>\n" . trim($data, "\n\r ") . "\n</script>\n";
     }
 }
