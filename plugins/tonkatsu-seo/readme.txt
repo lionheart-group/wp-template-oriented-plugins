@@ -1,6 +1,7 @@
 === TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility) ===
 Contributors: lionheartgroup
 Tags: seo, meta, open graph, json-ld, sitemap
+Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.0.1
