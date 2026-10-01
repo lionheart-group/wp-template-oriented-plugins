@@ -70,9 +70,10 @@ php scripts/build-release.php --zip   # build and also produce build/<slug>-<ver
 `composer check` has to be run locally before pushing.
 
 `build-release.php` copies an **allow-list** (`src/`, `assets/`, `languages/`, `migrations/`
-plus the three root files) into `build/` and regenerates a classmap autoloader, rather than
-excluding what we remember to exclude. The plugin ships with zero runtime dependencies, so
-`build/vendor/` holds nothing but Composer's autoloader. Files sit directly in `build/`, as
+plus the three root files and `composer.json`) into `build/` and regenerates a classmap
+autoloader, rather than excluding what we remember to exclude. The plugin ships with zero runtime
+dependencies, so `build/vendor/` holds nothing but Composer's autoloader. `composer.json` is kept
+in the build: WordPress.org expects it next to a Composer-generated `vendor/`. Files sit directly in `build/`, as
 they did under the previous pipeline; only the `--zip` archive nests them under a slug-named
 directory, which is the layout WordPress expects on upload.
 
