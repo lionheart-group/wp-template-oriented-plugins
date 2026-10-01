@@ -99,8 +99,8 @@ Fires immediately before each email is dispatched, once per configured recipient
 do_action( 'tofu_pre_send_mail', Mail $mail, MailRecipientsConfig $recipient, array $values, FormConfig $config );
 ```
 
-`$mail` is mutable — call `addHeader()`, `addAttachment()`, `addBcc()` and so on to adjust the
-message. Recipients, subject and body come from `MailRecipientsConfig`; use this hook for what the
+`$mail` is mutable — call `addHeader()`, `addAttachment()`, `addBcc()`, `setReturnPath()` and so on
+to adjust the message. Recipients, subject and body come from `MailRecipientsConfig`; use this hook for what the
 static configuration cannot express, namely decisions that depend on what was actually submitted.
 
 ```php

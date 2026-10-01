@@ -381,7 +381,11 @@ if (!function_exists('sanitize_email')) {
 
 if (!function_exists('wp_mail')) {
     function wp_mail($to, string $subject, string $message, $headers = '', $attachments = []): bool {
+        // Stand-in for PHPMailer so phpmailer_init callbacks (Return-Path) can be asserted on.
+        $phpmailer = new \stdClass();
+        do_action('phpmailer_init', $phpmailer);
         $GLOBALS['__tofu_wp_mail_calls'][] = [
+            'sender' => $phpmailer->Sender ?? null,
             'to' => $to,
             'subject' => $subject,
             'message' => $message,
@@ -450,6 +454,30 @@ if (!function_exists('apply_filters')) {
 if (!function_exists('add_action')) {
     function add_action(string $tag, callable $callback, int $priority = 10, int $accepted_args = 1): bool {
         return add_filter($tag, $callback, $priority, $accepted_args);
+    }
+}
+
+if (!function_exists('remove_filter')) {
+    function remove_filter(string $tag, callable $callback, int $priority = 10): bool {
+        foreach ($GLOBALS['__tofu_hooks'][$tag][$priority] ?? [] as $i => $hook) {
+            if ($hook['callback'] === $callback) {
+                unset($GLOBALS['__tofu_hooks'][$tag][$priority][$i]);
+                if ($GLOBALS['__tofu_hooks'][$tag][$priority] === []) {
+                    unset($GLOBALS['__tofu_hooks'][$tag][$priority]);
+                }
+                if ($GLOBALS['__tofu_hooks'][$tag] === []) {
+                    unset($GLOBALS['__tofu_hooks'][$tag]);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+if (!function_exists('remove_action')) {
+    function remove_action(string $tag, callable $callback, int $priority = 10): bool {
+        return remove_filter($tag, $callback, $priority);
     }
 }
 
