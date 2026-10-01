@@ -36,3 +36,24 @@ An invalid address throws `InvalidArgumentException` when the form is registered
 
 To vary it per recipient or per submission, call `$mail->setReturnPath()` from the
 [`tofu_pre_send_mail`](../hooks/index.md#tofu_pre_send_mail) hook.
+
+### Shared hosting and sendmail
+
+When WordPress sends through PHP's `mail()` (the default), the Return-Path reaches the server's
+sendmail as `-f<address>`. Some shared hosts reject a `-f` address whose domain is not hosted on
+that server. Sakura Internet is one, with sendmail exiting with status 65 (`EX_DATAERR`). `mail()`
+then returns false, and the only error TOFU can log is PHPMailer's generic
+`Could not instantiate mail function.` (Japanese: `メール機能をインスタンス化できませんでした。`).
+The same form sends fine as soon as `returnPath` is removed.
+
+To check whether a host does this, call sendmail directly over SSH and look at the exit status:
+
+```bash
+printf "To: you@example.com\nSubject: test\n\nbody\n" | /usr/sbin/sendmail -t -i -f bounce@example.com; echo "exit=$?"
+```
+
+If the domain's mail lives on another server, send through that server over SMTP instead, using
+an SMTP plugin or a `phpmailer_init` callback that calls `$phpmailer->isSMTP()`. The sending
+server then sets the envelope sender, and SPF, DKIM and DMARC align with the From domain. Many
+SMTP servers only accept a `MAIL FROM` that matches the authenticated account, so either leave
+`returnPath` unset or set it to that account's address.
