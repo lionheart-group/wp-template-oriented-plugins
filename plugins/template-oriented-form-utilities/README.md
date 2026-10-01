@@ -1,5 +1,7 @@
 # TOFU
 
+![TOFU — Template-Oriented Form Utilities for WordPress](.github/banner-1544x500.jpg)
+
 Template-Oriented Form Utilities
 
 ## Description
