@@ -1,0 +1,111 @@
+# Translation of Plugins - TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility) - Stable Readme (latest release) in Japanese
+# This file is distributed under the same license as the Plugins - TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility) - Stable Readme (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: +0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/4.1.0\n"
+"Language: ja_JP\n"
+"Project-Id-Version: Plugins - TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility) - Stable Readme (latest release)\n"
+
+#. Short description.
+#, gp-priority: high
+msgid "TONKATSU outputs SEO metadata, structured data and sitemap adjustments configured entirely in theme code."
+msgstr "TONKATSUは、テーマのコードだけで設定したSEOメタデータ・構造化データ・サイトマップ調整を出力します。"
+
+#. Plugin name.
+#, gp-priority: high
+msgid "TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility)"
+msgstr "TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility)"
+
+#. Found in faq paragraph.
+msgid "No. It adjusts WordPress core's sitemap at /wp-sitemap.xml."
+msgstr "いいえ。WordPress本体のサイトマップ（/wp-sitemap.xml）を調整します。"
+
+#. Found in faq paragraph.
+msgid "In your theme's code. Tools -&gt; SEO (TONKATSU) shows them, read-only."
+msgstr "テーマのコードの中にあります。「ツール」-&gt;「SEO (TONKATSU)」で、閲覧専用で確認できます。"
+
+#. Found in faq header.
+msgid "Does TONKATSU generate its own sitemap?"
+msgstr "TONKATSUは独自のサイトマップを作成しますか？"
+
+#. Found in faq header.
+msgid "Where are the settings?"
+msgstr "設定はどこにありますか？"
+
+#. Found in installation paragraph.
+msgid "Then register the configuration in your theme — see the documentation."
+msgstr "その後、テーマで設定を登録してください。詳しくはドキュメントを参照してください。"
+
+#. Found in installation paragraph.
+msgid "OR…"
+msgstr "または…"
+
+#. Found in installation list item.
+msgid "Click \"Install\".. and then \"Activate plugin\"."
+msgstr "「今すぐインストール」をクリックし、続けて「有効化」をクリックします。"
+
+#. Found in installation list item.
+msgid "Click \"upload\".. then browse to the .zip file downloaded from this page."
+msgstr "「プラグインのアップロード」をクリックし、このページからダウンロードした.zipファイルを選択します。"
+
+#. Found in installation list item.
+msgid "Open the WP admin panel, and click \"Plugins\" -&gt; \"Add new\"."
+msgstr "WordPressの管理画面を開き、「プラグイン」-&gt;「新規追加」をクリックします。"
+
+#. Found in installation list item.
+msgid "Save the .zip file to a location on your computer."
+msgstr "コンピューター上の任意の場所に.zipファイルを保存します。"
+
+#. Found in installation list item.
+msgid "Download the plugin from this page."
+msgstr "このページからプラグインをダウンロードします。"
+
+#. Found in installation list item.
+msgid "Activate the plugin."
+msgstr "プラグインを有効化します。"
+
+#. Found in installation list item.
+msgid "Select the \"Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility\" plugin and click \"Install\"."
+msgstr "「Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility」プラグインを選び、「今すぐインストール」をクリックします。"
+
+#. Found in installation list item.
+msgid "In the browser input box, type \"Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility\"."
+msgstr "検索欄に「Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility」と入力します。"
+
+#. Found in installation list item.
+msgid "From the WP admin panel, click \"Plugins\" -&gt; \"Add new\"."
+msgstr "WordPressの管理画面で「プラグイン」-&gt;「新規追加」をクリックします。"
+
+#. Found in description paragraph.
+msgid "<a href=\"https://github.com/lionheart-group/tonkatsu-seo\">https://github.com/lionheart-group/tonkatsu-seo</a>"
+msgstr "<a href=\"https://github.com/lionheart-group/tonkatsu-seo\">https://github.com/lionheart-group/tonkatsu-seo</a>"
+
+#. Found in description paragraph.
+msgid "GitHub and documentation for this plugin can be found at:"
+msgstr "このプラグインのGitHubリポジトリとドキュメントはこちらです:"
+
+#. Found in description paragraph.
+msgid "TONKATSU stands down while Rank Math, Yoast SEO, All in One SEO or SEOPress is active, and shows an admin notice instead."
+msgstr "Rank Math、Yoast SEO、All in One SEO、SEOPressのいずれかが有効な間、TONKATSUは出力を行わず、代わりに管理画面で通知を表示します。"
+
+#. Found in description paragraph.
+msgid "Per-post values that editors maintain (for example in custom fields) are supplied through the <code>tonkatsu_post_values</code> filter."
+msgstr "編集者が管理する投稿ごとの値（カスタムフィールドなど）は、<code>tonkatsu_post_values</code>フィルターで渡します。"
+
+#. Found in description paragraph.
+msgid "Everything is configured in the theme's PHP code, on <code>init</code>. Nothing is stored in the database and there is no settings screen, so the SEO configuration is reviewed, versioned and deployed together with the templates that render the pages. A read-only screen under Tools shows what the theme registered and what each page resolves to."
+msgstr "設定はすべて、テーマのPHPコードで<code>init</code>のタイミングに行います。データベースには何も保存せず、設定画面もありません。そのため、SEOの設定を、ページを表示するテンプレートと一緒にレビュー・バージョン管理・デプロイできます。「ツール」の下にある閲覧専用の画面で、テーマが登録した内容と、各ページが最終的に出力する値を確認できます。"
+
+#. Found in description paragraph.
+msgid "Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility (TONKATSU) handles the SEO output of a WordPress site — title, meta description, canonical, robots, Open Graph, Twitter Card and JSON-LD — and adjusts WordPress core's XML sitemaps."
+msgstr "Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility（TONKATSU）は、WordPressサイトのSEOに関わる出力（タイトル、meta description、canonical、robots、Open Graph、Twitter Card、JSON-LD）を担い、WordPress本体のXMLサイトマップを調整します。"
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Initial release."
+msgstr "初回リリース。"
