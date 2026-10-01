@@ -23,16 +23,19 @@ the decisions behind the permalink behaviour, conventions, and dev workflow.
 
 ```
 functions.php (on `init`, any priority < 99, any order)
-    └── TobiuoPlugin\Helpers\Registry::registerTaxonomy() / registerPostType()
+    └── TobiuoPlugin\Helpers\Registry::registerTaxonomy() / registerPostType() / registerPosts()
             (static in-memory registry of Structure/ objects)
 
 init 99 — Init\Registration::handOver()
+    ├── Init\Posts::apply() — re-read the permalink structure into WP_Rewrite, `post` archive + rules
+    ├── refuse post types core reports as `_builtin`
     ├── register_taxonomy() for every TaxonomyConfig, then register_post_type() for every PostTypeConfig
     ├── Registration::permalinkErrors() against what core now has → wp_die() on a bad config
     └── do_action('tobiuo_registered')
             └── Init\Rewrite::apply() — private rewrite tags, replaced permastruct, date/author rules
 
 request
+    ├── pre_option_permalink_structure / post_type_archive_link → Init\Posts
     ├── post_type_link        → Init\Permalink::filterLink()
     ├── template_redirect (9) → Init\Redirect::maybeRedirect()
     └── get_archives_link     → Init\ArchiveLinks::filterArchivesLink()
@@ -40,16 +43,16 @@ request
 
 The bootstrap registers `Registration`, `AdminPage` and `Activation` unconditionally, and on
 `plugins_loaded` checks `Init\Conflict::detect()`: with CPTP active only the notice is registered;
-otherwise `Rewrite`, `Permalink`, `Redirect` and `ArchiveLinks`. The post types are the site's
+otherwise `Posts`, `Rewrite`, `Permalink`, `Redirect` and `ArchiveLinks`. The post types are the site's
 content model and are registered either way.
 
 ### `src/` layout
 
 | Dir | Responsibility |
 |---|---|
-| `Init/` | WordPress integration: `Registration` (hand-over on `init` 99 + config checks), `Rewrite` (permastruct + archive rules, pure rule builders, missing-rules check), `Permalink` (`post_type_link`), `Redirect` (canonical 301), `ArchiveLinks` (date/author links, `wp_get_archives`), `Conflict` (CPTP detection + notice), `Activation` (rewrite-rule reset), `AdminPage` (read-only Tools page) |
+| `Init/` | WordPress integration: `Registration` (hand-over on `init` 99 + config checks), `Posts` (core `post`: permalink structure, archive), `Rewrite` (permastruct + archive rules, pure rule builders, missing-rules check), `Permalink` (`post_type_link`), `Redirect` (canonical 301), `ArchiveLinks` (date/author links, `wp_get_archives`), `Conflict` (CPTP detection + notice), `Activation` (rewrite-rule reset), `AdminPage` (read-only Tools page) |
 | `Helpers/` | `Registry` (the class themes call), `Fields` (key/type checks shared by every `fromArray()`) |
-| `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `PostTypeConfig`, `TaxonomyConfig`, `PermalinkConfig`, each with `fromArray()` rejecting unknown keys and wrong types |
+| `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `PostTypeConfig`, `TaxonomyConfig`, `PermalinkConfig`, `PostsConfig`, each with `fromArray()` rejecting unknown keys and wrong types |
 | `functions.php` | `tobiuo_get_year_link()` / `_month_` / `_day_` / `tobiuo_get_author_link()`, thin wrappers over `ArchiveLinks` |
 | `Consts.php` | Plugin-wide constants (admin slug, priorities, private tag prefixes, `/date`, conflicting plugin) |
 
@@ -120,6 +123,36 @@ The spec was derived from reading CPTP. What is kept, and what is deliberately d
 - **CPTP active**: register post types and taxonomies, hook nothing else, notice on Plugins + TOBIUO
   page. CPTP enabled date/author archives by default; TOBIUO's default is off (documented in the
   migration table).
+
+### Built-in posts (`PostsConfig`)
+
+- **`post` is never registered again.** `Registry::registerPostType()` refuses the names in
+  `Consts::BUILTIN_POST_TYPES` at once (pointing to `registerPosts()` for `post`), and
+  `Registration::handOver()` refuses anything core reports as `_builtin` (future core types).
+- **The post permalink is the site's permalink structure**, supplied by
+  `pre_option_permalink_structure` as `'/' . archive . structure`. The option in the DB is never
+  written; Settings → Permalinks shows a notice (on that screen only) that saving there has no effect.
+  Only core's tags plus `%category%` are allowed, and `dateArchive` / `authorArchive` / `dateFront`
+  must stay default (core provides those archives, under the front) — checked in `PostsConfig`.
+- **Timing.** `WP_Rewrite` is constructed after `plugins_loaded` from the stored option, before the
+  theme loads, and the theme registers at `init` 10. So `Posts::apply()` (first thing in the
+  hand-over) runs `WP_Rewrite::init()` — what core runs after `set_permalink_structure()` — but
+  restores `endpoints`, `extra_rules` and `non_wp_rules`, which `init()` empties and plugins may have
+  filled on `init` already. Then what was built on the old front/root is moved: permastructs
+  (`rebasePermastructs()`: `with_front` ones on the front, others on the root) and core's archive rules
+  of post types with `has_archive` (`renameRules()` of exactly the four regexes
+  `WP_Post_Type::add_rewrite_rules()` produces, order kept). Arbitrary rules other code built from
+  `$wp_rewrite->front` before `init` 99 are not guessed at (documented).
+- **Archive.** Core registers `post` at `init` 0 with `rewrite => false`, before any theme config
+  exists, so `register_post_type_args` is too late: `apply()` sets `has_archive` on the registered
+  object (so `is_post_type_archive('post')` works) and adds core-shaped archive rules
+  (`Posts::archiveRules()`, root-relative, not under the front — the front *is* the archive). The
+  args filter is kept for a later re-registration. `post_type_archive_link` returns
+  `home_url(user_trailingslashit(root . archive))` (core returns the posts page / home for `post`).
+  The archive rules are part of `Rewrite::expectedRules()`.
+- **Template functions** delegate to core for `post` (`get_year_link()` etc.) rather than returning
+  `''`: those archives always exist for posts.
+- `category_base` / `tag_base` are separate stored options and are left alone.
 
 Known limits are listed in `docs/index.md#limits` (hierarchical post type + taxonomy tag, numeric
 slugs vs date archives, trailing slash vs core's `redirect_canonical()`).

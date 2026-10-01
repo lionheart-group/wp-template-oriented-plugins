@@ -39,6 +39,17 @@ class Registration
             return;
         }
 
+        // Before anything is registered: it may change WP_Rewrite::$front,
+        // which the permastructs added below are built on.
+        Posts::apply();
+
+        foreach (Registry::getPostTypes() as $config) {
+            $existing = get_post_type_object($config->name);
+            if ($existing instanceof \WP_Post_Type && $existing->_builtin) {
+                Registry::refuseBuiltin($config->name);
+            }
+        }
+
         foreach (Registry::getTaxonomies() as $config) {
             $result = register_taxonomy($config->name, $config->objectTypes, $config->args);
 

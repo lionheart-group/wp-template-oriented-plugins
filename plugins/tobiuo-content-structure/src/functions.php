@@ -18,6 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * @param string $post_type
  * @param int $year
  * @return string `''` unless the post type has a PermalinkConfig with `dateArchive`.
+ *                For `post`, core's own archive link.
  */
 function tobiuo_get_year_link(string $post_type, int $year): string
 {
@@ -31,6 +32,7 @@ function tobiuo_get_year_link(string $post_type, int $year): string
  * @param int $year
  * @param int $month
  * @return string `''` unless the post type has a PermalinkConfig with `dateArchive`.
+ *                For `post`, core's own archive link.
  */
 function tobiuo_get_month_link(string $post_type, int $year, int $month): string
 {
@@ -45,6 +47,7 @@ function tobiuo_get_month_link(string $post_type, int $year, int $month): string
  * @param int $month
  * @param int $day
  * @return string `''` unless the post type has a PermalinkConfig with `dateArchive`.
+ *                For `post`, core's own archive link.
  */
 function tobiuo_get_day_link(string $post_type, int $year, int $month, int $day): string
 {
@@ -57,6 +60,7 @@ function tobiuo_get_day_link(string $post_type, int $year, int $month, int $day)
  * @param string $post_type
  * @param WP_User|int $user A user or a user ID.
  * @return string `''` unless the post type has a PermalinkConfig with `authorArchive`.
+ *                For `post`, core's own archive link.
  */
 function tobiuo_get_author_link(string $post_type, WP_User|int $user): string
 {

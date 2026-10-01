@@ -61,6 +61,34 @@ final class Consts
     public const DATE_FRONT = '/date';
 
     /**
+     * Post types core registers itself, which TOBIUO must not register again.
+     *
+     * Checked when a config is registered; Init\Registration also refuses any
+     * post type core reports as `_builtin`, so ones added in later WordPress
+     * versions are caught too. `post` is configured with Registry::registerPosts().
+     *
+     * @var string[]
+     */
+    public const BUILTIN_POST_TYPES = [
+        'post',
+        'page',
+        'attachment',
+        'revision',
+        'nav_menu_item',
+        'custom_css',
+        'customize_changeset',
+        'oembed_cache',
+        'user_request',
+        'wp_block',
+        'wp_template',
+        'wp_template_part',
+        'wp_global_styles',
+        'wp_navigation',
+        'wp_font_family',
+        'wp_font_face',
+    ];
+
+    /**
      * Plugins TOBIUO hands the permalinks to, keyed by a constant each defines.
      *
      * @var array<string, string>

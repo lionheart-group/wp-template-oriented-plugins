@@ -74,7 +74,19 @@ class ArchiveLinksTest extends BaseTestCase
 
         $this->assertSame('', ArchiveLinks::dateLink('case', 2024));
         $this->assertSame('', ArchiveLinks::dateLink('news', 2024));
-        $this->assertSame('', tobiuo_get_year_link('post', 2024));
+        $this->assertSame('', tobiuo_get_year_link('page', 2024));
+    }
+
+    public function testPostsUseCoresArchiveLinks(): void
+    {
+        $this->useRewrite('/news/%postname%/');
+
+        $this->assertSame('https://example.com/news/2024/', tobiuo_get_year_link('post', 2024));
+        $this->assertSame('https://example.com/news/2024/05/', tobiuo_get_month_link('post', 2024, 5));
+        $this->assertSame('https://example.com/news/2024/05/09/', tobiuo_get_day_link('post', 2024, 5, 9));
+        $this->assertSame('https://example.com/news/author/jane/', tobiuo_get_author_link('post', new \WP_User(3, 'jane')));
+        $this->assertSame('', tobiuo_get_year_link('post', 99));
+        $this->assertSame('', tobiuo_get_author_link('post', 404));
     }
 
     public function testDateLinksAreEmptyWhileAnotherPluginHandlesPermalinks(): void

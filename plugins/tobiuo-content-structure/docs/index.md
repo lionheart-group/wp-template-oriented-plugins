@@ -7,6 +7,7 @@ TOBIUO is configured in your WordPress theme's `functions.php` (on `init`) using
 - [PostTypeConfig](settings/posttypeconfig.md) — a post type, registered with `Registry::registerPostType()`
   - [PermalinkConfig](settings/permalinkconfig.md) — its URL structure and its date / author archives
 - [TaxonomyConfig](settings/taxonomyconfig.md) — a taxonomy, registered with `Registry::registerTaxonomy()`
+- [PostsConfig](settings/postsconfig.md) — the archive and permalink of WordPress's built-in posts, registered with `Registry::registerPosts()`
 
 Here's a complete example showing all of them together:
 
@@ -16,14 +17,24 @@ Here's a complete example showing all of them together:
 
 | When | What |
 |---|---|
-| `init`, priority below 99 (the default 10 is fine) | The theme calls `Registry::registerTaxonomy()` / `Registry::registerPostType()`, in any order. Nothing reaches WordPress yet. |
-| `init`, priority 99 | TOBIUO calls `register_taxonomy()` for every taxonomy, then `register_post_type()` for every post type, then checks each `PermalinkConfig` against what is now registered (a bad config stops with `wp_die()` naming the post type and the tag). Then the action [`tobiuo_registered`](hooks/index.md#tobiuo_registered) fires, and TOBIUO replaces the permastructs and adds the archive rules. |
+| `init`, priority below 99 (the default 10 is fine) | The theme calls `Registry::registerTaxonomy()` / `Registry::registerPostType()` / `Registry::registerPosts()`, in any order. Nothing reaches WordPress yet, except that `get_option('permalink_structure')` returns the `PostsConfig` structure from then on. |
+| `init`, priority 99 | TOBIUO first applies the `PostsConfig` (re-reads the permalink structure into `WP_Rewrite`, sets the posts archive), then calls `register_taxonomy()` for every taxonomy, then `register_post_type()` for every post type, then checks each `PermalinkConfig` against what is now registered (a bad config stops with `wp_die()` naming the post type and the tag). Then the action [`tobiuo_registered`](hooks/index.md#tobiuo_registered) fires, and TOBIUO replaces the permastructs and adds the archive rules. |
 | Any later request | `get_permalink()` builds the links from the structure; a post requested through a wrong term path is redirected to its permalink. |
 
 Because TOBIUO registers everything at `init` 99, code that needs the post types or taxonomies to
 exist must run after that — on `tobiuo_registered`, on `wp_loaded`, or at `init` 100 and later.
 Registering a config after the hand-over calls `wp_die()`, so a late registration is noticed instead
-of silently doing nothing.
+of silently doing nothing. So does registering a post type built into WordPress (`post`, `page`, …)
+with `registerPostType()`: it would replace core's definition. Posts are configured with
+[PostsConfig](settings/postsconfig.md).
+
+## Posts
+
+WordPress's own posts keep core's post type. [PostsConfig](settings/postsconfig.md) gives them an
+archive (`/news/`) and the permalink structure (`/news/%postname%/`) from theme code, replacing the
+structure stored by Settings → Permalinks. Because that structure is the site's, its front also
+prefixes core's date, author, category and tag archives — and every custom post type or taxonomy whose
+`rewrite` has `with_front => true`.
 
 ## Permalinks
 
@@ -95,7 +106,9 @@ tobiuo_get_day_link('case', 2024, 5, 12);       // https://example.com/case/2024
 tobiuo_get_author_link('case', get_the_author_meta('ID')); // https://example.com/case/author/jane/
 ```
 
-Each returns `''` when the post type has no such archive, so a template can test the result.
+Each returns `''` when the post type has no such archive, so a template can test the result. For
+`post` they return core's own links (`get_year_link()`, `get_month_link()`, `get_day_link()`,
+`get_author_posts_url()`).
 
 `wp_get_archives(['post_type' => 'case'])` links to these archives as well, instead of core's
 `/2024/05/?post_type=case`. Only the daily, monthly and yearly types are rewritten; weekly archives
@@ -135,7 +148,9 @@ archives come before both.
 
 ## Admin page
 
-**Tools → Content Structure (TOBIUO)** lists the post types and taxonomies the theme registered, with
+**Tools → Content Structure (TOBIUO)** shows the posts archive and the permalink structure in use (and
+whether it comes from the theme or from Settings → Permalinks), and lists the post types and
+taxonomies the theme registered, with
 their structure, the URL of the latest post, the archive URL, example date and author archive links,
 example term URLs, and whether the stored rewrite rules are complete. It is read-only. The capability
 required to see it is `manage_options`, filterable with

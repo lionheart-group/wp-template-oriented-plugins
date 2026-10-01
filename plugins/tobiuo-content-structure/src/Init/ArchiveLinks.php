@@ -37,6 +37,8 @@ class ArchiveLinks
     /**
      * Year, month or day archive link of a post type.
      *
+     * For `post`, core's own date archives: get_year_link() and friends.
+     *
      * @param string $postType
      * @param int $year
      * @param ?int $month
@@ -47,6 +49,14 @@ class ArchiveLinks
     {
         if ($year < 1000 || $year > 9999 || ($month !== null && ($month < 1 || $month > 12)) || ($day !== null && ($month === null || $day < 1 || $day > 31))) {
             return '';
+        }
+
+        if ($postType === 'post') {
+            return match (true) {
+                $day !== null   => (string) get_day_link($year, (int) $month, $day),
+                $month !== null => (string) get_month_link($year, $month),
+                default         => (string) get_year_link($year),
+            };
         }
 
         $context = self::context($postType, 'date');
@@ -84,6 +94,8 @@ class ArchiveLinks
     /**
      * Author archive link of a post type.
      *
+     * For `post`, core's own author archive: get_author_posts_url().
+     *
      * @param string $postType
      * @param \WP_User|int $user
      * @return string `''` when the post type has no author archive, or there is no such user.
@@ -96,6 +108,10 @@ class ArchiveLinks
 
         if (!$user instanceof \WP_User || (string) $user->user_nicename === '') {
             return '';
+        }
+
+        if ($postType === 'post') {
+            return (string) get_author_posts_url($user->ID, $user->user_nicename);
         }
 
         $context = self::context($postType, 'author');

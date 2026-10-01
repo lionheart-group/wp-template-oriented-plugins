@@ -109,6 +109,7 @@ if (!class_exists('WP_Post_Type')) {
         public $rewrite = false;
         public $query_var = false;
         public $taxonomies = [];
+        public $_builtin = false;
 
         public function __construct(string $name, array $args = [])
         {
@@ -176,12 +177,29 @@ if (!class_exists('WP_Rewrite')) {
         public $comments_pagination_base = 'comment-page';
         public $endpoints = [];
         public $extra_permastructs = [];
+        public $extra_rules_top = [];
+        public $extra_rules = [];
+        public $non_wp_rules = [];
+        public $use_trailing_slashes = false;
         public $matches = '';
 
+        // As core, the structure comes from the option; a test passes it in
+        // instead, and it is stored as the option.
         public function __construct(string $permalinkStructure = '/%postname%/')
         {
-            $this->permalink_structure = $permalinkStructure;
-            $this->front = $permalinkStructure === '' ? '' : substr($permalinkStructure, 0, (int) strpos($permalinkStructure, '%'));
+            $GLOBALS['__tobiuo_test_options']['permalink_structure'] = $permalinkStructure;
+            $this->init();
+        }
+
+        // Core's init(), minus the index.php root detection and the verbose page rules.
+        public function init()
+        {
+            $this->extra_rules = [];
+            $this->non_wp_rules = [];
+            $this->endpoints = [];
+            $this->permalink_structure = (string) get_option('permalink_structure');
+            $this->front = substr($this->permalink_structure, 0, (int) strpos($this->permalink_structure, '%'));
+            $this->use_trailing_slashes = str_ends_with($this->permalink_structure, '/');
         }
 
         public function using_permalinks()
@@ -458,8 +476,13 @@ if (!function_exists('has_filter')) {
  */
 
 // e.g. $GLOBALS['__tobiuo_test_options']['default_term_case_category'] = 7;
+// `pre_option_{$option}` applies, as in core.
 if (!function_exists('get_option')) {
     function get_option(string $option, $default = false) {
+        $pre = apply_filters("pre_option_{$option}", false, $option, $default);
+        if ($pre !== false) {
+            return $pre;
+        }
         return $GLOBALS['__tobiuo_test_options'][$option] ?? $default;
     }
 }
@@ -620,6 +643,38 @@ if (!function_exists('register_post_type')) {
 if (!function_exists('get_post_type_object')) {
     function get_post_type_object($post_type) {
         return $GLOBALS['__tobiuo_test_post_types'][$post_type] ?? null;
+    }
+}
+
+if (!function_exists('get_post_types')) {
+    function get_post_types($args = [], $output = 'names') {
+        $types = $GLOBALS['__tobiuo_test_post_types'] ?? [];
+        return $output === 'objects' ? $types : array_combine(array_keys($types), array_keys($types));
+    }
+}
+
+// Core's date and author archive links, under the front.
+if (!function_exists('get_year_link')) {
+    function get_year_link($year) {
+        return home_url(user_trailingslashit($GLOBALS['wp_rewrite']->front . $year));
+    }
+}
+
+if (!function_exists('get_month_link')) {
+    function get_month_link($year, $month) {
+        return home_url(user_trailingslashit($GLOBALS['wp_rewrite']->front . $year . '/' . sprintf('%02d', $month)));
+    }
+}
+
+if (!function_exists('get_day_link')) {
+    function get_day_link($year, $month, $day) {
+        return home_url(user_trailingslashit($GLOBALS['wp_rewrite']->front . $year . '/' . sprintf('%02d/%02d', $month, $day)));
+    }
+}
+
+if (!function_exists('get_author_posts_url')) {
+    function get_author_posts_url($author_id, $author_nicename = '') {
+        return home_url(user_trailingslashit($GLOBALS['wp_rewrite']->front . 'author/' . $author_nicename));
     }
 }
 

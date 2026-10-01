@@ -40,6 +40,7 @@ use TobiuoPlugin\Init\AdminPage;
 use TobiuoPlugin\Init\ArchiveLinks;
 use TobiuoPlugin\Init\Conflict;
 use TobiuoPlugin\Init\Permalink;
+use TobiuoPlugin\Init\Posts;
 use TobiuoPlugin\Init\Redirect;
 use TobiuoPlugin\Init\Registration;
 use TobiuoPlugin\Init\Rewrite;
@@ -63,6 +64,7 @@ add_action('plugins_loaded', function () {
         return;
     }
 
+    Posts::register();
     Rewrite::register();
     Permalink::register();
     Redirect::register();
