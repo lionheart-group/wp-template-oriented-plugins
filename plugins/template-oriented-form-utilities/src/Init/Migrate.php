@@ -2,6 +2,7 @@
 
 namespace TofuPlugin\Init;
 
+use TofuPlugin\Base\Migration;
 use TofuPlugin\Logger;
 
 class Migrate
@@ -10,6 +11,13 @@ class Migrate
      * Migrate table suffix
      */
     const TABLE_SUFFIX = 'tofu_migrate';
+
+    /**
+     * Migration objects already loaded in this request, keyed by file path.
+     *
+     * @var array<string, Migration>
+     */
+    protected static array $loaded = [];
 
     /**
      * Get migrate table name
@@ -87,7 +95,11 @@ class Migrate
 
             // Execute migration
             Logger::info("Get migration file: {$migrate}");
-            $migrateClass = require_once TOFU_PLUGIN_DIR . '/migrations/' . $migrate . '.php';
+            $migrateClass = static::loadMigration(TOFU_PLUGIN_DIR . '/migrations/' . $migrate . '.php');
+            if ($migrateClass === null) {
+                Logger::error("Migration {$migrate} does not return a Migration object.");
+                continue;
+            }
             $sql = $migrateClass->sql();
             Logger::info($sql);
             if ($migrateClass->useRawQuery()) {
@@ -112,6 +124,29 @@ class Migrate
                 'updated_at' => $updated_at,
             ]);
         }
+    }
+
+    /**
+     * Load a migration file once per request.
+     *
+     * A migration that failed is not marked as done, so migrate() may meet it
+     * again in the same request (activation and upgrade). `require_once` would
+     * then return true instead of the object, so the object is kept here.
+     *
+     * @param string $path
+     * @return ?Migration Null when the file does not return a Migration.
+     */
+    public static function loadMigration(string $path): ?Migration
+    {
+        if (!isset(static::$loaded[$path])) {
+            $migration = require $path;
+            if (!$migration instanceof Migration) {
+                return null;
+            }
+            static::$loaded[$path] = $migration;
+        }
+
+        return static::$loaded[$path];
     }
 
     /**
