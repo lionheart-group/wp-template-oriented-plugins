@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  changes:
+    name: Detect changed plugins
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.filter.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            template-oriented-form-utilities:
+              - 'plugins/template-oriented-form-utilities/**'
+              - '.github/workflows/ci.yml'
+            tonkatsu-seo:
+              - 'plugins/tonkatsu-seo/**'
+              - '.github/workflows/ci.yml'
+            tobiuo-content-structure:
+              - 'plugins/tobiuo-content-structure/**'
+              - '.github/workflows/ci.yml'
+
+  check:
+    name: ${{ matrix.plugin }}
+    needs: changes
+    if: needs.changes.outputs.plugins != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJSON(needs.changes.outputs.plugins) }}
+    defaults:
+      run:
+        working-directory: plugins/${{ matrix.plugin }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+      - name: PHPStan and PHPUnit
+        run: composer check
+      - name: Build
+        run: php scripts/build-release.php --zip

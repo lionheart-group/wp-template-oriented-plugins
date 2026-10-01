@@ -1,5 +1,7 @@
 # TOBIUO (Template-Oriented Builder of Items, URLs & Organization)
 
+> Shared conventions for all plugins in this repository are in [`../../CLAUDE.md`](../../CLAUDE.md).
+
 WordPress plugin (PHP 8.1+, GPLv3+) that registers custom post types and taxonomies and builds
 per-post-type permalink structures (`/case/%case_category%/%postname%/`) with optional date and
 author archives. Replaces Custom Post Type Permalinks (CPTP). All configuration lives in theme PHP,

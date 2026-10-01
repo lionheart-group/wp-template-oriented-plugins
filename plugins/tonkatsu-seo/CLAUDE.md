@@ -1,5 +1,7 @@
 # TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility)
 
+> Shared conventions for all plugins in this repository are in [`../../CLAUDE.md`](../../CLAUDE.md).
+
 WordPress plugin (PHP 8.1+, GPLv3+) that outputs SEO metadata — title, meta description,
 canonical, robots, OGP, Twitter Card, JSON-LD — and adjusts core's `/wp-sitemap.xml`. Replaces Rank
 Math. All configuration lives in theme PHP, registered on `init` into an in-memory static registry:

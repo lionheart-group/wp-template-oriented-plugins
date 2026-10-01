@@ -1,5 +1,7 @@
 # TOFU (Template-Oriented Form Utilities)
 
+> Shared conventions for all plugins in this repository are in [`../../CLAUDE.md`](../../CLAUDE.md).
+
 WordPress plugin (PHP 8.1+, GPLv3+) for building multi-step forms using PHP templates.
 Handles validation, session storage, file uploads, email notifications, DB recording, and bot
 protection — all configured in code (no WP admin settings UI; there is an admin *viewer* for

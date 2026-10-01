@@ -1,0 +1,10 @@
+{
+    "name": "lionheart-group/wp-template-oriented-plugins",
+    "description": "Monorepo of the template-oriented WordPress plugins (TOFU, TONKATSU, TOBIUO)",
+    "license": "GPL-3.0-or-later",
+    "scripts": {
+        "install-all": "scripts/each.sh composer install --no-interaction",
+        "check-all": "scripts/each.sh composer check",
+        "build-all": "scripts/each.sh php scripts/build-release.php"
+    }
+}
