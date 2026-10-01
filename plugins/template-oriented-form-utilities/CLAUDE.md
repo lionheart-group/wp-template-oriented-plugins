@@ -79,6 +79,13 @@ in the build: WordPress.org expects it next to a Composer-generated `vendor/`. F
 they did under the previous pipeline; only the `--zip` archive nests them under a slug-named
 directory, which is the layout WordPress expects on upload.
 
+**Bundled translations are temporary.** `languages/` and the `load_plugin_textdomain()` call in
+the main file are the one Plugin Check warning left on purpose: translate.wordpress.org has no
+Japanese translation yet, and removing them now would turn the validation messages English on
+every site. Once the Japanese translation is available there (it imports the strings only because
+`Requires at least` is declared), remove both in a release of their own, together with
+`Domain Path` in the header and `languages/` in `build-release.php`.
+
 > There used to be a PHP-Scoper step here, prefixing bundled libraries to `TofuVendor\` so they
 > could not collide with another plugin's copy. Nothing is bundled any more, so it was removed
 > along with `install-tools.sh`, `phpunit.scoped.xml` and `tests/bootstrap-scoped.php`.
