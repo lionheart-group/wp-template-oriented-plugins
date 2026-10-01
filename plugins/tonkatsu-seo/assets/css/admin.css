@@ -1,0 +1,23 @@
+/* Badges on the SEO columns and the TONKATSU screen (Tools → SEO (TONKATSU)). */
+.tonkatsu-badge {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 0 8px;
+    border: 1px solid;
+    border-radius: 10px;
+    font-size: 11px;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+.tonkatsu-badge--info {
+    border-color: #c3c4c7;
+    background: #f6f7f7;
+    color: #50575e;
+}
+
+.tonkatsu-badge--warning {
+    border-color: #dba617;
+    background: #fcf9e8;
+    color: #6b4e00;
+}
