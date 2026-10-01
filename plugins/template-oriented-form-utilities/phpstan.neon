@@ -15,4 +15,5 @@ parameters:
         # Plugin-specific constants
         - '#Constant TOFU_PLUGIN_FILE not found\.#'
         - '#Constant TOFU_PLUGIN_DIR not found\.#'
+        - '#Constant TOFU_VERSION not found\.#'
         - '#Constant COOKIEPATH not found\.#'

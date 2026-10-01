@@ -158,6 +158,7 @@ msgid "TOFU"
 msgstr ""
 
 #: src/Init/AdminPage.php:45
+#: src/Init/FormsPage.php:106
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -223,11 +224,249 @@ msgid "Field data could not be decrypted or is unavailable."
 msgstr ""
 
 #: src/Init/AdminPage.php:253
+#: src/Init/FormsPage.php:262
 msgid "Field"
 msgstr ""
 
 #: src/Init/AdminPage.php:254
 msgid "Value"
+msgstr ""
+
+#: src/Init/FormsPage.php:64
+#: src/Init/FormsPage.php:114
+msgid "Form Settings (TOFU)"
+msgstr ""
+
+#: src/Init/FormsPage.php:65
+msgid "Forms (TOFU)"
+msgstr ""
+
+#: src/Init/FormsPage.php:116
+msgid "This screen is read-only. TOFU is configured in the theme's PHP code, and nothing is stored in the database."
+msgstr ""
+
+#: src/Init/FormsPage.php:118
+msgid "Bot protection"
+msgstr ""
+
+#: src/Init/FormsPage.php:123
+#: src/Init/FormsPage.php:297
+msgid "reCAPTCHA"
+msgstr ""
+
+#: src/Init/FormsPage.php:126
+#: src/Init/FormsPage.php:142
+msgid "Not registered"
+msgstr ""
+
+#: src/Init/FormsPage.php:128
+#: src/Init/FormsPage.php:144
+msgid "Registered"
+msgstr ""
+
+#: src/Init/FormsPage.php:130
+#: src/Init/FormsPage.php:146
+msgid "Site key:"
+msgstr ""
+
+#: src/Init/FormsPage.php:132
+msgid "Threshold:"
+msgstr ""
+
+#: src/Init/FormsPage.php:139
+#: src/Init/FormsPage.php:301
+msgid "Turnstile"
+msgstr ""
+
+#: src/Init/FormsPage.php:156
+msgid "Forms"
+msgstr ""
+
+#: src/Init/FormsPage.php:157
+msgid "No forms are registered."
+msgstr ""
+
+#: src/Init/FormsPage.php:184
+msgid "Input page"
+msgstr ""
+
+#: src/Init/FormsPage.php:185
+msgid "Confirm page"
+msgstr ""
+
+#: src/Init/FormsPage.php:186
+msgid "Result page"
+msgstr ""
+
+#: src/Init/FormsPage.php:194
+msgid "Pages"
+msgstr ""
+
+#: src/Init/FormsPage.php:209
+msgid "Mail"
+msgstr ""
+
+#: src/Init/FormsPage.php:214
+msgid "From"
+msgstr ""
+
+#: src/Init/FormsPage.php:218
+msgid "Return-Path"
+msgstr ""
+
+#: src/Init/FormsPage.php:222
+msgid "Recipients"
+msgstr ""
+
+#: src/Init/FormsPage.php:230
+msgid "To"
+msgstr ""
+
+#: src/Init/FormsPage.php:231
+msgid "CC"
+msgstr ""
+
+#: src/Init/FormsPage.php:232
+msgid "BCC"
+msgstr ""
+
+#: src/Init/FormsPage.php:233
+msgid "Subject"
+msgstr ""
+
+#: src/Init/FormsPage.php:234
+msgid "Body"
+msgstr ""
+
+#: src/Init/FormsPage.php:249
+msgctxt "form settings section"
+msgid "Fields"
+msgstr ""
+
+#: src/Init/FormsPage.php:254
+msgid "Allowed fields"
+msgstr ""
+
+#: src/Init/FormsPage.php:263
+msgid "Label"
+msgstr ""
+
+#: src/Init/FormsPage.php:264
+msgid "Rules"
+msgstr ""
+
+#: src/Init/FormsPage.php:265
+msgid "Recorded"
+msgstr ""
+
+#: src/Init/FormsPage.php:278
+msgid "\"after\" hook"
+msgstr ""
+
+#: src/Init/FormsPage.php:284
+msgid "Features"
+msgstr ""
+
+#: src/Init/FormsPage.php:289
+msgid "Save to database"
+msgstr ""
+
+#: src/Init/FormsPage.php:293
+msgid "Confirm step"
+msgstr ""
+
+#: src/Init/FormsPage.php:305
+msgid "AJAX (REST API)"
+msgstr ""
+
+#: src/Init/FormsPage.php:309
+msgid "CORS origins"
+msgstr ""
+
+#: src/Init/FormsPage.php:321
+msgid "Dynamic template"
+msgstr ""
+
+#: src/Init/FormsPage.php:327
+msgid "Checks"
+msgstr ""
+
+#: src/Init/FormsPage.php:330
+msgid "No problems found"
+msgstr ""
+
+#: src/Init/FormsPage.php:334
+msgid "Warning"
+msgstr ""
+
+#: src/Init/FormsPage.php:360
+msgid "Inline text"
+msgstr ""
+
+#: src/Init/FormsPage.php:423
+msgid "Page not found"
+msgstr ""
+
+#: src/Init/FormsPage.php:425
+msgid "Can't be checked"
+msgstr ""
+
+#: src/Init/FormsPage.php:445
+msgid "Template not found"
+msgstr ""
+
+#: src/Init/FormsPage.php:455
+msgid "Yes"
+msgstr ""
+
+#: src/Init/FormsPage.php:456
+msgid "No"
+msgstr ""
+
+#: src/Init/FormsPage.php:465
+msgid "Enabled"
+msgstr ""
+
+#: src/Init/FormsPage.php:466
+msgid "Disabled"
+msgstr ""
+
+#. translators: %s: page path, e.g. /contact/
+#: src/Init/FormsPage.php:519
+msgid "Input page not found: %s"
+msgstr ""
+
+#. translators: %s: page path, e.g. /contact/confirm/
+#: src/Init/FormsPage.php:521
+msgid "Confirm page not found: %s"
+msgstr ""
+
+#. translators: %s: page path, e.g. /contact/result/
+#: src/Init/FormsPage.php:523
+msgid "Result page not found: %s"
+msgstr ""
+
+#. translators: %s: template slug, e.g. form/contact/admin-body
+#: src/Init/FormsPage.php:543
+msgid "Mail template not found: %s"
+msgstr ""
+
+#: src/Init/FormsPage.php:549
+msgid "reCAPTCHA is enabled, but no reCAPTCHA configuration is registered (Form::setRecaptcha())."
+msgstr ""
+
+#: src/Init/FormsPage.php:553
+msgid "Turnstile is enabled, but no Turnstile configuration is registered (Form::setTurnstile())."
+msgstr ""
+
+#. translators: %s: comma-separated placeholders, e.g. {company}, {zip}
+#: src/Init/FormsPage.php:561
+msgid "Placeholders that are not allowed fields: %s. They stay as they are in the mail unless the \"after\" hook sets them."
+msgstr ""
+
+#. translators: %s: comma-separated placeholders, e.g. {company}, {zip}
+#: src/Init/FormsPage.php:563
+msgid "Placeholders that are not allowed fields: %s. They stay as they are in the mail."
 msgstr ""
 
 #. Validation message: rule.accepted

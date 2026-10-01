@@ -498,6 +498,40 @@ if (!function_exists('do_action')) {
     }
 }
 
+if (!function_exists('has_action')) {
+    function has_action(string $tag, $callback = false) {
+        foreach ($GLOBALS['__tofu_hooks'][$tag] ?? [] as $priority => $callbacks) {
+            foreach ($callbacks as $hook) {
+                if ($hook['callback'] === $callback) {
+                    return $priority;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+// Just enough of wp_kses() to show that markup a helper builds survives it:
+// tags and attributes outside $allowed_html are dropped, the rest kept.
+if (!function_exists('wp_kses')) {
+    function wp_kses($content, $allowed_html, $allowed_protocols = []) {
+        return (string) preg_replace_callback('#</?([a-z]+)([^>]*)>#i', function ($m) use ($allowed_html) {
+            $tag = strtolower($m[1]);
+            if (!isset($allowed_html[$tag])) {
+                return '';
+            }
+            preg_match_all('#\\s([a-z-]+)="[^"]*"#i', $m[2], $attrs, PREG_SET_ORDER);
+            $kept = '';
+            foreach ($attrs as $attr) {
+                if (isset($allowed_html[$tag][strtolower($attr[1])])) {
+                    $kept .= $attr[0];
+                }
+            }
+            return str_starts_with($m[0], '</') ? "</{$tag}>" : "<{$tag}{$kept}>";
+        }, (string) $content);
+    }
+}
+
 if (!defined('COOKIEPATH')) {
     define('COOKIEPATH', '/');
 }

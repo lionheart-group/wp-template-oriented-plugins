@@ -157,6 +157,7 @@ msgid "TOFU"
 msgstr "TOFU"
 
 #: src/Init/AdminPage.php:45
+#: src/Init/FormsPage.php:106
 msgid "You do not have sufficient permissions to access this page."
 msgstr "このページにアクセスする権限がありません。"
 
@@ -222,12 +223,250 @@ msgid "Field data could not be decrypted or is unavailable."
 msgstr "項目データを復号できないか、利用できません。"
 
 #: src/Init/AdminPage.php:253
+#: src/Init/FormsPage.php:262
 msgid "Field"
 msgstr "項目"
 
 #: src/Init/AdminPage.php:254
 msgid "Value"
 msgstr "値"
+
+#: src/Init/FormsPage.php:64
+#: src/Init/FormsPage.php:114
+msgid "Form Settings (TOFU)"
+msgstr "フォームの設定 (TOFU)"
+
+#: src/Init/FormsPage.php:65
+msgid "Forms (TOFU)"
+msgstr "フォーム (TOFU)"
+
+#: src/Init/FormsPage.php:116
+msgid "This screen is read-only. TOFU is configured in the theme's PHP code, and nothing is stored in the database."
+msgstr "この画面は表示専用です。TOFU はテーマの PHP コードで設定し、データベースには何も保存しません。"
+
+#: src/Init/FormsPage.php:118
+msgid "Bot protection"
+msgstr "ボット対策"
+
+#: src/Init/FormsPage.php:123
+#: src/Init/FormsPage.php:297
+msgid "reCAPTCHA"
+msgstr "reCAPTCHA"
+
+#: src/Init/FormsPage.php:126
+#: src/Init/FormsPage.php:142
+msgid "Not registered"
+msgstr "未登録"
+
+#: src/Init/FormsPage.php:128
+#: src/Init/FormsPage.php:144
+msgid "Registered"
+msgstr "登録済み"
+
+#: src/Init/FormsPage.php:130
+#: src/Init/FormsPage.php:146
+msgid "Site key:"
+msgstr "サイトキー:"
+
+#: src/Init/FormsPage.php:132
+msgid "Threshold:"
+msgstr "しきい値:"
+
+#: src/Init/FormsPage.php:139
+#: src/Init/FormsPage.php:301
+msgid "Turnstile"
+msgstr "Turnstile"
+
+#: src/Init/FormsPage.php:156
+msgid "Forms"
+msgstr "フォーム"
+
+#: src/Init/FormsPage.php:157
+msgid "No forms are registered."
+msgstr "登録されているフォームはありません。"
+
+#: src/Init/FormsPage.php:184
+msgid "Input page"
+msgstr "入力ページ"
+
+#: src/Init/FormsPage.php:185
+msgid "Confirm page"
+msgstr "確認ページ"
+
+#: src/Init/FormsPage.php:186
+msgid "Result page"
+msgstr "完了ページ"
+
+#: src/Init/FormsPage.php:194
+msgid "Pages"
+msgstr "ページ"
+
+#: src/Init/FormsPage.php:209
+msgid "Mail"
+msgstr "メール"
+
+#: src/Init/FormsPage.php:214
+msgid "From"
+msgstr "送信元"
+
+#: src/Init/FormsPage.php:218
+msgid "Return-Path"
+msgstr "Return-Path"
+
+#: src/Init/FormsPage.php:222
+msgid "Recipients"
+msgstr "送信先"
+
+#: src/Init/FormsPage.php:230
+msgid "To"
+msgstr "To"
+
+#: src/Init/FormsPage.php:231
+msgid "CC"
+msgstr "CC"
+
+#: src/Init/FormsPage.php:232
+msgid "BCC"
+msgstr "BCC"
+
+#: src/Init/FormsPage.php:233
+msgid "Subject"
+msgstr "件名"
+
+#: src/Init/FormsPage.php:234
+msgid "Body"
+msgstr "本文"
+
+#: src/Init/FormsPage.php:249
+msgctxt "form settings section"
+msgid "Fields"
+msgstr "入力項目"
+
+#: src/Init/FormsPage.php:254
+msgid "Allowed fields"
+msgstr "受け付ける項目"
+
+#: src/Init/FormsPage.php:263
+msgid "Label"
+msgstr "項目名"
+
+#: src/Init/FormsPage.php:264
+msgid "Rules"
+msgstr "ルール"
+
+#: src/Init/FormsPage.php:265
+msgid "Recorded"
+msgstr "記録"
+
+#: src/Init/FormsPage.php:278
+msgid "\"after\" hook"
+msgstr "after フック"
+
+#: src/Init/FormsPage.php:284
+msgid "Features"
+msgstr "機能"
+
+#: src/Init/FormsPage.php:289
+msgid "Save to database"
+msgstr "データベースへの保存"
+
+#: src/Init/FormsPage.php:293
+msgid "Confirm step"
+msgstr "確認ステップ"
+
+#: src/Init/FormsPage.php:305
+msgid "AJAX (REST API)"
+msgstr "AJAX (REST API)"
+
+#: src/Init/FormsPage.php:309
+msgid "CORS origins"
+msgstr "CORS オリジン"
+
+#: src/Init/FormsPage.php:321
+msgid "Dynamic template"
+msgstr "動的テンプレート"
+
+#: src/Init/FormsPage.php:327
+msgid "Checks"
+msgstr "チェック"
+
+#: src/Init/FormsPage.php:330
+msgid "No problems found"
+msgstr "問題はありません"
+
+#: src/Init/FormsPage.php:334
+msgid "Warning"
+msgstr "警告"
+
+#: src/Init/FormsPage.php:360
+msgid "Inline text"
+msgstr "直接記述"
+
+#: src/Init/FormsPage.php:423
+msgid "Page not found"
+msgstr "ページが見つかりません"
+
+#: src/Init/FormsPage.php:425
+msgid "Can't be checked"
+msgstr "確認できません"
+
+#: src/Init/FormsPage.php:445
+msgid "Template not found"
+msgstr "テンプレートが見つかりません"
+
+#: src/Init/FormsPage.php:455
+msgid "Yes"
+msgstr "はい"
+
+#: src/Init/FormsPage.php:456
+msgid "No"
+msgstr "いいえ"
+
+#: src/Init/FormsPage.php:465
+msgid "Enabled"
+msgstr "有効"
+
+#: src/Init/FormsPage.php:466
+msgid "Disabled"
+msgstr "無効"
+
+#. translators: %s: page path, e.g. /contact/
+#: src/Init/FormsPage.php:519
+msgid "Input page not found: %s"
+msgstr "入力ページが見つかりません: %s"
+
+#. translators: %s: page path, e.g. /contact/confirm/
+#: src/Init/FormsPage.php:521
+msgid "Confirm page not found: %s"
+msgstr "確認ページが見つかりません: %s"
+
+#. translators: %s: page path, e.g. /contact/result/
+#: src/Init/FormsPage.php:523
+msgid "Result page not found: %s"
+msgstr "完了ページが見つかりません: %s"
+
+#. translators: %s: template slug, e.g. form/contact/admin-body
+#: src/Init/FormsPage.php:543
+msgid "Mail template not found: %s"
+msgstr "メールのテンプレートが見つかりません: %s"
+
+#: src/Init/FormsPage.php:549
+msgid "reCAPTCHA is enabled, but no reCAPTCHA configuration is registered (Form::setRecaptcha())."
+msgstr "reCAPTCHA が有効ですが、reCAPTCHA の設定が登録されていません (Form::setRecaptcha())。"
+
+#: src/Init/FormsPage.php:553
+msgid "Turnstile is enabled, but no Turnstile configuration is registered (Form::setTurnstile())."
+msgstr "Turnstile が有効ですが、Turnstile の設定が登録されていません (Form::setTurnstile())。"
+
+#. translators: %s: comma-separated placeholders, e.g. {company}, {zip}
+#: src/Init/FormsPage.php:561
+msgid "Placeholders that are not allowed fields: %s. They stay as they are in the mail unless the \"after\" hook sets them."
+msgstr "受け付ける項目にないプレースホルダーがあります: %s。after フックで値を設定しない限り、メールにはそのまま残ります。"
+
+#. translators: %s: comma-separated placeholders, e.g. {company}, {zip}
+#: src/Init/FormsPage.php:563
+msgid "Placeholders that are not allowed fields: %s. They stay as they are in the mail."
+msgstr "受け付ける項目にないプレースホルダーがあります: %s。メールにはそのまま残ります。"
 
 #. Validation message: rule.accepted
 #: src/Validation/Messages.php

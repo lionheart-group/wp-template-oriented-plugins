@@ -4,8 +4,8 @@
 
 WordPress plugin (PHP 8.1+, GPLv3+) for building multi-step forms using PHP templates.
 Handles validation, session storage, file uploads, email notifications, DB recording, and bot
-protection — all configured in code (no WP admin settings UI; there is an admin *viewer* for
-recorded submissions, see below).
+protection — all configured in code (no WP admin settings UI; there are two read-only admin
+*viewers*: recorded submissions, and the registered forms' settings under Tools, see below).
 
 **Namespace:** `TofuPlugin\` (PSR-4, mapped to `src/`)
 **Entry point:** `template-oriented-form-utilities.php`
@@ -36,7 +36,7 @@ AJAX/headless forms via `TofuPlugin\Init\RestEndpoint` — see `docs/ajax/`.
 
 | Dir | Responsibility |
 |---|---|
-| `Init/` | WordPress integration: `Initializer` (activation/deactivation/upgrade), `Migrate` (runs `migrations/`), `Endpoint` (`_tofu_key` handling), `RestEndpoint` (opt-in `tofu/v1` REST routes + CORS), `AdminPage` (admin UI listing recorded submissions) |
+| `Init/` | WordPress integration: `Initializer` (activation/deactivation/upgrade), `Migrate` (runs `migrations/`), `Endpoint` (`_tofu_key` handling), `RestEndpoint` (opt-in `tofu/v1` REST routes + CORS), `AdminPage` (admin UI listing recorded submissions; owns `capability()`, the `tofu_admin_page_capability` filter shared by both screens), `FormsPage` (read-only Tools → Forms (TOFU): each form's pages, mail, fields, features and warnings; pure helpers `pathStatus()`/`templateStatus()`/`unknownPlaceholders()`/`warnings()` are unit-tested, CSS in `assets/css/admin.css` enqueued on that screen only) |
 | `Helpers/` | Static-façade public API: `Form` (the class themes call — register/render/verify/redirect), `Session`, `Uploader`, `Encryptor` (AES via `AUTH_KEY`/`SECURE_AUTH_KEY`), `Template` (`get_template_part` + `{field}` placeholders), `Sanitizer`, `ReCAPTCHA`, `Turnstile`, `Directory` |
 | `Models/` | Stateful domain objects: `Form` (core action flow), `Validation`, `Mail`, `Session`/`Record` (DB models extending `Base\DatabaseModels`), `FieldValueCollection`, `UploadedFileCollection`, `ValidationErrorCollection`, `Optional` |
 | `Structure/` | Immutable config/value objects, PHP 8.1 promoted `readonly` properties + named args: `FormConfig`, `TemplateConfig`, `MailConfig`, `MailRecipientsConfig`/`Collection`, `MailAddress`, `ValidationConfig`, `ValidationError`, `ReCAPTCHAConfig`, `TurnstileConfig`, `FieldValue`, `UploadedFile`, `DatabaseModelColumn` |

@@ -40,6 +40,7 @@ use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Init\AdminPage;
+use TofuPlugin\Init\FormsPage;
 use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
 use TofuPlugin\Init\RestEndpoint;
@@ -120,3 +121,6 @@ RestEndpoint::init();
 
 // Register admin UI for viewing recorded submissions
 AdminPage::register();
+
+// Register the read-only form settings screen (Tools → Forms (TOFU))
+FormsPage::register();

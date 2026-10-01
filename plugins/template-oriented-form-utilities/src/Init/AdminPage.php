@@ -21,16 +21,18 @@ class AdminPage
     }
 
     /**
-     * Resolve the capability required to view recorded submissions.
+     * Resolve the capability required to view TOFU's admin pages: the recorded
+     * submissions and the read-only form settings (FormsPage).
      *
-     * Used both to register the menu and to guard the page itself — filtering only
-     * one of the two would show a menu entry that dies on click, or hide a page that
-     * is still reachable by URL.
+     * Used both to register the menus and to guard the pages themselves — filtering
+     * only one of the two would show a menu entry that dies on click, or hide a page
+     * that is still reachable by URL.
      */
-    private static function capability(): string
+    public static function capability(): string
     {
         /**
-         * Filters the capability required to view TOFU submission records.
+         * Filters the capability required to view TOFU's admin pages
+         * (submission records and form settings).
          *
          * @param string $capability Defaults to 'manage_options'.
          */
