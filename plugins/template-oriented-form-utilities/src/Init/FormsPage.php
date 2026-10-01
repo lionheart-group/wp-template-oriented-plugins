@@ -29,6 +29,17 @@ class FormsPage
     public const TONE_WARNING = 'warning';
 
     /**
+     * Badge tones for a switch: on (enabled, registered) and off.
+     */
+    public const TONE_ON = 'on';
+    public const TONE_OFF = 'off';
+
+    /**
+     * Every tone badgeHtml() accepts; anything else becomes TONE_INFO.
+     */
+    protected const TONES = [self::TONE_INFO, self::TONE_WARNING, self::TONE_ON, self::TONE_OFF];
+
+    /**
      * Results of pathStatus() and templateStatus().
      */
     public const STATUS_OK = 'ok';
@@ -122,10 +133,8 @@ class FormsPage
                     <tr>
                         <th scope="row"><?php echo esc_html__('reCAPTCHA', 'template-oriented-form-utilities'); ?></th>
                         <td>
-                            <?php if ($recaptcha === null) : ?>
-                                <?php echo esc_html__('Not registered', 'template-oriented-form-utilities'); ?>
-                            <?php else : ?>
-                                <?php echo esc_html__('Registered', 'template-oriented-form-utilities'); ?>
+                            <?php self::renderRegistered($recaptcha !== null); ?>
+                            <?php if ($recaptcha !== null) : ?>
                                 <p class="description">
                                     <?php echo esc_html__('Site key:', 'template-oriented-form-utilities'); ?>
                                     <code><?php echo esc_html($recaptcha->siteKey); ?></code><br>
@@ -138,10 +147,8 @@ class FormsPage
                     <tr>
                         <th scope="row"><?php echo esc_html__('Turnstile', 'template-oriented-form-utilities'); ?></th>
                         <td>
-                            <?php if ($turnstile === null) : ?>
-                                <?php echo esc_html__('Not registered', 'template-oriented-form-utilities'); ?>
-                            <?php else : ?>
-                                <?php echo esc_html__('Registered', 'template-oriented-form-utilities'); ?>
+                            <?php self::renderRegistered($turnstile !== null); ?>
+                            <?php if ($turnstile !== null) : ?>
                                 <p class="description">
                                     <?php echo esc_html__('Site key:', 'template-oriented-form-utilities'); ?>
                                     <code><?php echo esc_html($turnstile->siteKey); ?></code>
@@ -152,13 +159,42 @@ class FormsPage
                 </tbody>
             </table>
 
+            <h2><?php echo esc_html__('Forms', 'template-oriented-form-utilities'); ?></h2>
+
             <?php if ($forms === []) : ?>
-                <h2><?php echo esc_html__('Forms', 'template-oriented-form-utilities'); ?></h2>
                 <p><?php echo esc_html__('No forms are registered.', 'template-oriented-form-utilities'); ?></p>
             <?php else : ?>
-                <?php foreach ($forms as $form) : ?>
-                    <?php self::renderForm($form->config, $recaptcha !== null, $turnstile !== null); ?>
-                <?php endforeach; ?>
+                <?php
+                $configs = [];
+                foreach ($forms as $form) {
+                    $configs[$form->config->key] = $form->config;
+                }
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only tab selection, no state change
+                $requested = isset($_GET['form']) ? sanitize_text_field(wp_unslash((string) $_GET['form'])) : '';
+                $selected = self::selectedFormKey(array_keys($configs), $requested);
+                ?>
+                <nav class="nav-tab-wrapper tofu-tabs" aria-label="<?php echo esc_attr__('Forms', 'template-oriented-form-utilities'); ?>">
+                    <?php foreach ($configs as $key => $config) : ?>
+                        <?php
+                        $count = count(self::warnings($config, [static::class, 'pageExists'], [static::class, 'templateExists'], $recaptcha !== null, $turnstile !== null));
+                        $url = add_query_arg(['page' => Consts::ADMIN_PAGE_SLUG, 'form' => $key], admin_url('tools.php'));
+                        ?>
+                        <a href="<?php echo esc_url($url); ?>" class="nav-tab<?php echo $key === $selected ? ' nav-tab-active' : ''; ?>"<?php echo $key === $selected ? ' aria-current="page"' : ''; ?>>
+                            <?php echo esc_html($config->name); ?>
+                            <?php if ($count > 0) : ?>
+                                <?php
+                                /* translators: %d = number of warnings for the form */
+                                $label = sprintf(__('Warnings: %d', 'template-oriented-form-utilities'), $count);
+                                echo wp_kses(self::badgeHtml(self::TONE_WARNING, $label), self::ALLOWED_HTML);
+                                ?>
+                            <?php endif; ?>
+                        </a>
+                    <?php endforeach; ?>
+                </nav>
+
+                <?php if ($selected !== null) : ?>
+                    <?php self::renderForm($configs[$selected], $recaptcha !== null, $turnstile !== null); ?>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
         <?php
@@ -327,7 +363,7 @@ class FormsPage
         <h3><?php echo esc_html__('Checks', 'template-oriented-form-utilities'); ?></h3>
 
         <?php if ($warnings === []) : ?>
-            <p><?php echo wp_kses(self::badgeHtml(self::TONE_INFO, __('No problems found', 'template-oriented-form-utilities')), self::ALLOWED_HTML); ?></p>
+            <p><?php echo wp_kses(self::badgeHtml(self::TONE_ON, __('No problems found', 'template-oriented-form-utilities')), self::ALLOWED_HTML); ?></p>
         <?php else : ?>
             <ul class="tofu-warnings">
                 <?php foreach ($warnings as $warning) : ?>
@@ -461,9 +497,23 @@ class FormsPage
      */
     protected static function renderEnabled(bool $value): void
     {
-        echo $value
-            ? esc_html__('Enabled', 'template-oriented-form-utilities')
-            : esc_html__('Disabled', 'template-oriented-form-utilities');
+        echo wp_kses(self::switchBadgeHtml(
+            $value,
+            __('Enabled', 'template-oriented-form-utilities'),
+            __('Disabled', 'template-oriented-form-utilities')
+        ), self::ALLOWED_HTML);
+    }
+
+    /**
+     * @param bool $value
+     */
+    protected static function renderRegistered(bool $value): void
+    {
+        echo wp_kses(self::switchBadgeHtml(
+            $value,
+            __('Registered', 'template-oriented-form-utilities'),
+            __('Not registered', 'template-oriented-form-utilities')
+        ), self::ALLOWED_HTML);
     }
 
     /**
@@ -769,9 +819,39 @@ class FormsPage
      */
     public static function badgeHtml(string $tone, string $label): string
     {
-        $tone = $tone === self::TONE_WARNING ? self::TONE_WARNING : self::TONE_INFO;
+        $tone = in_array($tone, self::TONES, true) ? $tone : self::TONE_INFO;
 
         return sprintf('<span class="tofu-badge tofu-badge--%s">%s</span>', esc_attr($tone), esc_html($label));
+    }
+
+    /**
+     * The form whose tab is shown: the requested key when it is registered,
+     * otherwise the first form.
+     *
+     * @param string[] $keys Registered form keys, in registration order.
+     * @param string $requested The `form` query argument ('' when absent).
+     * @return ?string Null when no form is registered.
+     */
+    public static function selectedFormKey(array $keys, string $requested): ?string
+    {
+        if ($keys === []) {
+            return null;
+        }
+
+        return in_array($requested, $keys, true) ? $requested : $keys[0];
+    }
+
+    /**
+     * An on/off badge: TONE_ON with $onLabel, or TONE_OFF with $offLabel.
+     *
+     * @param bool $on
+     * @param string $onLabel
+     * @param string $offLabel
+     * @return string
+     */
+    public static function switchBadgeHtml(bool $on, string $onLabel, string $offLabel): string
+    {
+        return $on ? self::badgeHtml(self::TONE_ON, $onLabel) : self::badgeHtml(self::TONE_OFF, $offLabel);
     }
 
     /**

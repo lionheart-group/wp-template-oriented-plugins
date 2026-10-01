@@ -24,7 +24,7 @@ the configuration without reading the theme's code.
 **Bot protection** shows whether `Form::setRecaptcha()` and `Form::setTurnstile()` registered a
 configuration, with the site key and, for reCAPTCHA, the threshold. Secret keys are never shown.
 
-Then, for each form, its name and key, and:
+Then one tab per form, in registration order; a tab with problems shows how many. The first form is shown unless the URL asks for another (`&form=<key>`). Switches (enabled, registered) are shown as badges: green when on, grey when off. For the selected form, its name and key, and:
 
 | Section | What it shows |
 |---|---|

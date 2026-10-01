@@ -77,6 +77,31 @@ class FormsPageTest extends BaseTestCase
         $this->assertStringContainsString('tofu-badge--info', FormsPage::badgeHtml('"><script>', 'x'));
     }
 
+    public function testOnAndOffAreTonesOfTheirOwn(): void
+    {
+        $this->assertSame('<span class="tofu-badge tofu-badge--on">x</span>', FormsPage::badgeHtml(FormsPage::TONE_ON, 'x'));
+        $this->assertSame('<span class="tofu-badge tofu-badge--off">x</span>', FormsPage::badgeHtml(FormsPage::TONE_OFF, 'x'));
+    }
+
+    public function testSwitchBadgeShowsTheLabelForItsState(): void
+    {
+        $this->assertSame('<span class="tofu-badge tofu-badge--on">Enabled</span>', FormsPage::switchBadgeHtml(true, 'Enabled', 'Disabled'));
+        $this->assertSame('<span class="tofu-badge tofu-badge--off">Disabled</span>', FormsPage::switchBadgeHtml(false, 'Enabled', 'Disabled'));
+
+        $html = FormsPage::switchBadgeHtml(false, 'On', '<i>Off</i>');
+        $this->assertSame($html, wp_kses($html, FormsPage::ALLOWED_HTML));
+        $this->assertStringContainsString('&lt;i&gt;Off&lt;/i&gt;', $html);
+    }
+
+    public function testSelectedFormKey(): void
+    {
+        $this->assertSame('recruit', FormsPage::selectedFormKey(['contact', 'recruit'], 'recruit'));
+        $this->assertSame('contact', FormsPage::selectedFormKey(['contact', 'recruit'], ''));
+        $this->assertSame('contact', FormsPage::selectedFormKey(['contact', 'recruit'], 'unknown'));
+        $this->assertSame('contact', FormsPage::selectedFormKey(['contact', 'recruit'], 'Recruit'));
+        $this->assertNull(FormsPage::selectedFormKey([], 'contact'));
+    }
+
     public function testPlaceholders(): void
     {
         $this->assertSame(['email', 'name'], FormsPage::placeholders('{email}, { name } and {email} again'));

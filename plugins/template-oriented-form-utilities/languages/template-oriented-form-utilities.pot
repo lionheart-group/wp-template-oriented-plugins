@@ -818,3 +818,9 @@ msgstr ""
 #: src/Validation/Messages.php
 msgid ":attribute is not one of the accepted file types: :allowed_types"
 msgstr ""
+
+#. translators: %d = number of warnings for the form
+#: src/Init/FormsPage.php
+#, php-format
+msgid "Warnings: %d"
+msgstr ""

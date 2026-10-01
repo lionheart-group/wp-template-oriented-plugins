@@ -16,21 +16,53 @@
     color: #50575e;
 }
 
+.tofu-badge--on {
+    border-color: #00a32a;
+    background: #edfaef;
+    color: #005c12;
+}
+
+.tofu-badge--off {
+    border-color: #dcdcde;
+    background: #fff;
+    color: #646970;
+}
+
 .tofu-badge--warning {
     border-color: #dba617;
     background: #fcf9e8;
     color: #6b4e00;
 }
 
+.tofu-tabs {
+    margin-bottom: 0;
+}
+
+.tofu-tabs .tofu-badge {
+    margin: 0 0 0 4px;
+    vertical-align: 1px;
+}
+
 .tofu-page .tofu-form-title {
-    margin-top: 2.5em;
-    padding-top: 1.5em;
-    border-top: 1px solid #c3c4c7;
+    margin-top: 1.5em;
 }
 
 .tofu-page .tofu-form-title code {
     font-size: 13px;
     font-weight: 400;
+}
+
+/* Nested in a form-table: undo its th/td spacing so headers line up with cells. */
+.form-table .tofu-table th,
+.form-table .tofu-table td {
+    padding: 8px 10px;
+    line-height: 1.5;
+    vertical-align: top;
+}
+
+.form-table .tofu-table th {
+    width: auto;
+    font-weight: 600;
 }
 
 .tofu-table code {

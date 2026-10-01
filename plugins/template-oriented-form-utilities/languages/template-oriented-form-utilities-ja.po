@@ -817,3 +817,9 @@ msgstr ":attributeが大きすぎます。最大サイズは:max_sizeです"
 #: src/Validation/Messages.php
 msgid ":attribute is not one of the accepted file types: :allowed_types"
 msgstr ":attributeは許可された形式のファイルではありません: :allowed_types"
+
+#. translators: %d = number of warnings for the form
+#: src/Init/FormsPage.php
+#, php-format
+msgid "Warnings: %d"
+msgstr "警告 %d 件"
