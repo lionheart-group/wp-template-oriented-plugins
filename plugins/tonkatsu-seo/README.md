@@ -1,5 +1,7 @@
 # TONKATSU
 
+![TONKATSU — Template-Oriented No-database Knowledge-graph & Tag Setup Utility for WordPress](.github/banner-1544x500.jpg)
+
 Template-Oriented No-database Knowledge-graph & Tag Setup Utility
 
 ## Description
