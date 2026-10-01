@@ -27,7 +27,7 @@ $files = [
     'template-oriented-form-utilities.php',
     'index.php',
     'readme.txt',
-    // Carried so the autoloader can be regenerated from it, below.
+    // Used to generate the autoloader below, and shipped alongside vendor/.
     'composer.json',
 ];
 
@@ -127,9 +127,9 @@ if ($status !== 0) {
     exit(1);
 }
 
-// composer.json has served its purpose; shipping it would only invite
-// someone to run `composer install` inside a live plugin directory.
-unlink($target . '/composer.json');
+// composer.json stays in the build: WordPress.org expects it next to a
+// Composer-generated vendor/ directory, so reviewers can see there are no
+// runtime dependencies.
 
 if (in_array('--zip', $argv, true)) {
     $version = '0.0.0';
