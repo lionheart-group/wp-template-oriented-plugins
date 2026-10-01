@@ -1,6 +1,6 @@
 ---
 name: create-issue
-description: 'Create a new issue markdown file in the issues/ directory. Use when tracking a bug, feature request, or task for the TOFU plugin. The file name is auto-generated from the current date/time as YYYY-mm-dd-hh-ii-ss.md.'
+description: 'Create a new issue markdown file in a plugin''s issues/ directory (plugins/<slug>/issues/). Use when tracking a bug, feature request, or task for one of the plugins. The file name is auto-generated from the current date/time as YYYY-mm-dd-hh-ii-ss.md.'
 allowed-tools: 'Bash(date:*), Write'
 ---
 
@@ -16,7 +16,7 @@ allowed-tools: 'Bash(date:*), Write'
 
 1. **Get the current date/time** — run `date '+%Y-%m-%d-%H-%M-%S'` in the terminal to produce the filename timestamp (format: `YYYY-mm-dd-hh-ii-ss`).
 
-2. **Determine the filename** — `issues/<timestamp>.md`
+2. **Determine the filename** — `plugins/<slug>/issues/<timestamp>.md`. Ask which plugin it is for if that is not clear from context; create the `issues/` folder if it does not exist.
 
 3. **Gather information** — ask the user (or infer from context):
    - Issue type: Bug | Feature | Task | Refactor

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # PostToolUse hook (Edit|Write): run PHPStan on a single edited file when it
-# lives under src/ and is a .php file. Exits 2 (blocking, stderr fed back to
-# Claude) on PHPStan errors; exits 0 silently otherwise.
+# is a .php file under plugins/<slug>/src/, using that plugin's own PHPStan and
+# phpstan.neon. Exits 2 (blocking, stderr fed back to Claude) on PHPStan
+# errors; exits 0 silently otherwise.
 set -euo pipefail
 
 input="$(cat)"
@@ -17,7 +18,7 @@ if [ -z "$file_path" ]; then
 fi
 
 case "$file_path" in
-  */src/*.php|src/*.php) ;;
+  */plugins/*/src/*.php|plugins/*/src/*.php) ;;
   *) exit 0 ;;
 esac
 
@@ -25,17 +26,22 @@ if [ ! -f "$file_path" ]; then
   exit 0
 fi
 
-project_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-phpstan_bin="$project_dir/vendor/bin/phpstan"
+# The plugin folder is everything up to plugins/<slug>.
+plugin_dir="$(printf '%s' "$file_path" | sed -E 's#^(.*plugins/[^/]+)/src/.*$#\1#')"
+case "$plugin_dir" in
+  /*) ;;
+  *) plugin_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}/$plugin_dir" ;;
+esac
+phpstan_bin="$plugin_dir/vendor/bin/phpstan"
 
 if [ ! -x "$phpstan_bin" ]; then
   exit 0
 fi
 
 output="$("$phpstan_bin" analyse "$file_path" \
-  --configuration="$project_dir/phpstan.neon" \
+  --configuration="$plugin_dir/phpstan.neon" \
   --no-progress \
-  --memory-limit=512M \
+  --memory-limit=1024M \
   --error-format=raw 2>&1)" && exit 0
 
 echo "PHPStan found issues in $file_path:" >&2

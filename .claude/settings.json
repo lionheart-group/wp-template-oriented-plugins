@@ -5,6 +5,7 @@
       "Bash(composer test:*)",
       "Bash(composer phpstan:*)",
       "Bash(composer check:*)",
+      "Bash(composer check-all:*)",
       "Bash(composer dump-autoload:*)",
       "Bash(vendor/bin/phpunit:*)",
       "Bash(vendor/bin/phpstan:*)",
@@ -18,9 +19,8 @@
       "Bash(date:*)"
     ],
     "deny": [
-      "Read(./build/**)",
-      "Read(./vendor/**)",
-      "Read(./page/node_modules/**)"
+      "Read(./plugins/*/build/**)",
+      "Read(./plugins/*/vendor/**)"
     ]
   },
   "hooks": {

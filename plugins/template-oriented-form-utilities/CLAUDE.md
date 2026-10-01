@@ -105,10 +105,9 @@ directory, which is the layout WordPress expects on upload.
 ## Repo conventions
 
 - Use the `create-issue` skill to log bugs/features/tasks as `issues/YYYY-mm-dd-hh-ii-ss.md`
-- The `wp-phpstan`, `wp-plugin-development`, and `wp-plugin-directory-guidelines` skills under
-  `.claude/skills/` are vendored from `WordPress/agent-skills` and pinned in `skills-lock.json`
-  (repo root). If that lockfile's tooling is ever re-run, it may recreate `.github/skills/` —
-  re-run `git mv .github/skills .claude/skills` and delete the stray `.github/skills/` if so.
+  (in this plugin's folder)
+- Claude Code skills, commands and hooks are shared by all plugins and live in the repository
+  root's `.claude/` — see `../../CLAUDE.md`
 - Public API docs live in `docs/` (settings reference, page templates, AJAX/headless guides) —
   update them alongside any change to `Structure/` or `Helpers/Form.php` public methods
 

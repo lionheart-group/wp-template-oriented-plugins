@@ -17,6 +17,11 @@ Each plugin has its own `CLAUDE.md` for its architecture and decisions, and its 
 - **No runtime code is shared between plugins.** They are distributed separately and may run on the same site at different versions. Copy a pattern; never `require` another plugin's code.
 - `scripts/` holds tooling shared by all plugins (`each.sh`, `plugin-check.sh`, `svn-release.sh`).
 - The WordPress.org SVN working copies live outside this repo, in `../svn/<slug>/`.
+- `.claude/` (repo root) is shared by all plugins:
+  - commands `/check [slug]`, `/build <slug>`, `/release <slug> <version>`
+  - a PostToolUse hook that runs the edited plugin's PHPStan on files under `plugins/<slug>/src/`
+  - the skills `wp-phpstan`, `wp-plugin-development` and `wp-plugin-directory-guidelines`, vendored from `WordPress/agent-skills` and pinned in `skills-lock.json` (repo root); `create-issue` writes to `plugins/<slug>/issues/`
+  - If the skills lockfile tooling is re-run it may recreate `.github/skills/`; move it back with `git mv .github/skills .claude/skills`.
 
 ## Design principles (all plugins)
 
