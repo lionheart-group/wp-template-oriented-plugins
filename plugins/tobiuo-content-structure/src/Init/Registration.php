@@ -51,6 +51,13 @@ class Registration
         }
 
         foreach (Registry::getTaxonomies() as $config) {
+            $existing = get_taxonomy($config->name);
+            if ($existing instanceof \WP_Taxonomy && $existing->_builtin) {
+                Registry::refuseBuiltinTaxonomy($config->name);
+            }
+        }
+
+        foreach (Registry::getTaxonomies() as $config) {
             $result = register_taxonomy($config->name, $config->objectTypes, $config->args);
 
             if (is_wp_error($result)) {

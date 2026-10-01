@@ -214,4 +214,30 @@ class RegistrationTest extends BaseTestCase
 
         $this->assertSame(['post_type:event'], $GLOBALS['__tobiuo_test_log']);
     }
+
+    public function testATaxonomyCoreReportsAsBuiltInDiesAtTheHandOver(): void
+    {
+        // A built-in taxonomy of a later WordPress version, not in Consts::BUILTIN_TAXONOMIES
+        $GLOBALS['__tobiuo_test_taxonomies']['wp_future_tax'] = new \WP_Taxonomy('wp_future_tax', ['post'], ['_builtin' => true]);
+        Registry::registerTaxonomy(new TaxonomyConfig(name: 'wp_future_tax', objectTypes: ['case']));
+
+        try {
+            Registration::handOver();
+            $this->fail('Expected wp_die().');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Taxonomy "wp_future_tax" is built into WordPress', $e->getMessage());
+        }
+
+        $this->assertArrayNotHasKey('__tobiuo_test_log', $GLOBALS);
+    }
+
+    public function testATaxonomyRegisteredByAnotherPluginMayBeTakenOver(): void
+    {
+        $GLOBALS['__tobiuo_test_taxonomies']['area'] = new \WP_Taxonomy('area', ['post']);
+        Registry::registerTaxonomy(new TaxonomyConfig(name: 'area', objectTypes: ['case']));
+
+        Registration::handOver();
+
+        $this->assertSame(['taxonomy:area'], $GLOBALS['__tobiuo_test_log']);
+    }
 }

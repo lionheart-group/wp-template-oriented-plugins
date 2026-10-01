@@ -94,6 +94,10 @@ class Registry
     {
         self::assertOpen('registerTaxonomy', $config->name);
 
+        if (in_array($config->name, Consts::BUILTIN_TAXONOMIES, true)) {
+            self::refuseBuiltinTaxonomy($config->name);
+        }
+
         if (isset(self::$taxonomies[$config->name])) {
             wp_die(
                 sprintf('Taxonomy "%s" is already registered.', esc_html($config->name)),
@@ -237,6 +241,27 @@ class Registry
                 $name === 'post' ? ' Use Registry::registerPosts(new PostsConfig(...)) to set its archive and permalink.' : ''
             ),
             'TOBIUO Post Type Registration Error',
+            ['response' => 500]
+        );
+    }
+
+    /**
+     * Stop on a taxonomy core registers itself: registering it again would
+     * replace core's definition.
+     *
+     * @param string $name
+     * @return void
+     * @internal Also used by Init\Registration for taxonomies core reports as built in.
+     */
+    public static function refuseBuiltinTaxonomy(string $name): void
+    {
+        wp_die(
+            sprintf(
+                'Taxonomy "%s" is built into WordPress and cannot be registered with TOBIUO.%s',
+                esc_html($name),
+                in_array($name, ['category', 'post_tag'], true) ? ' To use it with a post type, list it in that post type\'s "taxonomies" argument.' : ''
+            ),
+            'TOBIUO Taxonomy Registration Error',
             ['response' => 500]
         );
     }

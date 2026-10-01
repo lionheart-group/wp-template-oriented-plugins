@@ -28,7 +28,7 @@ functions.php (on `init`, any priority < 99, any order)
 
 init 99 — Init\Registration::handOver()
     ├── Init\Posts::apply() — re-read the permalink structure into WP_Rewrite, `post` archive + rules
-    ├── refuse post types core reports as `_builtin`
+    ├── refuse post types and taxonomies core reports as `_builtin`
     ├── register_taxonomy() for every TaxonomyConfig, then register_post_type() for every PostTypeConfig
     ├── Registration::permalinkErrors() against what core now has → wp_die() on a bad config
     └── do_action('tobiuo_registered')
@@ -129,6 +129,8 @@ The spec was derived from reading CPTP. What is kept, and what is deliberately d
 - **`post` is never registered again.** `Registry::registerPostType()` refuses the names in
   `Consts::BUILTIN_POST_TYPES` at once (pointing to `registerPosts()` for `post`), and
   `Registration::handOver()` refuses anything core reports as `_builtin` (future core types).
+- **Built-in taxonomies are refused the same way**: `Consts::BUILTIN_TAXONOMIES` in
+  `registerTaxonomy()`, `_builtin` at the hand-over (`Registry::refuseBuiltinTaxonomy()`).
 - **The post permalink is the site's permalink structure**, supplied by
   `pre_option_permalink_structure` as `'/' . archive . structure`. The option in the DB is never
   written; Settings → Permalinks shows a notice (on that screen only) that saving there has no effect.

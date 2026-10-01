@@ -89,6 +89,26 @@ final class Consts
     ];
 
     /**
+     * Taxonomies core registers itself, which TOBIUO must not register again.
+     *
+     * Checked when a config is registered; Init\Registration also refuses any
+     * taxonomy core reports as `_builtin`, so ones added in later WordPress
+     * versions are caught too.
+     *
+     * @var string[]
+     */
+    public const BUILTIN_TAXONOMIES = [
+        'category',
+        'post_tag',
+        'nav_menu',
+        'link_category',
+        'post_format',
+        'wp_theme',
+        'wp_template_part_area',
+        'wp_pattern_category',
+    ];
+
+    /**
      * Plugins TOBIUO hands the permalinks to, keyed by a constant each defines.
      *
      * @var array<string, string>

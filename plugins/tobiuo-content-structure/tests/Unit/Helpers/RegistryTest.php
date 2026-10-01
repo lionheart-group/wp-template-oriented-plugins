@@ -158,4 +158,52 @@ class RegistryTest extends BaseTestCase
 
         $this->assertSame([], Registry::getPostTypes());
     }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function builtinTaxonomies(): array
+    {
+        $cases = [];
+        foreach ((new \ReflectionClassConstant(\TobiuoPlugin\Consts::class, 'BUILTIN_TAXONOMIES'))->getValue() as $name) {
+            $cases[$name] = [$name];
+        }
+
+        return $cases;
+    }
+
+    /**
+     * @dataProvider builtinTaxonomies
+     */
+    public function testRegisteringABuiltinTaxonomyDies(string $name): void
+    {
+        try {
+            Registry::registerTaxonomy(new TaxonomyConfig(name: $name, objectTypes: ['case']));
+            $this->fail('Expected wp_die().');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString("Taxonomy \"{$name}\" is built into WordPress", $e->getMessage());
+        }
+
+        $this->assertSame([], Registry::getTaxonomies());
+    }
+
+    public function testRefusingCategoryPointsToThePostTypeTaxonomiesArgument(): void
+    {
+        try {
+            Registry::registerTaxonomy(new TaxonomyConfig(name: 'category', objectTypes: ['case']));
+            $this->fail('Expected wp_die().');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('"taxonomies" argument', $e->getMessage());
+        }
+    }
+
+    public function testRefusingNavMenuHasNoHint(): void
+    {
+        try {
+            Registry::registerTaxonomy(new TaxonomyConfig(name: 'nav_menu'));
+            $this->fail('Expected wp_die().');
+        } catch (\RuntimeException $e) {
+            $this->assertStringNotContainsString('"taxonomies" argument', $e->getMessage());
+        }
+    }
 }

@@ -128,6 +128,7 @@ if (!class_exists('WP_Taxonomy')) {
         public $label = '';
         public $object_type = [];
         public $rewrite = false;
+        public $_builtin = false;
 
         public function __construct(string $name, array $objectType, array $args = [])
         {
@@ -643,6 +644,12 @@ if (!function_exists('register_post_type')) {
 if (!function_exists('get_post_type_object')) {
     function get_post_type_object($post_type) {
         return $GLOBALS['__tobiuo_test_post_types'][$post_type] ?? null;
+    }
+}
+
+if (!function_exists('get_taxonomy')) {
+    function get_taxonomy($taxonomy) {
+        return $GLOBALS['__tobiuo_test_taxonomies'][$taxonomy] ?? false;
     }
 }
 

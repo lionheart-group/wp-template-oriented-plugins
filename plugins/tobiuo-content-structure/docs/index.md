@@ -25,8 +25,10 @@ Because TOBIUO registers everything at `init` 99, code that needs the post types
 exist must run after that — on `tobiuo_registered`, on `wp_loaded`, or at `init` 100 and later.
 Registering a config after the hand-over calls `wp_die()`, so a late registration is noticed instead
 of silently doing nothing. So does registering a post type built into WordPress (`post`, `page`, …)
-with `registerPostType()`: it would replace core's definition. Posts are configured with
-[PostsConfig](settings/postsconfig.md).
+with `registerPostType()`, or a taxonomy built into WordPress (`category`, `post_tag`, …) with
+`registerTaxonomy()`: it would replace core's definition. Posts are configured with
+[PostsConfig](settings/postsconfig.md); to use `category` or `post_tag` with a post type, list it in
+that post type's `taxonomies` argument.
 
 ## Posts
 
