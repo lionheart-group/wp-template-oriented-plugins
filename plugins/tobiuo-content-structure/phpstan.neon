@@ -1,0 +1,13 @@
+parameters:
+    level: 5
+    phpVersion: 80100
+    paths:
+        - src
+    excludePaths:
+        - vendor
+    bootstrapFiles:
+        - tests/bootstrap-phpstan.php
+    parallel:
+        maximumNumberOfProcesses: 1
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
