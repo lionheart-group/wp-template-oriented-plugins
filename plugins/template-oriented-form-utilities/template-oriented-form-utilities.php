@@ -8,7 +8,7 @@
  *
  * @wordpress-plugin
  * Plugin Name: TOFU (Template-Oriented Form Utilities)
- * Plugin URI: https://lionheart-group.github.io/template-oriented-form-utilities/
+ * Plugin URI: https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities
  * Description: Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner.
  * Version: 0.1.1
  * Author: lionheartgroup

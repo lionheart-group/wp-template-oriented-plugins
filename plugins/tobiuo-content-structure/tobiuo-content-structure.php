@@ -7,7 +7,7 @@
  *
  * @wordpress-plugin
  * Plugin Name: TOBIUO (Template-Oriented Builder of Items, URLs & Organization)
- * Plugin URI: https://github.com/lionheart-group/tobiuo-content-structure
+ * Plugin URI: https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tobiuo-content-structure
  * Description: TOBIUO registers post types, taxonomies and custom permalink structures configured entirely in theme code, with nothing stored in the database.
  * Version: 0.0.1
  * Author: lionheartgroup

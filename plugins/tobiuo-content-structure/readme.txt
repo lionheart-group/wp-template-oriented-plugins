@@ -25,7 +25,7 @@ TOBIUO replaces the Custom Post Type Permalinks plugin. While that plugin is act
 
 GitHub and documentation for this plugin can be found at:
 
-[https://github.com/lionheart-group/tobiuo-content-structure](https://github.com/lionheart-group/tobiuo-content-structure)
+[https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tobiuo-content-structure](https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tobiuo-content-structure)
 
 == Installation ==
 

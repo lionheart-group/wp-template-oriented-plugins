@@ -10,7 +10,7 @@ Template-Oriented Builder of Items, URLs & Organization
 
 This plugin registers a WordPress site's custom post types and taxonomies, and gives each post type its own permalink structure — `/case/%case_category%/%postname%/`, `/news/%year%/%monthnum%/%postname%/`, `/event/%post_id%/` — with optional date and author archives below the post type archive. All of it is configured in theme PHP code: nothing is stored in the database and there is no settings screen, so the content structure is version-controlled with the theme that displays it.
 
-It replaces the [Custom Post Type Permalinks](https://wordpress.org/plugins/custom-post-type-permalinks/) plugin. It is a sibling of [TOFU](https://github.com/lionheart-group/template-oriented-form-utilities) and [TONKATSU](https://github.com/lionheart-group/tonkatsu-seo) and follows the same conventions.
+It replaces the [Custom Post Type Permalinks](https://wordpress.org/plugins/custom-post-type-permalinks/) plugin. It is a sibling of [TOFU](../template-oriented-form-utilities) and [TONKATSU](../tonkatsu-seo) and follows the same conventions.
 
 ## Installation
 

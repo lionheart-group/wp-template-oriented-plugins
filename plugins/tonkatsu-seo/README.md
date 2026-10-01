@@ -8,7 +8,7 @@ Template-Oriented No-database Knowledge-graph & Tag Setup Utility
 
 This plugin outputs SEO metadata for WordPress — title, meta description, canonical, robots, OGP, Twitter Card and JSON-LD — and adjusts WordPress core's sitemaps. All of it is configured in theme PHP code: nothing is stored in the database and there is no settings screen, so SEO configuration is version-controlled with the theme that renders the pages.
 
-It is a sibling of [TOFU](https://github.com/lionheart-group/template-oriented-form-utilities) and follows the same conventions.
+It is a sibling of [TOFU](../template-oriented-form-utilities) and follows the same conventions.
 
 ## Installation
 

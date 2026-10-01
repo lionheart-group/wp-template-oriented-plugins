@@ -22,7 +22,7 @@ TONKATSU stands down while Rank Math, Yoast SEO, All in One SEO or SEOPress is a
 
 GitHub and documentation for this plugin can be found at:
 
-[https://github.com/lionheart-group/tonkatsu-seo](https://github.com/lionheart-group/tonkatsu-seo)
+[https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tonkatsu-seo](https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tonkatsu-seo)
 
 == Installation ==
 

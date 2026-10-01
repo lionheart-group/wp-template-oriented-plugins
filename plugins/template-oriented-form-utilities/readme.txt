@@ -15,7 +15,7 @@ Template-Oriented Form Utilities (TOFU) is designed to streamline the process of
 
 GitHub and documentation for this plugin can be found at:
 
-[https://github.com/lionheart-group/template-oriented-form-utilities](https://github.com/lionheart-group/template-oriented-form-utilities)
+[https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities](https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities)
 
 == External services ==
 
