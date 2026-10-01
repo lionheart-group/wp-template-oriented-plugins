@@ -4,7 +4,7 @@ Tags: forms, utilities, template-oriented
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -150,6 +150,19 @@ In your theme's code. Tools -> Forms (TOFU) shows them, read-only.
       ignores a `Return-Path:` header passed to `wp_mail()`, so it is applied to PHPMailer's
       `Sender` and only for the plugin's own messages. `Mail::setReturnPath()` lets a
       `tofu_pre_send_mail` callback set it per recipient. See docs/settings/mailconfig.md.
+* v0.1.2
+    - Added: a read-only screen under Tools -> Forms (TOFU) that shows each registered form's
+      pages, mail, fields and features, one tab per form. It points out pages and mail
+      templates that don't exist, bot protection that is enabled but not registered, and
+      placeholders that are not allowed fields. Secret keys are never shown. The screen uses
+      the same `tofu_admin_page_capability` as the records screen. See docs/admin/index.md.
+    - Fixed: the migration that adds the `data` and `submitted_at` columns compares column
+      names exactly. With `LIKE`, the `_` in `submitted_at` matched any character, so a
+      similarly named column could make the migration skip adding it.
+    - Fixed: running the migrations a second time in the same request, after one had failed,
+      stopped with a fatal error instead of retrying it.
+    - Declared `Requires at least: 6.0`, so translate.wordpress.org imports the plugin's strings.
+    - Escaped and sanitized request values flagged by Plugin Check.
 
 
 == Upgrade Notice ==
