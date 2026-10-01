@@ -1,7 +1,7 @@
 === TOBIUO (Template-Oriented Builder of Items, URLs & Organization) ===
 Contributors: lionheartgroup
 Tags: post-types, permalinks, custom-post-type, taxonomy, rewrite
-Requires at least: 6.0
+Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.0.1

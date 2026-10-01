@@ -363,6 +363,7 @@ class Rewrite
 
             // The same filter core applies before saving, so a site that
             // adjusts the rules is not told they are missing.
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- core's own "{$permastructname}_rewrite_rules" filter, not a TOBIUO hook
             $filtered = apply_filters("{$postType->name}_rewrite_rules", $generated);
             $rules += is_array($filtered) ? $filtered : $generated;
         }
