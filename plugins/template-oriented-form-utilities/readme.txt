@@ -1,0 +1,238 @@
+=== TOFU (Template-Oriented Form Utilities) ===
+Contributors: lionheartgroup
+Tags: forms, utilities, template-oriented
+Tested up to: 7.1
+Requires PHP: 8.1
+Stable tag: 0.1.1
+License: GPLv3 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.txt
+
+Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing via template-based data management.
+
+== Description ==
+
+Template-Oriented Form Utilities (TOFU) is designed to streamline the process of creating and managing forms within WordPress themes and plugins. By adopting a template-oriented approach, TOFU allows developers to define form structures and behaviors using reusable templates, making it easier to manage/maintain with team collaboration through version control systems.
+
+GitHub and documentation for this plugin can be found at:
+
+[https://github.com/lionheart-group/template-oriented-form-utilities](https://github.com/lionheart-group/template-oriented-form-utilities)
+
+== External services ==
+
+This plugin relies on third-party services to protect your website from spam and automated attacks. Depending on your configuration, this plugin connects to the following services:
+
+= Google reCAPTCHA =
+* **Purpose:** Protecting forms from spam and bot abuse.
+* **When data is sent:** When a page containing a reCAPTCHA-protected form is loaded or submitted.
+* **Data sent:** IP address, mouse movements, browser/device information, and duration of stay.
+* **Service Provider:** Google LLC.
+* **Links:** [Google Privacy Policy](https://policies.google.com/privacy), [Google Terms of Service](https://policies.google.com/terms).
+
+= Cloudflare Turnstile =
+* **Purpose:** Privacy-focused alternative for bot protection and spam prevention.
+* **When data is sent:** When a user interacts with a form protected by Turnstile.
+* **Data sent:** Browser/device characteristics and interaction data (privacy-friendly, does not use cookies for tracking).
+* **Service Provider:** Cloudflare, Inc.
+* **Links:** [Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/), [Cloudflare Website Terms](https://www.cloudflare.com/website-terms/).
+
+== Installation ==
+
+1. From the WP admin panel, click "Plugins" -> "Add new".
+2. In the browser input box, type "Template-Oriented Form Utilities".
+3. Select the "Template-Oriented Form Utilities" plugin and click "Install".
+4. Activate the plugin.
+
+OR…
+
+1. Download the plugin from this page.
+2. Save the .zip file to a location on your computer.
+3. Open the WP admin panel, and click "Plugins" -> "Add new".
+4. Click "upload".. then browse to the .zip file downloaded from this page.
+5. Click "Install".. and then "Activate plugin".
+
+== Frequently Asked Questions ==
+
+
+
+== Screenshots ==
+
+
+
+== Changelog ==
+
+* v0.0.1 - Initial release.
+* v0.0.2 - Arranged required PHP version to 8.1, added external services section to the readme.
+* v0.0.3
+    - Implemented Ajax form submission and validation with reCAPTCHA and Turnstile support.
+    - Fixed recaptcha issue when embedded multiple forms on the same page.
+    - Replaced validation library from wixel/gump to somnambulist/validation.
+* v0.0.4
+    - Added optional database recording of form submissions (`saveToDatabase`), encrypted at
+      rest, with an admin screen to view recorded data.
+    - Added `Form::setTemplate()` to override a form's input/confirm/result URLs per visitor
+      session, so a single registered form can be embedded on multiple pages (e.g. post
+      templates); added `FormConfig::$dynamicTemplate` for forms configured this way.
+* v0.0.5
+    - The AJAX nonce endpoint (`GET /wp-json/tofu/v1/forms/{key}/nonce`) now also returns the
+      reCAPTCHA/Turnstile site key when enabled, so cross-origin/headless clients no longer need
+      to hardcode it separately from the server-side configuration.
+* v0.0.6
+    - Fixed: AJAX form submissions with a field literally named `key` could fail with a
+      "form not found" error, because the REST handlers read the form key from the merged
+      request parameters instead of strictly from the URL route.
+* v0.0.7
+    - Replaced the bundled validation library with an in-house engine. The plugin now has no
+      runtime dependencies at all. Every rule name still resolves, so existing `rules:`
+      configuration keeps working — see the upgrade notice for the behavioural differences.
+    - Added: `required_file` as the name of the required-file rule. `custom_required_file`,
+      its name since 0.0.3, still works and runs the same code.
+    - Fixed: a full-width space (U+3000) no longer satisfies `required`. It is what a Japanese
+      IME emits for the space bar, so a field the visitor sees as empty could pass.
+    - Fixed: `required` now recognises an empty file input as empty.
+    - Fixed: `after`, `before`, `extension` and `uuid` no longer raise a fatal error on
+      ordinary input — a blank date field was enough to return a 500.
+    - Fixed: `uploaded_file`, `mimes` and `extension` now work. They depended on a check that
+      is never true in this plugin's request flow.
+    - Fixed: a file carried over to the confirm page is verified against the server's own
+      session record, so a tampered form cannot claim an upload that is not there.
+    - Fixed: the session cookie is issued only when a session is actually saved. It was
+      previously sent on every request, including pages with no form and the admin screens,
+      which is enough to stop most full-page caches serving anything cached.
+    - Fixed: the plugin never called `load_plugin_textdomain()`, so its bundled Japanese
+      translations were not loaded and validation, reCAPTCHA and Turnstile messages rendered
+      in English on Japanese sites.
+    - Fixed: "reCAPTCHA token is missing." and "Turnstile token is missing." were the only
+      bot-protection messages not passed through `__()`, so they stayed English even on a
+      translated site.
+    - Fixed: none of the recorded-submissions admin screen's text had been extracted for
+      translation since it was added in 0.0.4, so translators never received it. It is in the
+      .pot now, with Japanese supplied.
+    - Tested against WordPress 7.1.
+* v0.1.0
+    - Added: seven actions and filters, so code outside a form's own configuration can react to
+      submissions and extend validation — `tofu_form_submitted`,
+      `tofu_register_validation_rules`, `tofu_pre_send_mail`, `tofu_validation_failed`,
+      `tofu_redirect_url`, `tofu_record_values` and `tofu_admin_page_capability`. They fire for
+      the redirect and AJAX flows alike. See docs/hooks/index.md.
+    - Added: a named custom validation rule can now be registered site-wide, via the
+      `tofu_register_validation_rules` action. The validator factory was previously unreachable,
+      so this was not possible without editing the plugin.
+    - Fixed: `Form::setTemplate()` no longer writes to the session, and so no longer sends a
+      `Set-Cookie`, when a page is merely rendered. A theme calling it for each of its registered
+      forms on every page load was issuing one cookie per form on every response — including
+      pages with no form on them — which stops server and CDN page caches serving anything
+      cached. The override is now carried to the following POST in a hidden field and persisted
+      only when the visitor actually submits.
+    - Fixed: at most one session cookie is issued per response. A single response can save the
+      session more than once, and each save sent its own redundant `Set-Cookie`.
+    - Fixed: database migrations now run when the plugin is updated. The plugin listened for
+      `upgrade_process_complete`, which WordPress does not define — the hook is
+      `upgrader_process_complete` — so migrations had only ever run on activation. A site that
+      installed before a migration was added and updated since never received it; updating to
+      this version applies anything outstanding. Migrations are tracked in `wp_tofu_migrate` and
+      already-applied ones are skipped, so there is nothing to do by hand.
+    - Fixed: a submission nonce is now bound to the form it was issued for. The redirect flow
+      minted its nonce against a bare `input`/`confirm` action, so a nonce issued for one form
+      verified against every other one; only the field name distinguished them, and a field name
+      is a label the sender controls. The REST flow already did this.
+    - Changed: the plugin's own hidden field names now all use a `__tofu_` prefix, and a form may
+      no longer declare a field name starting with `_tofu_` or `__tofu_` — `FormConfig` throws at
+      registration instead of letting the collision silently drop the form's value. Breaking for
+      AJAX/headless clients that hardcode those names; see the upgrade notice.
+* v0.1.1
+    - Added: `MailConfig::$returnPath` sets the Return-Path (envelope sender) of the plugin's
+      emails, so bounces go to a chosen address instead of the server default. WordPress
+      ignores a `Return-Path:` header passed to `wp_mail()`, so it is applied to PHPMailer's
+      `Sender` and only for the plugin's own messages. `Mail::setReturnPath()` lets a
+      `tofu_pre_send_mail` callback set it per recipient. See docs/settings/mailconfig.md.
+
+
+== Upgrade Notice ==
+
+= 0.1.0 =
+**The plugin's own hidden form fields have moved to a `__tofu_` prefix, and the field
+names a form declares may no longer start with `_tofu_` or `__tofu_`.**
+
+1. **Hidden field names renamed.** `_tofu_{key}_nonce` → `__tofu_{key}_nonce`,
+   `_tofu_recaptcha_token` → `__tofu_recaptcha_token`, `_tofu_turnstile_token` →
+   `__tofu_turnstile_token`. All of the plugin's form fields now share one prefix, which
+   the plugin also reserves, so a form's own field can never silently overwrite one.
+   - **Themes using `Form::formOpen()`/`formClose()` and the `Form::` helpers need no
+     changes** — the names are generated for you.
+   - **AJAX/headless clients that hardcode these names must be updated.** Clients reading
+     `field_name` and `token_field_name` from `GET /wp-json/tofu/v1/forms/{key}/nonce`
+     already follow automatically. Note the reCAPTCHA/Turnstile *error* keys in a
+     `{"success":false,"errors":{…}}` response change with the field names.
+   - Nothing outside form fields changed: the `_tofu_key` query parameter, the
+     `_tofu_session_key` cookie and the `_tofu_form_{key}` element ID are untouched, as
+     they cannot collide with a form's field names.
+   - A visitor who loaded a form page before updating can still submit it: the old field
+     names are accepted as a fallback for one release.
+
+2. **Field names starting with `_tofu_` or `__tofu_` are now rejected at registration.**
+   `FormConfig` throws an `InvalidArgumentException` naming the offending field if
+   `allows`, `rules`, `names`, `messages` or `records` declares one. Such a field never
+   worked — PHP keeps only the last value for a repeated name, and the plugin's input is
+   rendered last, so the form's own value was silently dropped. Rename the field.
+
+3. **Submission nonces are now bound to the form.** The redirect flow minted its nonce
+   against a bare `input`/`confirm` action, so a nonce issued for one form verified
+   against any other; the form key is now part of the action, as it already was for the
+   REST flow. No configuration change is needed.
+
+= 0.0.7 =
+**The validation library has been replaced with an in-house engine. No rule name was
+removed, so existing `rules:` configuration keeps working unchanged.**
+
+1. **English validation messages have been rewritten.** They previously came from the
+   bundled library; they are now TOFU's own text, in one consistent voice. Verdicts are
+   unaffected — a submission that passed before still passes — but any English wording
+   your site displays, or that your tests assert on, will differ. Japanese messages have
+   been rewritten to match.
+   - `required_file` returns as the name for the required-file rule.
+     `custom_required_file`, its name since 0.0.3, still works and behaves identically.
+
+2. **Translations now load properly.** The plugin never called
+   `load_plugin_textdomain()`, so its Japanese `.mo` was almost certainly never used —
+   validation, reCAPTCHA and Turnstile messages rendered in English on Japanese sites.
+   That call has been added, so those strings appear translated for the first time.
+   - German, French, Turkish and Chinese messages, which the old library bundled, now
+     fall back to English until a `.po` is contributed for them.
+
+3. **Behaviour fixes that may change what a form accepts:**
+   - A full-width space (U+3000) now counts as blank. It is what a Japanese IME emits
+     for the space bar in full-width mode, and it previously passed `required` — a field
+     the visitor believes is empty could satisfy a required check.
+   - `required` now understands file fields. It previously accepted a file input that
+     the visitor left empty, because the `$_FILES` entry is a non-empty array.
+   - Invalid input no longer raises a fatal error. `after`, `before`, `extension` and
+     `uuid` could return a 500 for ordinary input — a blank date field was enough. They
+     now fail validation and show a message.
+   - `uploaded_file`, `mimes` and `extension` work at all now; they previously depended
+     on a check that is never true in this plugin's request flow.
+   - A file carried over to the confirm page is verified against the server's own
+     session record, so a tampered form can no longer claim an upload that is not there.
+
+= 0.0.3 =
+**Breaking changes from v0.0.2:**
+
+1. **Validation rules renamed** (somnambulist/validation replaces wixel/gump):
+   - `required_file` → `custom_required_file`
+   - `max_len` → `max`
+   - `min_len` → `min`
+   - `valid_email` → `email`
+   - `numeric` stays the same
+   - `filters` parameter has been removed from `ValidationConfig` — sanitize input in the `after` hook if needed.
+   - A custom validation rule can also be registered site-wide via the
+     `tofu_register_validation_rules` action; see docs/hooks/index.md.
+
+2. **reCAPTCHA / Turnstile configuration moved to plugin level:**
+   - Remove `recaptcha: new ReCAPTCHAConfig(...)` and `turnstile: new TurnstileConfig(...)` from `FormConfig`.
+   - Call `Form::setRecaptcha(new ReCAPTCHAConfig(...))` once before registering forms.
+   - Call `Form::setTurnstile(new TurnstileConfig(...))` once before registering forms.
+   - Replace with `recaptchaEnabled: true` or `turnstileEnabled: true` in each `FormConfig`.
+
+3. **Confirm step requires explicit opt-in:**
+   - `confirmStep: true` must now be set explicitly in `FormConfig` to enable the confirm step.
+   - For the traditional redirect flow, also set `template->confirmPath`.
+   - `Form::embedScript()` is no longer needed on the confirm page template.

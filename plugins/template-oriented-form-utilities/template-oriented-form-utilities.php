@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * @link https://www.lionheart.co.jp/
+ * @since 0.0.2 - Changed required PHP version to 8.1
+ * @since 0.0.1
+ * @package Tofu
+ *
+ * @wordpress-plugin
+ * Plugin Name: TOFU (Template-Oriented Form Utilities)
+ * Plugin URI: https://lionheart-group.github.io/template-oriented-form-utilities/
+ * Description: Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner.
+ * Version: 0.1.1
+ * Author: lionheartgroup
+ * Author URI: https://www.lionheart.co.jp/
+ * Text Domain: template-oriented-form-utilities
+ * Domain Path: /languages
+ * Requires PHP: 8.1
+ * License: GPL-3.0+
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
+ */
+
+// If this file is called directly, abort.
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Currently plugin version.
+ * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Rename this for your plugin and update it as you release new versions.
+ */
+define('TOFU_VERSION', '0.1.1');
+define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('TOFU_PLUGIN_FILE', __FILE__);
+
+// Load autoloader
+require_once __DIR__ . '/vendor/autoload.php';
+
+use TofuPlugin\Consts;
+use TofuPlugin\Helpers\Session;
+use TofuPlugin\Helpers\Uploader;
+use TofuPlugin\Init\AdminPage;
+use TofuPlugin\Init\Initializer;
+use TofuPlugin\Init\Endpoint;
+use TofuPlugin\Init\RestEndpoint;
+use TofuPlugin\Logger;
+
+// Prepare Logger
+Logger::init('tofu');
+
+/**
+ * Load translations from the bundled languages/ directory.
+ *
+ * Without this the plugin's own .mo files are never registered, so every
+ * __() call — validation messages, reCAPTCHA and Turnstile errors, the
+ * "Remove File" label — renders untranslated English no matter the site
+ * locale. Runs on `init` because that is the earliest point translations
+ * are allowed to load.
+ */
+add_action('init', function () {
+    load_plugin_textdomain(
+        'template-oriented-form-utilities',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
+    );
+});
+
+// Register hooks that are fired when the plugin is activated or deactivated.
+register_activation_hook(__FILE__, function () {
+    Initializer::activate();
+});
+
+register_deactivation_hook(__FILE__, function () {
+    Initializer::deactivate();
+});
+
+// Register hooks that are fired when the plugin is upgraded.
+//
+// The hook is `upgrader_process_complete` — with the "r". This listened for
+// `upgrade_process_complete`, which WordPress does not define, so migrations
+// only ever ran on activation: updating the plugin applied none of them.
+add_action('upgrader_process_complete', function ($upgrader_object, $options) {
+    if (($options['action'] ?? '') !== 'update' || ($options['type'] ?? '') !== 'plugin') {
+        return;
+    }
+
+    // Updating one plugin passes 'plugin'; a bulk update passes 'plugins'.
+    // Reading only the latter is a TypeError on the single-update path, which
+    // is the one most sites take.
+    $plugins = $options['plugins'] ?? array_filter([$options['plugin'] ?? null]);
+    if (!is_array($plugins)) {
+        return;
+    }
+
+    if (in_array(plugin_basename(__FILE__), $plugins, true)) {
+        Initializer::upgrade();
+    }
+}, 10, 2);
+
+// Register hooks that are fired when the sendmail is failed
+add_action('wp_mail_failed', function ($wp_error) {
+    Logger::error('Mail sending failed: ' . $wp_error->get_error_message());
+}, 10, 1);
+
+// Garbage collection for expired sessions
+add_action('init', function () {
+    $rand = wp_rand(1, 100);
+
+    if ($rand <= Consts::GARBAGE_COLLECTION_PERCENTAGE) {
+        Session::clearExpired();
+        Uploader::clearExpired();
+    }
+});
+
+// Initialize endpoint
+Endpoint::init();
+
+// Initialize REST endpoint (AJAX / headless support)
+RestEndpoint::init();
+
+// Register admin UI for viewing recorded submissions
+AdminPage::register();

@@ -1,0 +1,580 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TOFU (Template-Oriented Form Utilities) 0.0.3\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/template-oriented-form-utilities\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-01-22T09:05:14+00:00\n"
+"PO-Revision-Date: 2026-01-22 17:12+0800\n"
+"Language: ja\n"
+"X-Generator: Poedit 3.8\n"
+"X-Domain: template-oriented-form-utilities\n"
+
+#. Plugin Name of the plugin
+#: template-oriented-form-utilities.php
+msgid "TOFU (Template-Oriented Form Utilities)"
+msgstr "TOFU (Template-Oriented Form Utilities)"
+
+#. Plugin URI of the plugin
+#: template-oriented-form-utilities.php
+msgid "https://lionheart-group.github.io/template-oriented-form-utilities/"
+msgstr "https://lionheart-group.github.io/template-oriented-form-utilities/"
+
+#. Description of the plugin
+#: template-oriented-form-utilities.php
+msgid "Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner."
+msgstr "Template-Oriented Form Utilitiesは、テンプレート指向でフォームを扱うためのユーティリティを提供するWordPressプラグインです。"
+
+#. Author of the plugin
+#: template-oriented-form-utilities.php
+msgid "lionheartgroup"
+msgstr "lionheartgroup"
+
+#. Author URI of the plugin
+#: template-oriented-form-utilities.php
+msgid "https://www.lionheart.co.jp/"
+msgstr "https://www.lionheart.co.jp/"
+
+#: build/src/Helpers/Form.php:225
+#: src/Helpers/Form.php:274
+msgid "Remove File"
+msgstr "ファイルの削除"
+
+#: src/Models/Form.php:497
+msgid "reCAPTCHA token is missing."
+msgstr "reCAPTCHAのトークンが取得できませんでした。ページを再読み込みしてお試しください。"
+
+#: src/Models/Form.php:535
+msgid "Turnstile token is missing."
+msgstr "Turnstileのトークンが取得できませんでした。ページを再読み込みしてお試しください。"
+
+#: build/src/Helpers/ReCAPTCHA.php:27
+#: build/src/Helpers/ReCAPTCHA.php:33
+#: src/Helpers/ReCAPTCHA.php:41
+#: src/Helpers/ReCAPTCHA.php:48
+msgid "Failed to verify reCAPTCHA at this time. Please try again later."
+msgstr "reCAPTCHAの検証に失敗しました。後ほど再度お試しください。"
+
+#: build/src/Helpers/ReCAPTCHA.php:43
+#: src/Helpers/ReCAPTCHA.php:59
+msgid "Unexpected response from the reCAPTCHA service. Please try again later."
+msgstr "reCAPTCHAサービスから予期せぬ応答がありました。後でもう一度お試しください。"
+
+#: build/src/Helpers/ReCAPTCHA.php:51
+#: build/src/Helpers/Turnstile.php:51
+#: src/Helpers/ReCAPTCHA.php:74
+#: src/Helpers/Turnstile.php:74
+msgid "The secret parameter is missing."
+msgstr "シークレットパラメータがありません."
+
+#: build/src/Helpers/ReCAPTCHA.php:54
+#: build/src/Helpers/Turnstile.php:54
+#: src/Helpers/ReCAPTCHA.php:77
+#: src/Helpers/Turnstile.php:77
+msgid "The secret parameter is invalid or malformed."
+msgstr "シークレットパラメータが無効か、または形式が正しくありません."
+
+#: build/src/Helpers/ReCAPTCHA.php:57
+#: build/src/Helpers/Turnstile.php:57
+#: src/Helpers/ReCAPTCHA.php:80
+#: src/Helpers/Turnstile.php:80
+msgid "The response parameter is missing."
+msgstr "レスポンスのパラメーターがありません."
+
+#: build/src/Helpers/ReCAPTCHA.php:60
+#: build/src/Helpers/Turnstile.php:60
+#: src/Helpers/ReCAPTCHA.php:83
+#: src/Helpers/Turnstile.php:83
+msgid "The response parameter is invalid or malformed."
+msgstr "レスポンスのパラメータが正しくないか、形が正しくありません。"
+
+#: build/src/Helpers/ReCAPTCHA.php:63
+#: build/src/Helpers/Turnstile.php:63
+#: src/Helpers/ReCAPTCHA.php:86
+#: src/Helpers/Turnstile.php:86
+msgid "The request is invalid or malformed."
+msgstr "リクエストが正しくないか、形式が正しくありません。"
+
+#: build/src/Helpers/ReCAPTCHA.php:66
+#: build/src/Helpers/Turnstile.php:66
+#: src/Helpers/ReCAPTCHA.php:89
+#: src/Helpers/Turnstile.php:89
+msgid "The response is no longer valid: either is too old or has been used previously."
+msgstr "レスポンスが有効ではありません。有効期限が切れているか、以前に使用された可能性があります。"
+
+#. translators: %s is the error code
+#: build/src/Helpers/ReCAPTCHA.php:72
+#: src/Helpers/ReCAPTCHA.php:94
+#, php-format
+msgid "An unknown reCAPTCHA error occurred (code: %s). Please try again later."
+msgstr "reCAPTCHAの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてください。"
+
+#: build/src/Helpers/ReCAPTCHA.php:82
+#: src/Helpers/ReCAPTCHA.php:105
+msgid "Failed to verify reCAPTCHA score. Please try again later."
+msgstr "reCAPTCHAのスコアを確認することができませんでした。後でもう一度試してみてください。"
+
+#: build/src/Helpers/ReCAPTCHA.php:85
+#: src/Helpers/ReCAPTCHA.php:108
+msgid "Verification failed. Please try again later."
+msgstr "認証に失敗しました。後でもう一度お試しください。"
+
+#: build/src/Helpers/Turnstile.php:27
+#: build/src/Helpers/Turnstile.php:33
+#: src/Helpers/Turnstile.php:41
+#: src/Helpers/Turnstile.php:48
+msgid "Failed to verify Turnstile at this time. Please try again later."
+msgstr "Turnstile の認証に失敗しました。後でもう一度お試しください。"
+
+#: build/src/Helpers/Turnstile.php:43
+#: src/Helpers/Turnstile.php:59
+msgid "Unexpected response from the Turnstile service. Please try again later."
+msgstr "Turnstileから予期せぬ応答がありました。後でもう一度お試しください。"
+
+#: build/src/Helpers/Turnstile.php:69
+#: src/Helpers/Turnstile.php:92
+msgid "An internal error occurred while verifying the response."
+msgstr "応答の検証中に内部エラーが発生しました。"
+
+#. translators: %s is the error code
+#: build/src/Helpers/Turnstile.php:75
+#: src/Helpers/Turnstile.php:97
+#, php-format
+msgid "An unknown Turnstile error occurred (code: %s). Please try again later."
+msgstr "Turnstileの不明のエラーが発生しました（コード：%s）。後でもう一度試してみてください。"
+
+#: src/Init/AdminPage.php:29
+#: src/Init/AdminPage.php:78
+#: src/Init/AdminPage.php:198
+msgid "TOFU Records"
+msgstr "TOFU 送信記録"
+
+#: src/Init/AdminPage.php:30
+msgid "TOFU"
+msgstr "TOFU"
+
+#: src/Init/AdminPage.php:45
+msgid "You do not have sufficient permissions to access this page."
+msgstr "このページにアクセスする権限がありません。"
+
+#: src/Init/AdminPage.php:85
+msgid "Filter by form"
+msgstr "フォームで絞り込む"
+
+#: src/Init/AdminPage.php:88
+msgid "All forms"
+msgstr "すべてのフォーム"
+
+#: src/Init/AdminPage.php:95
+msgid "Filter"
+msgstr "絞り込む"
+
+#: src/Init/AdminPage.php:118
+#: src/Init/AdminPage.php:155
+#: src/Init/AdminPage.php:231
+msgid "ID"
+msgstr "ID"
+
+#: src/Init/AdminPage.php:119
+#: src/Init/AdminPage.php:156
+#: src/Init/AdminPage.php:235
+msgid "Form"
+msgstr "フォーム"
+
+#: src/Init/AdminPage.php:120
+#: src/Init/AdminPage.php:157
+#: src/Init/AdminPage.php:239
+msgid "Submitted"
+msgstr "送信日時"
+
+#: src/Init/AdminPage.php:121
+#: src/Init/AdminPage.php:158
+msgid "Fields"
+msgstr "入力内容"
+
+#: src/Init/AdminPage.php:127
+msgid "No records found."
+msgstr "送信記録がありません。"
+
+#: src/Init/AdminPage.php:199
+msgid "Record not found."
+msgstr "送信記録が見つかりませんでした。"
+
+#: src/Init/AdminPage.php:201
+#: src/Init/AdminPage.php:225
+msgid "Back to list"
+msgstr "一覧へ戻る"
+
+#. translators: %d = record ID
+#: src/Init/AdminPage.php:218
+msgid "TOFU Record #%d"
+msgstr "TOFU 送信記録 #%d"
+
+#: src/Init/AdminPage.php:245
+msgid "Submitted Fields"
+msgstr "送信された項目"
+
+#: src/Init/AdminPage.php:248
+msgid "Field data could not be decrypted or is unavailable."
+msgstr "項目データを復号できないか、利用できません。"
+
+#: src/Init/AdminPage.php:253
+msgid "Field"
+msgstr "項目"
+
+#: src/Init/AdminPage.php:254
+msgid "Value"
+msgstr "値"
+
+#. Validation message: rule.accepted
+#: src/Validation/Messages.php
+msgid "Please confirm :attribute"
+msgstr ":attributeに同意してください"
+
+#. Validation message: rule.after
+#: src/Validation/Messages.php
+msgid ":attribute must be later than :time"
+msgstr ":attributeは:timeより後の日付である必要があります"
+
+#. Validation message: rule.alpha
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters only"
+msgstr ":attributeはアルファベットのみで入力してください"
+
+#. Validation message: rule.alpha_dash
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters, numbers, hyphens and underscores only"
+msgstr ":attributeはアルファベット、数字、ハイフン、アンダースコアのみで入力してください"
+
+#. Validation message: rule.alpha_num
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters and numbers only"
+msgstr ":attributeはアルファベットと数字のみで入力してください"
+
+#. Validation message: rule.alpha_spaces
+#: src/Validation/Messages.php
+msgid ":attribute must contain letters and spaces only"
+msgstr ":attributeはアルファベットとスペースのみで入力してください"
+
+#. Validation message: rule.any_of
+#: src/Validation/Messages.php
+msgid "Every entry in :attribute must be one of :allowed_values"
+msgstr ":attributeの各値は:allowed_valuesのいずれかである必要があります"
+
+#. Validation message: rule.array
+#: src/Validation/Messages.php
+msgid ":attribute must be a list of values"
+msgstr ":attributeは値のリストである必要があります"
+
+#. Validation message: rule.array_can_only_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute accepts only these keys: :keys"
+msgstr ":attributeで指定できるキーは次のみです: :keys"
+
+#. Validation message: rule.array_must_have_keys
+#: src/Validation/Messages.php
+msgid ":attribute is missing one or more required keys: :keys"
+msgstr ":attributeに必要なキーが不足しています: :keys"
+
+#. Validation message: rule.before
+#: src/Validation/Messages.php
+msgid ":attribute must be earlier than :time"
+msgstr ":attributeは:timeより前の日付である必要があります"
+
+#. Validation message: rule.between
+#: src/Validation/Messages.php
+msgid ":attribute must be between :min and :max"
+msgstr ":attributeは:minから:maxの間である必要があります"
+
+#. Validation message: rule.boolean
+#: src/Validation/Messages.php
+msgid ":attribute must be either true or false"
+msgstr ":attributeはtrueまたはfalseである必要があります"
+
+#. Validation message: rule.date
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid date"
+msgstr ":attributeは有効な日付を入力してください"
+
+#. Validation message: rule.default
+#: src/Validation/Messages.php
+msgid ":attribute is not valid"
+msgstr ":attributeは有効ではありません"
+
+#. Validation message: rule.default_value
+#: src/Validation/Messages.php
+msgid ":attribute falls back to :default"
+msgstr ":attributeの既定値は:defaultです"
+
+#. Validation message: rule.different
+#: src/Validation/Messages.php
+msgid ":attribute must not match :field"
+msgstr ":attributeは:fieldと異なる値にしてください"
+
+#. Validation message: rule.digits
+#: src/Validation/Messages.php
+msgid ":attribute must be exactly :length digits"
+msgstr ":attributeは:length桁の数字で入力してください"
+
+#. Validation message: rule.digits_between
+#: src/Validation/Messages.php
+msgid ":attribute must be between :min and :max digits"
+msgstr ":attributeは:min桁から:max桁の数字で入力してください"
+
+#. Validation message: rule.email
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid email address"
+msgstr ":attributeは有効なメールアドレスを入力してください"
+
+#. Validation message: rule.ends_with
+#: src/Validation/Messages.php
+msgid ":attribute must end with :compare_with"
+msgstr ":attributeは:compare_withで終わる必要があります"
+
+#. Validation message: rule.exists
+#: src/Validation/Messages.php
+msgid ":attribute does not match any existing record"
+msgstr ":attributeは既存のレコードと一致しません"
+
+#. Validation message: rule.extension
+#: src/Validation/Messages.php
+msgid ":attribute must be one of these file types: :allowed_extensions"
+msgstr ":attributeは次の形式のファイルを選択してください: :allowed_extensions"
+
+#. Validation message: rule.float
+#: src/Validation/Messages.php
+msgid ":attribute must be a decimal number"
+msgstr ":attributeは小数で入力してください"
+
+#. Validation message: rule.in
+#: src/Validation/Messages.php
+msgid ":attribute must be one of :allowed_values"
+msgstr ":attributeは:allowed_valuesのいずれかである必要があります"
+
+#. Validation message: rule.integer
+#: src/Validation/Messages.php
+msgid ":attribute must be a whole number"
+msgstr ":attributeは整数で入力してください"
+
+#. Validation message: rule.ip
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid IP address"
+msgstr ":attributeは有効なIPアドレスを入力してください"
+
+#. Validation message: rule.ipv4
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid IPv4 address"
+msgstr ":attributeは有効なIPv4アドレスを入力してください"
+
+#. Validation message: rule.ipv6
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid IPv6 address"
+msgstr ":attributeは有効なIPv6アドレスを入力してください"
+
+#. Validation message: rule.json
+#: src/Validation/Messages.php
+msgid ":attribute must be valid JSON"
+msgstr ":attributeは有効なJSONである必要があります"
+
+#. Validation message: rule.length
+#: src/Validation/Messages.php
+msgid ":attribute must be exactly :length characters"
+msgstr ":attributeは:length文字で入力してください"
+
+#. Validation message: rule.lowercase
+#: src/Validation/Messages.php
+msgid ":attribute must be lowercase"
+msgstr ":attributeは小文字である必要があります"
+
+#. Validation message: rule.max
+#: src/Validation/Messages.php
+msgid ":attribute may not be greater than :max"
+msgstr ":attributeは:max以下にしてください"
+
+#. Validation message: rule.mimes
+#: src/Validation/Messages.php
+msgid ":attribute must be one of these file types: :allowed_types"
+msgstr ":attributeは次の形式のファイルを選択してください: :allowed_types"
+
+#. Validation message: rule.min
+#: src/Validation/Messages.php
+msgid ":attribute may not be less than :min"
+msgstr ":attributeは:min以上にしてください"
+
+#. Validation message: rule.not_in
+#: src/Validation/Messages.php
+msgid ":attribute may not be any of :disallowed_values"
+msgstr ":attributeに:disallowed_valuesは指定できません"
+
+#. Validation message: rule.numeric
+#: src/Validation/Messages.php
+msgid ":attribute must be a number"
+msgstr ":attributeは数値で入力してください"
+
+#. Validation message: rule.phone_number
+#: src/Validation/Messages.php
+msgid "Enter :attribute in international format, such as +81312345678"
+msgstr ":attributeは国際形式で入力してください（例: +81312345678）"
+
+#. Validation message: rule.present
+#: src/Validation/Messages.php
+msgid ":attribute is missing from the submission"
+msgstr ":attributeが送信されていません"
+
+#. Validation message: rule.prohibited
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used here"
+msgstr ":attributeはここでは使用できません"
+
+#. Validation message: rule.prohibited_if
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used when :field is :values"
+msgstr ":attributeは:fieldが:valuesの場合は使用できません"
+
+#. Validation message: rule.prohibited_unless
+#: src/Validation/Messages.php
+msgid ":attribute can only be used when :field is :values"
+msgstr ":attributeは:fieldが:valuesの場合のみ使用できます"
+
+#. Validation message: rule.prohibited_with
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used together with :fields"
+msgstr ":attributeは:fieldsと同時には使用できません"
+
+#. Validation message: rule.prohibited_with_all
+#: src/Validation/Messages.php
+msgid ":attribute cannot be used when all of :fields are filled in"
+msgstr ":attributeは:fieldsがすべて入力されている場合は使用できません"
+
+#. Validation message: rule.prohibited_without
+#: src/Validation/Messages.php
+msgid ":attribute can only be used once :fields are filled in"
+msgstr ":attributeは:fieldsが入力されている場合のみ使用できます"
+
+#. Validation message: rule.prohibited_without_all
+#: src/Validation/Messages.php
+msgid ":attribute can only be used once all of :fields are filled in"
+msgstr ":attributeは:fieldsがすべて入力されている場合のみ使用できます"
+
+#. Validation message: rule.regex
+#: src/Validation/Messages.php
+msgid ":attribute is not in the expected format"
+msgstr ":attributeの形式が正しくありません"
+
+#. Validation message: rule.rejected
+#: src/Validation/Messages.php
+msgid ":attribute must be declined"
+msgstr ":attributeは同意しない状態にしてください"
+
+#. Validation message: rule.required
+#: src/Validation/Messages.php
+msgid ":attribute is required"
+msgstr ":attributeは必須項目です"
+
+#. Validation message: rule.required_if
+#: src/Validation/Messages.php
+msgid ":attribute is required when :field is :values"
+msgstr ":attributeは:fieldが:valuesの場合は必須です"
+
+#. Validation message: rule.required_unless
+#: src/Validation/Messages.php
+msgid ":attribute is required unless :field is :values"
+msgstr ":attributeは:fieldが:valuesでない場合は必須です"
+
+#. Validation message: rule.required_with
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields is filled in"
+msgstr ":attributeは:fieldsが入力されている場合は必須です"
+
+#. Validation message: rule.required_with_all
+#: src/Validation/Messages.php
+msgid ":attribute is required when all of :fields are filled in"
+msgstr ":attributeは:fieldsがすべて入力されている場合は必須です"
+
+#. Validation message: rule.required_without
+#: src/Validation/Messages.php
+msgid ":attribute is required when :fields is left blank"
+msgstr ":attributeは:fieldsが未入力の場合は必須です"
+
+#. Validation message: rule.required_without_all
+#: src/Validation/Messages.php
+msgid ":attribute is required when all of :fields are left blank"
+msgstr ":attributeは:fieldsがすべて未入力の場合は必須です"
+
+#. Validation message: rule.requires
+#: src/Validation/Messages.php
+msgid ":attribute also needs :fields to be filled in"
+msgstr ":attributeには:fieldsの入力も必要です"
+
+#. Validation message: rule.same
+#: src/Validation/Messages.php
+msgid ":attribute must match :field"
+msgstr ":attributeは:fieldと同じ値にしてください"
+
+#. Validation message: rule.starts_with
+#: src/Validation/Messages.php
+msgid ":attribute must start with :compare_with"
+msgstr ":attributeは:compare_withで始まる必要があります"
+
+#. Validation message: rule.string
+#: src/Validation/Messages.php
+msgid ":attribute must be text"
+msgstr ":attributeは文字列で入力してください"
+
+#. Validation message: rule.unique
+#: src/Validation/Messages.php
+msgid ":attribute must be unique — :value is already in use"
+msgstr ":attributeは重複できません。:valueは既に使用されています"
+
+#. Validation message: rule.uppercase
+#: src/Validation/Messages.php
+msgid ":attribute must be uppercase"
+msgstr ":attributeは大文字である必要があります"
+
+#. Validation message: rule.url
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid URL"
+msgstr ":attributeは有効なURLを入力してください"
+
+#. Validation message: rule.uuid
+#: src/Validation/Messages.php
+msgid "Enter :attribute as a valid UUID"
+msgstr ":attributeは有効なUUIDを入力してください"
+
+#. Validation message: rule.required_file
+#: src/Validation/Messages.php
+msgid "Please choose a file for :attribute"
+msgstr ":attributeのファイルを選択してください"
+
+#. Validation message: rule.max_mb
+#: src/Validation/Messages.php
+msgid ":attribute must be no larger than :max_mb MB"
+msgstr ":attributeは:max_mb MB以下のファイルを選択してください"
+
+#. Validation message: rule.mime_type
+#: src/Validation/Messages.php
+msgid ":attribute is not an accepted file type"
+msgstr ":attributeは許可されていない形式のファイルです"
+
+#. Validation message: rule.uploaded_file
+#: src/Validation/Messages.php
+msgid ":attribute was not uploaded successfully"
+msgstr ":attributeのアップロードに失敗しました"
+
+#. Validation message: rule.uploaded_file.min_size
+#: src/Validation/Messages.php
+msgid ":attribute is too small; the minimum is :min_size"
+msgstr ":attributeが小さすぎます。最小サイズは:min_sizeです"
+
+#. Validation message: rule.uploaded_file.max_size
+#: src/Validation/Messages.php
+msgid ":attribute is too large; the maximum is :max_size"
+msgstr ":attributeが大きすぎます。最大サイズは:max_sizeです"
+
+#. Validation message: rule.uploaded_file.type
+#: src/Validation/Messages.php
+msgid ":attribute is not one of the accepted file types: :allowed_types"
+msgstr ":attributeは許可された形式のファイルではありません: :allowed_types"

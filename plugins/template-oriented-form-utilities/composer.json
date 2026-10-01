@@ -1,0 +1,51 @@
+{
+    "name": "lionheart-group/template-oriented-form-utilities",
+    "description": "Template-Oriented Form Utilities",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "TofuPlugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TofuPlugin\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "LionHeart Group",
+            "email": "info@lionheart.co.jp"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "8.1"
+        },
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.2",
+        "phpstan/extension-installer": "^1.4",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "phpunit/phpunit": "^10.5"
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse --memory-limit=1024M",
+        "test": "phpunit",
+        "check": [
+            "@phpstan",
+            "@test"
+        ],
+        "build": [
+            "@check",
+            "php scripts/build-release.php"
+        ]
+    }
+}

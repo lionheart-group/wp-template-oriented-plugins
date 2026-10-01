@@ -1,0 +1,144 @@
+<?php
+
+namespace TofuPlugin\Structure;
+
+use TofuPlugin\Models\FieldValueCollection;
+use TofuPlugin\Models\ValidationErrorCollection;
+
+/**
+ * Template configuration class.
+ *
+ * ```php
+ * new ValidationConfig(
+ *     allows: [
+ *         'name',
+ *         'email',
+ *     ],
+ *     rules: [
+ *         'name' => 'required|max:200',
+ *         'email' => 'required|email',
+ *     ],
+ *     messages: [
+ *         'name' => [
+ *             'required' => 'The name field is required.',
+ *             'max' => 'The name must be maximum 200 characters.',
+ *         ],
+ *         'email' => [
+ *             'required' => 'The email field is required.',
+ *             'email' => 'The email must be a valid email address.',
+ *         ],
+ *     ],
+ *     after: function ($values, $errors) {
+ *         // Get the value of the 'name' field
+ *         $value = $values->getValue('name');
+ *
+ *         // Set the value of the 'foo' field
+ *         $values->addValue('foo', 'value');
+ *
+ *         // Add a custom error message
+ *         $errors->addError('name', 'This is a custom error message.');
+ *     }
+ * );
+ * ```
+ *
+ * @package TofuPlugin\Structure
+ */
+class ValidationConfig
+{
+    public function __construct(
+        /**
+         * Allowed field names.
+         *
+         * If not set, the specified fields do not store values in the session.
+         *
+         * ```php
+         * allows: [
+         *     'name',
+         *     'email',
+         * ],
+         * ```
+         *
+         * @var array
+         */
+        public readonly array $allows,
+
+        /**
+         * Validation rules.
+         *
+         * ```php
+         * rules: [
+         *     'name' => 'required|max:200',
+         *     'email' => 'required|email',
+         * ],
+         * ```
+         *
+         * Rules may also be given as an array, which is the only way to
+         * write a pattern containing a pipe:
+         *
+         * ```php
+         * rules: [
+         *     'name' => ['required', 'max' => 200],
+         *     'code' => ['regex' => '/^(a|b)-\d+$/'],
+         * ],
+         * ```
+         *
+         * @var array
+         * @see \TofuPlugin\Validation\ValidatorFactory::defaultRules() for every available rule
+         * @see docs/settings/validationconfig.md for the rule reference
+         */
+        public readonly array $rules,
+
+        /**
+         * Field names for error messages.
+         *
+         * ```php
+         * names: [
+         *     'name' => 'Full Name',
+         *     'email' => 'Email Address',
+         * ]
+         * ```
+         */
+        public readonly array $names,
+
+        /**
+         * Validation messages.
+         *
+         * ```php
+         * messages: [
+         *     'name' => [
+         *         'required' => 'The name field is required.',
+         *         'max' => 'The name must be maximum 200 characters.',
+         *     ],
+         *     'email' => [
+         *         'required' => 'The email field is required.',
+         *         'email' => 'The email must be a valid email address.',
+         *     ],
+         * ],
+         * ```
+         *
+         * @var array
+         */
+        public readonly array $messages = [],
+
+        /**
+         * Custom after hook
+         *
+         * @var ?\Closure(FieldValueCollection $values, ValidationErrorCollection $errors):void
+         */
+        public readonly ?\Closure $after = null,
+
+        /**
+         * Fields to persist when `FormConfig::$saveToDatabase` is true.
+         *
+         * Sits alongside `allows` so field names are easy to cross-reference.
+         * An empty array (default) stores all fields listed in `allows`.
+         * A non-empty array acts as a further filter: only the named fields are
+         * included in the encrypted payload. Fields absent from `allows` are
+         * silently skipped. Use this to exclude sensitive data (e.g. passwords,
+         * tokens) from the persisted record without changing validation rules.
+         *
+         * @var string[]
+         */
+        public readonly array $records = [],
+    ) {}
+}
