@@ -43,7 +43,9 @@ Each plugin has its own `CLAUDE.md` for its architecture and decisions, and its 
 - **No bundled translations** and no `load_plugin_textdomain()`: translate.wordpress.org serves them by slug. Every translation call uses the literal slug as text domain (`TextDomainTest`).
 - **Translations we contribute live in `plugins/<slug>/translations/`** (outside the build allow-list, so never shipped): `<slug>-ja.po` for the code (translate.wordpress.org project *Stable*) and `<slug>-readme-ja.po` for the readme (*Stable Readme*). Start each from an export of that project, so the originals match what translate.wordpress.org imported, then upload it there (Import Translations). Export again after approval to keep the files current.
 - Plugin names must not use others' trademarks (TORO was rejected); the slug is fixed after approval.
-- `readme.txt` and the plugin header declare `Requires at least` (6.0) and `Requires PHP` (8.1). Without `Requires at least`, translate.wordpress.org does not import the code strings.
+- `readme.txt` and the plugin header declare `Requires at least` (6.5) and `Requires PHP` (8.1). Without `Requires at least`, translate.wordpress.org does not import the code strings.
+  - 6.5 because the upload check reports WordPress functions newer than `Requires at least` as errors, and it counts PHP 8.1's `array_is_list()` as WordPress 6.5's polyfill. `$wpdb->prepare()`'s `%i` needs 6.2.
+  - `scripts/plugin-check.sh` runs only Plugin Check's PHPCS rulesets. The upload form at WordPress.org also runs Plugin Check's other checks (such as this one), so a clean local run can still get findings there.
 - The release zip contains only an allow-list (`src/`, `assets/`, other runtime folders, the main file, `index.php`, `readme.txt`, `composer.json` and the classmap autoloader) — never tests, scripts or dev docs.
 
 ## Commands
