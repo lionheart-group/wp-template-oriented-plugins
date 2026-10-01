@@ -57,6 +57,8 @@ scripts/svn-release.sh <slug>                   # WordPress.org release (asks be
 
 ## Git
 
-- `master` is the only long-lived branch. Commit messages in English, past tense, one topic per commit (`Added …`, `Fixed …`).
+- Each plugin has its own development branch, `<short name>/develop`: `tofu/develop`, `tonkatsu/develop`, `tobiuo/develop`. Work and commit on the branch of the plugin you are changing; create it from `master` when it doesn't exist yet.
+- `master` holds released code only and is updated by merging a plugin's development branch. Changes shared by all plugins (root files, `scripts/`, `.claude/`, CI) go through whichever development branch needs them first.
+- Commit messages in English, past tense, one topic per commit (`Added …`, `Fixed …`).
 - Keep each commit within one plugin when possible.
-- Release tags: `<slug>/<version>` (e.g. `tonkatsu-seo/0.0.1`).
+- Release tags: `<slug>/<version>` (e.g. `tonkatsu-seo/0.0.1`). Tag on `master`, after the merge.
