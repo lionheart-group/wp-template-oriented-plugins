@@ -1,0 +1,236 @@
+# Translation of Plugins - TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility) - Stable (latest release) in Japanese
+# This file is distributed under the same license as the Plugins - TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility) - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: +0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/4.1.0\n"
+"Language: ja_JP\n"
+"Project-Id-Version: Plugins - TONKATSU (Template-Oriented No-database Knowledge-graph &amp; Tag Setup Utility) - Stable (latest release)\n"
+
+#: src/Init/SearchVisibilityNotice.php:48
+msgid "Reading Settings"
+msgstr "表示設定"
+
+#: src/Init/SearchVisibilityNotice.php:46
+msgid "Every page is output as noindex and the XML sitemaps are disabled, whatever the SEO settings say. Uncheck the setting before the site goes live."
+msgstr "SEOの設定にかかわらず、すべてのページが noindex で出力され、XMLサイトマップも無効になります。サイトを公開する前に設定を解除してください。"
+
+#: src/Init/SearchVisibilityNotice.php:45
+msgid "Search engines are discouraged from indexing this site."
+msgstr "「検索エンジンがサイトをインデックスしないようにする」が有効になっています。"
+
+#. translators: %s: name of the other SEO plugin, e.g. "Rank Math SEO"
+#: src/Init/Conflict.php:80
+msgid "TONKATSU is not outputting any SEO tags or sitemap changes because %s is active. Deactivate it to let TONKATSU take over."
+msgstr "%s が有効化されているため、TONKATSUはSEOタグの出力とサイトマップの調整を行っていません。TONKATSUに切り替えるには、そのプラグインを無効化してください。"
+
+#: src/Init/AdminPage.php:236
+msgid "No taxonomies are registered."
+msgstr "登録されたタクソノミーはありません。"
+
+#: src/Init/AdminPage.php:235
+msgid "Taxonomy"
+msgstr "タクソノミー"
+
+#: src/Init/AdminPage.php:231
+msgid "Taxonomies"
+msgstr "タクソノミー"
+
+#: src/Init/AdminPage.php:227
+msgid "No post type archives are registered."
+msgstr "登録された投稿タイプアーカイブはありません。"
+
+#: src/Init/AdminPage.php:226
+msgid "Post type"
+msgstr "投稿タイプ"
+
+#: src/Init/AdminPage.php:222
+msgid "Post type archives"
+msgstr "投稿タイプアーカイブ"
+
+#: src/Init/AdminPage.php:208
+msgid "(front page)"
+msgstr "（フロントページ）"
+
+#: src/Init/AdminPage.php:194
+msgid "No pages are registered."
+msgstr "登録されたページはありません。"
+
+#: src/Init/AdminPage.php:188
+msgid "OG image"
+msgstr "OG画像"
+
+#: src/Init/AdminPage.php:186
+msgid "Canonical"
+msgstr "canonical"
+
+#: src/Init/AdminPage.php:184 src/Init/AdminPage.php:255
+msgid "Title"
+msgstr "タイトル"
+
+#: src/Init/AdminPage.php:183
+msgid "Path"
+msgstr "パス"
+
+#: src/Init/AdminPage.php:177
+msgid "Pages"
+msgstr "固定ページ一覧"
+
+#: src/Init/AdminPage.php:176
+msgid "Pages without a registration are listed with their values on the Pages screen."
+msgstr "登録していないページの値は、固定ページ一覧で確認できます。"
+
+#: src/Init/AdminPage.php:174
+msgid "Values as each page outputs them: the tonkatsu_post_values filter, the page configuration and the fallbacks, already resolved."
+msgstr "各ページが実際に出力する値です（tonkatsu_post_values フィルター、ページ設定、フォールバックを適用済み）。"
+
+#: src/Init/AdminPage.php:173
+msgid "Registered pages"
+msgstr "登録済みページ"
+
+#: src/Init/AdminPage.php:167
+msgid "Excluded taxonomies"
+msgstr "除外するタクソノミー"
+
+#: src/Init/AdminPage.php:163
+msgid "Excluded post types"
+msgstr "除外する投稿タイプ"
+
+#: src/Init/AdminPage.php:159
+msgid "Excluded providers"
+msgstr "除外するプロバイダー"
+
+#: src/Init/AdminPage.php:149
+msgid "Sitemap"
+msgstr "サイトマップ"
+
+#: src/Init/AdminPage.php:134
+msgid "Organization"
+msgstr "組織"
+
+#: src/Init/AdminPage.php:130
+msgid "Locale"
+msgstr "ロケール"
+
+#: src/Init/AdminPage.php:126
+msgid "Twitter account"
+msgstr "Twitterアカウント"
+
+#: src/Init/AdminPage.php:122
+msgid "Default OG image"
+msgstr "デフォルトのOG画像"
+
+#: src/Init/AdminPage.php:118
+msgid "Default description"
+msgstr "デフォルトのディスクリプション"
+
+#: src/Init/AdminPage.php:113 src/Init/AdminPage.php:154
+msgid "Disabled"
+msgstr "無効"
+
+#: src/Init/AdminPage.php:112 src/Init/AdminPage.php:153
+msgid "Enabled"
+msgstr "有効"
+
+#: src/Init/AdminPage.php:108
+msgid "Parent titles in child page titles"
+msgstr "子ページのタイトルに親ページを含める"
+
+#: src/Init/AdminPage.php:104
+msgid "Separator"
+msgstr "区切り文字"
+
+#: src/Init/AdminPage.php:99
+msgid "(WordPress site title)"
+msgstr "（WordPressのサイトタイトル）"
+
+#: src/Init/AdminPage.php:95
+msgid "Site name"
+msgstr "サイト名"
+
+#: src/Init/AdminPage.php:89
+msgid "The theme has not registered a SiteConfig, so the defaults below are in use."
+msgstr "テーマでSiteConfigが登録されていないため、以下のデフォルト値が使われています。"
+
+#: src/Init/AdminPage.php:86
+msgid "Site"
+msgstr "サイト設定"
+
+#: src/Init/AdminPage.php:84
+msgid "This screen is read-only. TONKATSU is configured in the theme's PHP code, and nothing is stored in the database."
+msgstr "この画面は閲覧専用です。TONKATSUの設定はテーマのPHPコードで行い、データベースには何も保存されません。"
+
+#: src/Init/AdminPage.php:74
+msgid "You do not have sufficient permissions to access this page."
+msgstr "このページにアクセスする権限がありません。"
+
+#: src/Init/AdminPage.php:61
+msgid "SEO (TONKATSU)"
+msgstr "SEO (TONKATSU)"
+
+#: src/Init/AdminPage.php:60 src/Init/AdminPage.php:82
+msgid "SEO Settings (TONKATSU)"
+msgstr "SEO設定 (TONKATSU)"
+
+#: src/Init/AdminColumns.php:223
+msgid "Search engines discouraged"
+msgstr "検索エンジンでの表示を制限中"
+
+#: src/Init/AdminColumns.php:188
+msgid "Site default"
+msgstr "サイト共通の設定"
+
+#: src/Init/AdminColumns.php:186
+msgid "Not output"
+msgstr "出力されません"
+
+#: src/Init/AdminColumns.php:178
+msgid "From the page title"
+msgstr "ページタイトルから生成"
+
+#: src/Init/AdminColumns.php:177
+msgid "From the site name"
+msgstr "サイト名から生成"
+
+#: src/Init/AdminColumns.php:102 src/Init/AdminPage.php:187
+#: src/Init/AdminPage.php:257
+msgid "Robots"
+msgstr "robots"
+
+#: src/Init/AdminColumns.php:101 src/Init/AdminPage.php:185
+#: src/Init/AdminPage.php:256
+msgid "Description"
+msgstr "ディスクリプション"
+
+#: src/Init/AdminColumns.php:100
+msgid "SEO title"
+msgstr "SEOタイトル"
+
+#. Author URI of the plugin
+#: tonkatsu-seo.php
+msgid "https://www.lionheart.co.jp/"
+msgstr "https://www.lionheart.co.jp/"
+
+#. Author of the plugin
+#: tonkatsu-seo.php
+msgid "lionheartgroup"
+msgstr "lionheartgroup"
+
+#. Description of the plugin
+#: tonkatsu-seo.php
+msgid "TONKATSU outputs SEO metadata, structured data and sitemap adjustments configured entirely in theme code, with nothing stored in the database."
+msgstr "TONKATSUは、テーマのコードだけで設定したSEOメタデータ・構造化データ・サイトマップ調整を出力します。データベースには何も保存しません。"
+
+#. Plugin URI of the plugin
+#: tonkatsu-seo.php
+msgid "https://github.com/lionheart-group/tonkatsu-seo"
+msgstr "https://github.com/lionheart-group/tonkatsu-seo"
+
+#. Plugin Name of the plugin
+#: tonkatsu-seo.php
+msgid "TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility)"
+msgstr "TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility)"
