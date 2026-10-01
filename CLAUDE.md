@@ -41,6 +41,7 @@ Each plugin has its own `CLAUDE.md` for its architecture and decisions, and its 
 - **Admin notices only on the screens they concern** (guideline 11): the Plugins screen and the plugin's own page.
 - Use `wp_parse_url()`, sanitize `$_SERVER` values, prefer core APIs to string surgery.
 - **No bundled translations** and no `load_plugin_textdomain()`: translate.wordpress.org serves them by slug. Every translation call uses the literal slug as text domain (`TextDomainTest`).
+- **Translations we contribute live in `plugins/<slug>/translations/`** (outside the build allow-list, so never shipped): `<slug>-ja.po` for the code (translate.wordpress.org project *Stable*) and `<slug>-readme-ja.po` for the readme (*Stable Readme*). Start each from an export of that project, so the originals match what translate.wordpress.org imported, then upload it there (Import Translations). Export again after approval to keep the files current.
 - Plugin names must not use others' trademarks (TORO was rejected); the slug is fixed after approval.
 - `readme.txt` and the plugin header declare `Requires at least` (6.0) and `Requires PHP` (8.1). Without `Requires at least`, translate.wordpress.org does not import the code strings.
 - The release zip contains only an allow-list (`src/`, `assets/`, other runtime folders, the main file, `index.php`, `readme.txt`, `composer.json` and the classmap autoloader) — never tests, scripts or dev docs.

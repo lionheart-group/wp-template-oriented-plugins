@@ -184,14 +184,15 @@ fits the site's privacy policy and retention rules.
 
 ### `tofu_admin_page_capability`
 
-Filters the capability required to view recorded submissions in wp-admin.
+Filters the capability required to view TOFU's admin screens: the recorded submissions and the
+read-only form settings under Tools (see [Admin screens](../admin/index.md)).
 
 ```php
 apply_filters( 'tofu_admin_page_capability', string $capability );
 ```
 
 Defaults to `manage_options`. A non-string or empty return value falls back to that default. The
-filter governs both the menu entry and the page itself.
+filter governs both screens, and for each both the menu entry and the page itself.
 
 ```php
 add_filter( 'tofu_admin_page_capability', fn () => 'edit_pages' );

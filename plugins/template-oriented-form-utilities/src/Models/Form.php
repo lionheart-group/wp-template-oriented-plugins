@@ -478,6 +478,7 @@ class Form
         $legacyNonceKey = sprintf(Consts::LEGACY_NONCE_FORMAT, $this->config->key);
 
         if (empty($post)) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- this method is the nonce check; it reads the nonce field from $_POST
             $post = $_POST;
         }
 
@@ -522,6 +523,7 @@ class Form
             wp_die('Nonce verification failed.', 'TOFU Nonce Error', ['response' => 403]);
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified by verifyNonceField() above
         $result = $this->processInput($_POST, $_FILES);
 
         if (!$result['success']) {
@@ -607,6 +609,7 @@ class Form
         }
 
         if (empty($post)) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- called from processInput(), after the caller's verifyNonceField()
             $post = $_POST;
         }
 
@@ -648,6 +651,7 @@ class Form
         }
 
         if (empty($post)) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- called from processInput(), after the caller's verifyNonceField()
             $post = $_POST;
         }
 

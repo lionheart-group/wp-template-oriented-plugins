@@ -133,4 +133,9 @@ final class Consts
      * 2nd parameter: Nonce action (e.g. `input`/`confirm`)
      */
     public const REST_NONCE_ACTION_FORMAT = '_tofu_%s_%s_rest_nonce';
+
+    /**
+     * Admin page slug (Tools → Forms (TOFU)).
+     */
+    public const ADMIN_PAGE_SLUG = 'template-oriented-form-utilities';
 }
