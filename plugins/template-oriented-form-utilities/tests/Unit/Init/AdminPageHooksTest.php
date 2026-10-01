@@ -7,23 +7,16 @@ use TofuPlugin\Tests\Unit\BaseTestCase;
 
 class AdminPageHooksTest extends BaseTestCase
 {
-    private function capability(): string
-    {
-        $method = new \ReflectionMethod(AdminPage::class, 'capability');
-        $method->setAccessible(true);
-        return $method->invoke(null);
-    }
-
     public function testDefaultsToManageOptions(): void
     {
-        $this->assertSame('manage_options', $this->capability());
+        $this->assertSame('manage_options', AdminPage::capability());
     }
 
     public function testFilterCanLowerTheRequiredCapability(): void
     {
         add_filter('tofu_admin_page_capability', fn () => 'edit_pages');
 
-        $this->assertSame('edit_pages', $this->capability());
+        $this->assertSame('edit_pages', AdminPage::capability());
     }
 
     /**
@@ -51,6 +44,6 @@ class AdminPageHooksTest extends BaseTestCase
     {
         add_filter('tofu_admin_page_capability', fn () => $return);
 
-        $this->assertSame('manage_options', $this->capability());
+        $this->assertSame('manage_options', AdminPage::capability());
     }
 }

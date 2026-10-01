@@ -16,9 +16,11 @@ class Uploader
      */
     public static function upload(string $name): ?UploadedFile
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- called from Validation within processInput(), after the caller's verifyNonceField()
         if (!isset($_FILES[$name]) || empty($_FILES[$name]['tmp_name'])) {
             return null;
         }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- after the nonce check (see above); the upload array is handed to wp_handle_upload(), which sanitizes the file name
         $filePost = $_FILES[$name];
 
         // Error check

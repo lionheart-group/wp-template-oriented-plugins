@@ -35,6 +35,14 @@ TOFU uses separate templates for each step of the form process:
 TOFU fires a small set of hooks so code outside a form's configuration can react to submissions and
 extend validation — Slack/CRM notifications, custom validation rules, per-submission mail tweaks.
 
+## Admin
+
+[Admin screens](admin/index.md)
+
+TOFU adds two read-only screens: the recorded submissions (**TOFU → TOFU Records**) and the form
+settings (**Tools → Forms (TOFU)**), which shows each registered form's pages, mail, fields and
+features and points out pages and mail templates that don't exist.
+
 ## AJAX / Headless Mode
 
 [AJAX / Headless Mode overview](ajax/index.md)

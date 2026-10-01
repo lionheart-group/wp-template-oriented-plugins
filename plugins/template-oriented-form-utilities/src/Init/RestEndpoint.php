@@ -397,7 +397,7 @@ class RestEndpoint
             return;
         }
 
-        $origin = isset($_SERVER['HTTP_ORIGIN']) ? trim(wp_unslash((string) $_SERVER['HTTP_ORIGIN'])) : '';
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? trim(sanitize_text_field(wp_unslash((string) $_SERVER['HTTP_ORIGIN']))) : '';
         if ($origin === '') {
             return;
         }

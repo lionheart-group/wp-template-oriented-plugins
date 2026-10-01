@@ -10,11 +10,12 @@
  * Plugin Name: TOFU (Template-Oriented Form Utilities)
  * Plugin URI: https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities
  * Description: Template-Oriented Form Utilities is a WordPress plugin that provides a set of utilities for handling forms in a template-oriented manner.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: template-oriented-form-utilities
  * Domain Path: /languages
+ * Requires at least: 6.0
  * Requires PHP: 8.1
  * License: GPL-3.0+
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -28,7 +29,7 @@ defined( 'ABSPATH' ) || exit;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('TOFU_VERSION', '0.1.1');
+define('TOFU_VERSION', '0.1.2');
 define('TOFU_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TOFU_PLUGIN_FILE', __FILE__);
 
@@ -39,6 +40,7 @@ use TofuPlugin\Consts;
 use TofuPlugin\Helpers\Session;
 use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Init\AdminPage;
+use TofuPlugin\Init\FormsPage;
 use TofuPlugin\Init\Initializer;
 use TofuPlugin\Init\Endpoint;
 use TofuPlugin\Init\RestEndpoint;
@@ -119,3 +121,6 @@ RestEndpoint::init();
 
 // Register admin UI for viewing recorded submissions
 AdminPage::register();
+
+// Register the read-only form settings screen (Tools → Forms (TOFU))
+FormsPage::register();
