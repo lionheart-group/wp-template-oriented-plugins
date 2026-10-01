@@ -180,6 +180,8 @@ class AdminPage
                 </tbody>
             </table>
 
+            <?php self::renderPostsSection($conflict === null); ?>
+
             <h2><?php echo esc_html__('Post types', 'tobiuo-content-structure'); ?></h2>
 
             <table class="wp-list-table widefat fixed striped tobiuo-table">
@@ -231,6 +233,54 @@ class AdminPage
                 </tbody>
             </table>
         </div>
+        <?php
+    }
+
+    /**
+     * Core's `post`: its archive and permalink structure, and where they come from.
+     *
+     * @param bool $handled Whether TOBIUO applies the PostsConfig (no conflicting plugin).
+     */
+    protected static function renderPostsSection(bool $handled): void
+    {
+        $config = $handled ? Registry::getPosts() : null;
+        $archive = get_post_type_archive_link('post');
+        $structure = (string) get_option('permalink_structure');
+        $fromTheme = $config !== null && $config->permalinkStructure() !== null;
+        ?>
+        <h2><?php echo esc_html__('Posts', 'tobiuo-content-structure'); ?></h2>
+
+        <table class="form-table" role="presentation">
+            <tbody>
+                <tr>
+                    <th scope="row"><?php echo esc_html__('Archive', 'tobiuo-content-structure'); ?></th>
+                    <td class="tobiuo-table__url">
+                        <?php if ($config === null || $config->archive === null) : ?>
+                            <?php echo wp_kses(self::badgeHtml(self::TONE_INFO, __('Core default', 'tobiuo-content-structure')), self::ALLOWED_HTML); ?>
+                        <?php endif; ?>
+                        <?php if (is_string($archive) && $archive !== '') : ?>
+                            <?php self::renderLink($archive); ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php echo esc_html__('Permalink structure', 'tobiuo-content-structure'); ?></th>
+                    <td>
+                        <?php if ($structure === '') : ?>
+                            <?php echo wp_kses(self::badgeHtml(self::TONE_WARNING, __('Plain permalinks are in use', 'tobiuo-content-structure')), self::ALLOWED_HTML); ?>
+                        <?php else : ?>
+                            <code><?php echo esc_html($structure); ?></code>
+                        <?php endif; ?>
+                        <br>
+                        <?php
+                        echo wp_kses(self::badgeHtml(self::TONE_INFO, $fromTheme
+                            ? __('From the theme (TOBIUO)', 'tobiuo-content-structure')
+                            : __('From Settings → Permalinks', 'tobiuo-content-structure')), self::ALLOWED_HTML);
+                        ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <?php
     }
 

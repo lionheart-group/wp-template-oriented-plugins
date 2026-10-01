@@ -4,6 +4,7 @@ namespace TobiuoPlugin\Helpers;
 
 use TobiuoPlugin\Consts;
 use TobiuoPlugin\Structure\PermalinkConfig;
+use TobiuoPlugin\Structure\PostsConfig;
 use TobiuoPlugin\Structure\PostTypeConfig;
 use TobiuoPlugin\Structure\TaxonomyConfig;
 
@@ -29,6 +30,13 @@ class Registry
      * @var array<string, TaxonomyConfig>
      */
     protected static array $taxonomies = [];
+
+    /**
+     * Configuration of the built-in `post` post type.
+     *
+     * @var ?PostsConfig
+     */
+    protected static ?PostsConfig $posts = null;
 
     /**
      * Whether the contents have been handed to core.
@@ -58,6 +66,10 @@ class Registry
     {
         self::assertOpen('registerPostType', $config->name);
 
+        if (in_array($config->name, Consts::BUILTIN_POST_TYPES, true)) {
+            self::refuseBuiltin($config->name);
+        }
+
         if (isset(self::$postTypes[$config->name])) {
             wp_die(
                 sprintf('Post type "%s" is already registered.', esc_html($config->name)),
@@ -82,6 +94,10 @@ class Registry
     {
         self::assertOpen('registerTaxonomy', $config->name);
 
+        if (in_array($config->name, Consts::BUILTIN_TAXONOMIES, true)) {
+            self::refuseBuiltinTaxonomy($config->name);
+        }
+
         if (isset(self::$taxonomies[$config->name])) {
             wp_die(
                 sprintf('Taxonomy "%s" is already registered.', esc_html($config->name)),
@@ -91,6 +107,47 @@ class Registry
         }
 
         self::$taxonomies[$config->name] = $config;
+    }
+
+    /**
+     * Configure the archive and permalink of core's `post` post type.
+     *
+     * `post` itself stays core's: it is not registered again. Call once,
+     * with the same timing as registerPostType():
+     *
+     * <code>
+     * Registry::registerPosts(new PostsConfig(
+     *     archive: 'news',
+     *     permalink: new PermalinkConfig(structure: '/%postname%/'),
+     * ));
+     * </code>
+     *
+     * @param PostsConfig $config
+     * @return void
+     */
+    public static function registerPosts(PostsConfig $config): void
+    {
+        self::assertOpen('registerPosts', 'post');
+
+        if (self::$posts !== null) {
+            wp_die(
+                'The posts configuration is already registered. Registry::registerPosts() may be called once.',
+                'TOBIUO Posts Registration Error',
+                ['response' => 500]
+            );
+        }
+
+        self::$posts = $config;
+    }
+
+    /**
+     * Get the configuration of core's `post` post type, if registered.
+     *
+     * @return ?PostsConfig
+     */
+    public static function getPosts(): ?PostsConfig
+    {
+        return self::$posts;
     }
 
     /**
@@ -165,6 +222,48 @@ class Registry
     public static function markHandedOver(): void
     {
         self::$handedOver = true;
+    }
+
+    /**
+     * Stop on a post type core registers itself: registering it again would
+     * replace core's definition.
+     *
+     * @param string $name
+     * @return void
+     * @internal Also used by Init\Registration for post types core reports as built in.
+     */
+    public static function refuseBuiltin(string $name): void
+    {
+        wp_die(
+            sprintf(
+                'Post type "%s" is built into WordPress and cannot be registered with TOBIUO.%s',
+                esc_html($name),
+                $name === 'post' ? ' Use Registry::registerPosts(new PostsConfig(...)) to set its archive and permalink.' : ''
+            ),
+            'TOBIUO Post Type Registration Error',
+            ['response' => 500]
+        );
+    }
+
+    /**
+     * Stop on a taxonomy core registers itself: registering it again would
+     * replace core's definition.
+     *
+     * @param string $name
+     * @return void
+     * @internal Also used by Init\Registration for taxonomies core reports as built in.
+     */
+    public static function refuseBuiltinTaxonomy(string $name): void
+    {
+        wp_die(
+            sprintf(
+                'Taxonomy "%s" is built into WordPress and cannot be registered with TOBIUO.%s',
+                esc_html($name),
+                in_array($name, ['category', 'post_tag'], true) ? ' To use it with a post type, list it in that post type\'s "taxonomies" argument.' : ''
+            ),
+            'TOBIUO Taxonomy Registration Error',
+            ['response' => 500]
+        );
     }
 
     /**

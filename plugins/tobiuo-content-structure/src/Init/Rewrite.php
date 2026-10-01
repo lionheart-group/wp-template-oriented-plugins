@@ -342,7 +342,7 @@ class Rewrite
         $matches = $wp_rewrite->matches;
         $wp_rewrite->matches = 'matches';
 
-        $rules = [];
+        $rules = Posts::expectedRules();
         foreach (self::managedPostTypes() as [$postType, $permalink]) {
             $rules += self::archiveRules($postType, $permalink, $wp_rewrite);
 

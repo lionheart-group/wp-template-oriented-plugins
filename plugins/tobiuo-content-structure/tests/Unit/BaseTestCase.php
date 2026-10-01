@@ -5,6 +5,7 @@ namespace TobiuoPlugin\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use TobiuoPlugin\Helpers\Registry;
 use TobiuoPlugin\Init\ArchiveLinks;
+use TobiuoPlugin\Init\Posts;
 
 /**
  * Base test case class for TobiuoPlugin tests
@@ -118,8 +119,10 @@ abstract class BaseTestCase extends TestCase
         $statics = [
             [Registry::class, 'postTypes', []],
             [Registry::class, 'taxonomies', []],
+            [Registry::class, 'posts', null],
             [Registry::class, 'handedOver', false],
             [ArchiveLinks::class, 'enabled', false],
+            [Posts::class, 'enabled', false],
         ];
 
         foreach ($statics as [$class, $property, $value]) {

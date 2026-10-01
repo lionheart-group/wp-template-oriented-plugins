@@ -1,7 +1,7 @@
 # Complete Example
 
-A theme that keeps one definition per file, with case studies filed by category, news by date, and
-events by ID.
+A theme with WordPress's posts as news below `/news/`, case studies filed by category, press releases
+by date, and events by ID.
 
 ```php
 <?php
@@ -9,6 +9,7 @@ events by ID.
 
 use TobiuoPlugin\Helpers\Registry;
 use TobiuoPlugin\Structure\PermalinkConfig;
+use TobiuoPlugin\Structure\PostsConfig;
 use TobiuoPlugin\Structure\PostTypeConfig;
 use TobiuoPlugin\Structure\TaxonomyConfig;
 
@@ -17,6 +18,15 @@ add_action('init', function () {
     if (!class_exists('TobiuoPlugin\Helpers\Registry')) {
         return;
     }
+
+    // WordPress's posts: archive at https://example.com/news/, posts at
+    // https://example.com/news/my-post/. The front /news/ also prefixes core's
+    // date, author, category and tag archives, and every post type below with
+    // 'with_front' => true — so they all set it to false.
+    Registry::registerPosts(new PostsConfig(
+        archive: 'news',
+        permalink: new PermalinkConfig(structure: '/%postname%/'),
+    ));
 
     // Post types may come before their taxonomies: TOBIUO registers every
     // taxonomy first, at init 99.
@@ -57,16 +67,16 @@ add_action('init', function () {
     ));
 
     Registry::registerPostType(new PostTypeConfig(
-        name: 'news',
+        name: 'press',
         args: [
-            'label'        => 'お知らせ',
+            'label'        => 'プレスリリース',
             'public'       => true,
             'has_archive'  => true,
-            'rewrite'      => ['slug' => 'news', 'with_front' => false],
+            'rewrite'      => ['slug' => 'press', 'with_front' => false],
             'show_in_rest' => true,
         ],
-        // https://example.com/news/2024/05/my-news/
-        // https://example.com/news/2024/ and /news/2024/05/
+        // https://example.com/press/2024/05/my-release/
+        // https://example.com/press/2024/ and /press/2024/05/
         permalink: new PermalinkConfig(
             structure: '/%year%/%monthnum%/%postname%/',
             dateArchive: true,
@@ -117,12 +127,12 @@ In a template:
 
 ```php
 <?php if (function_exists('tobiuo_get_year_link')) : ?>
-    <a href="<?php echo esc_url(tobiuo_get_year_link('news', (int) get_the_date('Y'))); ?>">
+    <a href="<?php echo esc_url(tobiuo_get_year_link('press', (int) get_the_date('Y'))); ?>">
         <?php echo esc_html(get_the_date('Y')); ?>
     </a>
 <?php endif; ?>
 
 <ul>
-    <?php wp_get_archives(['post_type' => 'news', 'type' => 'monthly']); ?>
+    <?php wp_get_archives(['post_type' => 'press', 'type' => 'monthly']); ?>
 </ul>
 ```

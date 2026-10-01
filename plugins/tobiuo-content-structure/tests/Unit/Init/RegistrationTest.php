@@ -188,4 +188,56 @@ class RegistrationTest extends BaseTestCase
             $this->assertStringContainsString('&quot;case&quot;', $e->getMessage());
         }
     }
+
+    public function testAPostTypeCoreReportsAsBuiltInDiesAtTheHandOver(): void
+    {
+        // A built-in post type of a later WordPress version, not in Consts::BUILTIN_POST_TYPES
+        $GLOBALS['__tobiuo_test_post_types']['wp_future'] = new \WP_Post_Type('wp_future', ['_builtin' => true]);
+        Registry::registerPostType(new PostTypeConfig(name: 'wp_future'));
+
+        try {
+            Registration::handOver();
+            $this->fail('Expected wp_die().');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Post type "wp_future" is built into WordPress', $e->getMessage());
+        }
+
+        $this->assertArrayNotHasKey('__tobiuo_test_log', $GLOBALS);
+    }
+
+    public function testAPostTypeRegisteredByAnotherPluginMayBeTakenOver(): void
+    {
+        $GLOBALS['__tobiuo_test_post_types']['event'] = new \WP_Post_Type('event');
+        Registry::registerPostType(new PostTypeConfig(name: 'event'));
+
+        Registration::handOver();
+
+        $this->assertSame(['post_type:event'], $GLOBALS['__tobiuo_test_log']);
+    }
+
+    public function testATaxonomyCoreReportsAsBuiltInDiesAtTheHandOver(): void
+    {
+        // A built-in taxonomy of a later WordPress version, not in Consts::BUILTIN_TAXONOMIES
+        $GLOBALS['__tobiuo_test_taxonomies']['wp_future_tax'] = new \WP_Taxonomy('wp_future_tax', ['post'], ['_builtin' => true]);
+        Registry::registerTaxonomy(new TaxonomyConfig(name: 'wp_future_tax', objectTypes: ['case']));
+
+        try {
+            Registration::handOver();
+            $this->fail('Expected wp_die().');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Taxonomy "wp_future_tax" is built into WordPress', $e->getMessage());
+        }
+
+        $this->assertArrayNotHasKey('__tobiuo_test_log', $GLOBALS);
+    }
+
+    public function testATaxonomyRegisteredByAnotherPluginMayBeTakenOver(): void
+    {
+        $GLOBALS['__tobiuo_test_taxonomies']['area'] = new \WP_Taxonomy('area', ['post']);
+        Registry::registerTaxonomy(new TaxonomyConfig(name: 'area', objectTypes: ['case']));
+
+        Registration::handOver();
+
+        $this->assertSame(['taxonomy:area'], $GLOBALS['__tobiuo_test_log']);
+    }
 }

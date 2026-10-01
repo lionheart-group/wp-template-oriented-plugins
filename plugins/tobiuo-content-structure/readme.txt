@@ -20,6 +20,7 @@ Everything is configured in the theme's PHP code, on `init`. Nothing is stored i
 * Permalink structures may use `%postname%`, `%post_id%`, the date tags, `%author%` and any attached taxonomy (`%{taxonomy}%`, with parent terms as `parent/child`).
 * A post requested through a wrong term path is redirected to its permalink.
 * `wp_get_archives( [ 'post_type' => … ] )` links to the post type's own date archives.
+* WordPress's own posts get an archive (`/news/`) and their permalink structure (`/news/%postname%/`) from theme code too, instead of Settings -> Permalinks.
 
 TOBIUO replaces the Custom Post Type Permalinks plugin. While that plugin is active, TOBIUO still registers the post types and taxonomies but leaves their URLs alone, and shows an admin notice.
 
@@ -49,6 +50,10 @@ Then register the configuration in your theme — see the documentation.
 = Where are the settings? =
 
 In your theme's code. Tools -> Content Structure (TOBIUO) shows them, read-only.
+
+= Settings -> Permalinks says the structure is set by the theme. =
+
+The theme sets the permalink structure of posts with TOBIUO, so the choice on that screen has no effect. Change it in the theme's code.
 
 = I changed a permalink structure and get 404s. =
 
