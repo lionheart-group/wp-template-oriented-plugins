@@ -764,6 +764,7 @@ class Form
                 email: $this->config->mail->fromEmail,
                 name: $this->config->mail->fromName,
             ));
+            $mail->setReturnPath($this->config->mail->returnPath);
 
             $mail->addTo(
                 Template::replaceBracesValues($recipient->recipientEmail, $values)
@@ -804,8 +805,8 @@ class Form
             /**
              * Fires just before each email is dispatched, once per configured recipient.
              *
-             * $mail is mutable — call addHeader(), addAttachment(), addBcc() and so on
-             * to adjust the message. Note that addTo()/addCc()/addBcc() construct a
+             * $mail is mutable — call addHeader(), addAttachment(), addBcc(),
+             * setReturnPath() and so on to adjust the message. Note that addTo()/addCc()/addBcc() construct a
              * MailAddress, which throws InvalidArgumentException on a malformed
              * address rather than skipping the send.
              *

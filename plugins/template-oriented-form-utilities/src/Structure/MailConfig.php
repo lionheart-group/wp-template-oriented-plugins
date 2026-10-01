@@ -31,6 +31,17 @@ class MailConfig
          * @var MailRecipientsCollection
          */
         public readonly MailRecipientsCollection $recipients,
+
+        /**
+         * Return-Path (envelope sender) address.
+         * Bounces are delivered here. When null, the server's default is used.
+         *
+         * @var string|null
+         */
+        public readonly ?string $returnPath = null,
     ) {
+        if ($this->returnPath !== null && !is_email($this->returnPath)) {
+            throw new \InvalidArgumentException('Invalid Return-Path email address.');
+        }
     }
 }

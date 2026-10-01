@@ -36,6 +36,13 @@ class Mail
     protected MailAddress $from;
 
     /**
+     * Return-Path (envelope sender)
+     *
+     * @var string|null
+     */
+    protected ?string $returnPath = null;
+
+    /**
      * Subject
      *
      * @var string
@@ -132,6 +139,21 @@ class Mail
             $from = new MailAddress(trim($from));
         }
         $this->from = $from;
+        return $this;
+    }
+
+    /**
+     * Set the Return-Path (envelope sender).
+     *
+     * WordPress ignores a "Return-Path:" header, so this is applied to
+     * PHPMailer's Sender through phpmailer_init for the duration of send().
+     *
+     * @param string|null $returnPath
+     * @return Mail
+     */
+    public function setReturnPath(?string $returnPath): Mail
+    {
+        $this->returnPath = $returnPath !== null ? trim($returnPath) : null;
         return $this;
     }
 
@@ -238,13 +260,29 @@ class Mail
             $headers[] = 'From: ' . (string)$this->from;
         }
 
-        return \wp_mail(
-            $toEmails,
-            $this->subject,
-            $this->body,
-            $headers,
-            $this->attachments
-        );
+        $setSender = null;
+        if ($this->returnPath !== null && $this->returnPath !== '') {
+            $returnPath = $this->returnPath;
+            $setSender = function ($phpmailer) use ($returnPath): void {
+                $phpmailer->Sender = $returnPath;
+            };
+            \add_action('phpmailer_init', $setSender);
+        }
+
+        try {
+            return \wp_mail(
+                $toEmails,
+                $this->subject,
+                $this->body,
+                $headers,
+                $this->attachments
+            );
+        } finally {
+            // Scoped to this message only, so later mail on the request is unaffected.
+            if ($setSender !== null) {
+                \remove_action('phpmailer_init', $setSender);
+            }
+        }
     }
 
     /**
@@ -259,6 +297,7 @@ class Mail
             'cc' => array_map(fn($addr) => (string)$addr, $this->cc),
             'bcc' => array_map(fn($addr) => (string)$addr, $this->bcc),
             'from' => isset($this->from) ? (string)$this->from : null,
+            'return_path' => $this->returnPath,
             'subject' => $this->subject,
             'body' => $this->body,
             'headers' => $this->headers,
