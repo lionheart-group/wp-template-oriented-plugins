@@ -24,11 +24,12 @@ return new class extends Migration {
         global $wpdb;
         $table = Record::getTableName();
 
+        // Exact match: in LIKE, the `_` of `submitted_at` would be a wildcard.
         $dataExists = !empty($wpdb->get_results(
-            $wpdb->prepare("SHOW COLUMNS FROM %i LIKE 'data'", $table)
+            $wpdb->prepare('SHOW COLUMNS FROM %i WHERE Field = %s', $table, 'data')
         ));
         $submittedAtExists = !empty($wpdb->get_results(
-            $wpdb->prepare("SHOW COLUMNS FROM %i LIKE 'submitted_at'", $table)
+            $wpdb->prepare('SHOW COLUMNS FROM %i WHERE Field = %s', $table, 'submitted_at')
         ));
 
         if (!$dataExists && !$submittedAtExists) {

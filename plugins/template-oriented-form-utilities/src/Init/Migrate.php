@@ -91,6 +91,7 @@ class Migrate
             $sql = $migrateClass->sql();
             Logger::info($sql);
             if ($migrateClass->useRawQuery()) {
+                // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- each migration's sql() builds its query with $wpdb->prepare()
                 $result = $wpdb->query($sql);
                 if ($result === false) {
                     Logger::error("Migration {$migrate} raw query failed: " . $wpdb->last_error);

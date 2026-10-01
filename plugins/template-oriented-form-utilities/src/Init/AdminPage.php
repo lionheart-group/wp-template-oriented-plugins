@@ -82,7 +82,7 @@ class AdminPage
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only, no state change
         $formId  = isset($_GET['form_id']) ? sanitize_key($_GET['form_id']) : '';
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only, no state change
-        $page    = max(1, (int) ($_GET['paged'] ?? 1));
+        $page    = max(1, absint(wp_unslash($_GET['paged'] ?? 1)));
         $perPage = 25;
 
         $result  = Record::getRecords($formId !== '' ? $formId : null, $perPage, $page);
