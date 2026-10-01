@@ -13,7 +13,7 @@
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: tobiuo-content-structure
- * Requires at least: 6.0
+ * Requires at least: 6.5
  * Requires PHP: 8.1
  * License: GPL-3.0+
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
