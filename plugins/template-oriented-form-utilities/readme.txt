@@ -3,7 +3,7 @@ Contributors: lionheartgroup
 Tags: forms, utilities, template-oriented
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -139,6 +139,12 @@ OR…
       no longer declare a field name starting with `_tofu_` or `__tofu_` — `FormConfig` throws at
       registration instead of letting the collision silently drop the form's value. Breaking for
       AJAX/headless clients that hardcode those names; see the upgrade notice.
+* v0.1.1
+    - Added: `MailConfig::$returnPath` sets the Return-Path (envelope sender) of the plugin's
+      emails, so bounces go to a chosen address instead of the server default. WordPress
+      ignores a `Return-Path:` header passed to `wp_mail()`, so it is applied to PHPMailer's
+      `Sender` and only for the plugin's own messages. `Mail::setReturnPath()` lets a
+      `tofu_pre_send_mail` callback set it per recipient. See docs/settings/mailconfig.md.
 
 
 == Upgrade Notice ==
