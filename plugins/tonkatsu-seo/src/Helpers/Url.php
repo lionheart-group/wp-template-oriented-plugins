@@ -81,12 +81,25 @@ final class Url
     }
 
     /**
+     * Percent-encode each segment, for building a URL from a decoded path.
+     *
+     * Slashes are kept, so `会社/概要` becomes `%E4%BC%9A%E7%A4%BE/%E6%A6%82%E8%A6%81`.
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function encodePath(string $path): string
+    {
+        return implode('/', array_map('rawurlencode', explode('/', $path)));
+    }
+
+    /**
      * `/path`, but not the protocol-relative `//host/path`.
      *
      * @param string $url
      * @return bool
      */
-    private static function isRootRelative(string $url): bool
+    public static function isRootRelative(string $url): bool
     {
         return str_starts_with($url, '/') && !str_starts_with($url, '//');
     }

@@ -23,7 +23,7 @@ architecture, conventions, and dev workflow.
 
 ```
 functions.php (on `init`)
-    └── TonkatsuPlugin\Helpers\Seo::setSite() / registerPage() / registerArchive() / registerTaxonomy()
+    └── TonkatsuPlugin\Helpers\Seo::setSite() / registerPage() / registerArchive() / registerTaxonomy() / registerRedirects()
             (static in-memory registry of Structure/ objects)
 
 request
@@ -34,7 +34,8 @@ request
 ```
 
 The plugin bootstrap hooks `plugins_loaded`: `Init\Conflict::detect()` first (another SEO plugin
-active → only an admin notice), otherwise `Init\Head::register()` and `Init\Sitemap::register()`.
+active → only an admin notice), otherwise `Init\Head::register()`, `Init\Redirects::register()` and
+`Init\Sitemap::register()`.
 It cannot run in the main file's body because Yoast (`wordpress-seo`) loads after TONKATSU
 alphabetically. `plugins_loaded` still precedes `init`, which `Sitemap::deferCoreServer()` needs.
 
@@ -42,10 +43,10 @@ alphabetically. `plugins_loaded` still precedes `init`, which `Sitemap::deferCor
 
 | Dir | Responsibility |
 |---|---|
-| `Init/` | WordPress integration: `Head` (title/robots/canonical filters + `wp_head` output), `Sitemap` (core `wp_sitemaps_*` filters; moves core's sitemap bootstrap to `init` 20), `Conflict` (Rank Math/Yoast/AIOSEO/SEOPress detection + notice), `AdminPage` (read-only Tools page) |
-| `Helpers/` | `Seo` (the class themes call — the registry and `normalizePath()`), `Url` (pure URL validation/absolutizing shared by `Structure/` and `Resolver`) |
+| `Init/` | WordPress integration: `Head` (title/robots/canonical filters + `wp_head` output), `Sitemap` (core `wp_sitemaps_*` filters; moves core's sitemap bootstrap to `init` 20), `Redirects` (`template_redirect` 0; the pure `match()` decides, `redirect()` only reads the request and responds), `Conflict` (Rank Math/Yoast/AIOSEO/SEOPress detection + notice), `AdminPage` (read-only Tools page) |
+| `Helpers/` | `Seo` (the class themes call — the registry and `normalizePath()`), `Url` (pure URL validation/absolutizing/per-segment encoding shared by `Structure/`, `Resolver`, `Context` and `Redirects`) |
 | `Models/` | `Context` (readonly value; WP-dependent static factories `fromQuery()`/`forPost()`/`forPath()`/`findPost()`), `Resolver` (all priority logic; constructor takes every input so it is unit-testable) |
-| `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `SiteConfig`, `OrganizationConfig`, `SitemapConfig`, `PageConfig` (+ `fromArray()` rejecting unknown keys), `ArchiveConfig` |
+| `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `SiteConfig`, `OrganizationConfig`, `SitemapConfig`, `PageConfig` (+ `fromArray()` rejecting unknown keys), `ArchiveConfig`, `RedirectConfig` (+ `fromArray()`) |
 | `Consts.php` | Plugin-wide constants (admin slug, priorities, JSON-LD flags, conflicting plugin constants, locale map) |
 
 ### Resolution order
@@ -61,6 +62,13 @@ never look up a `PageConfig`. Documented in full in `docs/index.md`; keep the tw
 `apply_filters`, which the test bootstrap implements). Anything that needs WP state belongs in a
 `Context` factory or in `Resolver::fromContext()`, so the logic stays testable with a hand-built
 `Context`. `Context::fromQuery()` is not unit-tested; smoke-test it against a real install.
+
+`Init\Redirects` follows the same split: `match()` takes the registered redirects, the request path
+(`Context::relativePath()` form), the query string and the home URL, and returns
+`{status, location}` without touching WordPress; `redirect()` and the 410 path (`set_404()` +
+`status_header(410)`) are smoke-tested on a real install. The configured hosts are added to
+`allowed_redirect_hosts` only while TONKATSU's own `wp_safe_redirect()` runs (`$redirecting`), so the
+site's other redirects (`redirect_to` on the login screen) are not widened.
 
 ---
 

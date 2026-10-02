@@ -9,6 +9,7 @@ TONKATSU is configured in your WordPress theme's `functions.php` (on `init`) usi
   - [SitemapConfig](settings/sitemapconfig.md)
 - [PageConfig](settings/pageconfig.md) — per URL path, registered with `Seo::registerPage()` / `Seo::registerPages()`
 - [ArchiveConfig](settings/archiveconfig.md) — per post type archive (`Seo::registerArchive()`) or taxonomy (`Seo::registerTaxonomy()`)
+- [RedirectConfig](settings/redirectconfig.md) — redirects and 410 Gone, registered with `Seo::registerRedirect()` / `Seo::registerRedirects()`
 
 Here's a complete example showing all of them together:
 
@@ -64,6 +65,24 @@ even if it is reached through another URL. Everything else uses the request URI.
   a JSON-LD `@graph` (`WebSite`, `Organization`, `BreadcrumbList`) on `wp_head`.
 - Sitemap adjustments to core's `/wp-sitemap.xml` — see [SitemapConfig](settings/sitemapconfig.md).
 
+## Redirects
+
+`Seo::registerRedirects()` replaces a redirection plugin for URLs that moved when a site was
+rebuilt: exact paths, path prefixes (the rest of the path is carried over) and regular expressions,
+with 301/302/307/308, or 410 Gone rendered with the theme's 404 template.
+
+```php
+Seo::registerRedirects([
+    ['from' => '/old-page/', 'to' => '/new-page/'],
+    ['from' => '/old-dir/', 'to' => '/new-dir/', 'type' => 'prefix'],
+    ['from' => '/closed/', 'status' => 410],
+]);
+```
+
+Sources are paths normalized like page paths; `to` starting with `/` is relative to the home URL.
+The query string is carried over. Exact sources are checked first, then prefixes (longest first),
+then regexes. Details in [RedirectConfig](settings/redirectconfig.md).
+
 ## Hooks
 
 [Actions and filters reference](hooks/index.md)
@@ -71,7 +90,8 @@ even if it is reached through another URL. Everything else uses the request URI.
 ## Admin page
 
 **Tools → SEO (TONKATSU)** lists what the theme registered and, for every registered page, the values
-it resolves to. It is read-only. The capability required to see it is `manage_options`, filterable
+it resolves to. The redirects are listed too, with a warning when one takes over a registered page or
+leads to another redirect. It is read-only. The capability required to see it is `manage_options`, filterable
 with [`tonkatsu_admin_page_capability`](hooks/index.md#tonkatsu_admin_page_capability).
 
 **Pages** gets **SEO title**, **Description** and **Robots** columns showing what every page
@@ -87,7 +107,7 @@ on the TONKATSU page and the list screens with SEO columns.
 ## Other SEO plugins
 
 While Rank Math, Yoast SEO, All in One SEO or SEOPress is active, TONKATSU hooks nothing on the front
-end and shows an admin notice on the Plugins screen and the TONKATSU page instead. Two plugins printing canonicals and robots metas leave
+end (no redirects either) and shows an admin notice on the Plugins screen and the TONKATSU page instead. Two plugins printing canonicals and robots metas leave
 search engines to choose between them.
 
 ## Migrating from Rank Math
@@ -102,4 +122,5 @@ Math, carry across:
 | Titles & Meta → Social Meta → Twitter username | `SiteConfig::$twitterSite` |
 | Titles & Meta → Global → OpenGraph thumbnail | `SiteConfig::$defaultOgImage` |
 | Per-page title / description / robots set in the editor | `Seo::registerPage()`, or `tonkatsu_post_values` reading your own custom fields |
+| Redirections | `Seo::registerRedirects()` (exact, prefix and regex sources; 301/302/307/308/410) |
 | Sitemap settings | `SitemapConfig` (core's `/wp-sitemap.xml` replaces `/sitemap_index.xml` — update the URL in Search Console) |

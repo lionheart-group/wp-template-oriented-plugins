@@ -5,6 +5,7 @@ namespace TonkatsuPlugin\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use TonkatsuPlugin\Helpers\Seo;
 use TonkatsuPlugin\Init\Head;
+use TonkatsuPlugin\Init\Redirects;
 use TonkatsuPlugin\Init\Sitemap;
 
 /**
@@ -64,7 +65,9 @@ abstract class BaseTestCase extends TestCase
             [Seo::class, 'pages', []],
             [Seo::class, 'archives', []],
             [Seo::class, 'taxonomies', []],
+            [Seo::class, 'redirects', []],
             [Head::class, 'resolver', null],
+            [Redirects::class, 'redirecting', false],
             [Sitemap::class, 'excludedPostIds', []],
             [Sitemap::class, 'buildingUrlList', false],
         ];

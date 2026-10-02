@@ -8,6 +8,7 @@ use TonkatsuPlugin\Helpers\Visibility;
 use TonkatsuPlugin\Models\Context;
 use TonkatsuPlugin\Models\Resolver;
 use TonkatsuPlugin\Structure\ArchiveConfig;
+use TonkatsuPlugin\Structure\RedirectConfig;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -236,6 +237,9 @@ class AdminPage
                 __('No taxonomies are registered.', 'tonkatsu-seo')
             );
             ?>
+
+            <h2><?php echo esc_html__('Redirects', 'tonkatsu-seo'); ?></h2>
+            <?php self::renderRedirectTable(Seo::getRedirects()); ?>
         </div>
         <?php
     }
@@ -281,6 +285,84 @@ class AdminPage
             </tbody>
         </table>
         <?php
+    }
+
+    /**
+     * @param list<RedirectConfig> $redirects
+     */
+    protected static function renderRedirectTable(array $redirects): void
+    {
+        $home = home_url('/');
+        ?>
+        <p class="description"><?php echo esc_html__('Checked in this order: exact paths, then prefixes (longest first), then regular expressions in registration order.', 'tonkatsu-seo'); ?></p>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th scope="col" style="width:100px"><?php echo esc_html__('Type', 'tonkatsu-seo'); ?></th>
+                    <th scope="col"><?php echo esc_html__('From', 'tonkatsu-seo'); ?></th>
+                    <th scope="col"><?php echo esc_html__('To', 'tonkatsu-seo'); ?></th>
+                    <th scope="col" style="width:100px"><?php echo esc_html__('Status', 'tonkatsu-seo'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($redirects === []) : ?>
+                    <tr>
+                        <td colspan="4"><?php echo esc_html__('No redirects are registered.', 'tonkatsu-seo'); ?></td>
+                    </tr>
+                <?php else : ?>
+                    <?php foreach ($redirects as $redirect) : ?>
+                        <tr>
+                            <td><?php echo esc_html(self::redirectType($redirect->type)); ?></td>
+                            <td style="word-break:break-all;">
+                                <code><?php echo esc_html(self::redirectSource($redirect)); ?></code>
+                                <?php if ($redirect->type === RedirectConfig::TYPE_EXACT && $redirect->path === '') : ?>
+                                    <br><span class="description"><?php echo esc_html__('(front page)', 'tonkatsu-seo'); ?></span>
+                                <?php endif; ?>
+                                <?php if (Redirects::hidesRegisteredPage($redirect)) : ?>
+                                    <br><?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Registered page is unreachable', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                                <?php endif; ?>
+                            </td>
+                            <td style="word-break:break-all;">
+                                <?php echo esc_html(self::display($redirect->to)); ?>
+                                <?php if (Redirects::isChained($redirect, $redirects, $home)) : ?>
+                                    <br><?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Redirected again', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo esc_html((string) $redirect->status); ?><?php echo $redirect->status === 410 ? ' ' . esc_html__('(Gone)', 'tonkatsu-seo') : ''; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <?php
+    }
+
+    /**
+     * @param string $type One of the RedirectConfig::TYPE_* constants.
+     * @return string
+     */
+    protected static function redirectType(string $type): string
+    {
+        return match ($type) {
+            RedirectConfig::TYPE_PREFIX => __('Prefix', 'tonkatsu-seo'),
+            RedirectConfig::TYPE_REGEX  => __('Regex', 'tonkatsu-seo'),
+            default                     => __('Exact', 'tonkatsu-seo'),
+        };
+    }
+
+    /**
+     * The source as written for a regex, or as a /path/ otherwise.
+     *
+     * @param RedirectConfig $redirect
+     * @return string
+     */
+    protected static function redirectSource(RedirectConfig $redirect): string
+    {
+        if ($redirect->type === RedirectConfig::TYPE_REGEX) {
+            return $redirect->path;
+        }
+
+        return '/' . $redirect->path . ($redirect->path !== '' ? '/' : '');
     }
 
     /**

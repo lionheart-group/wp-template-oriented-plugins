@@ -5,6 +5,7 @@ namespace TonkatsuPlugin\Tests\Unit\Helpers;
 use TonkatsuPlugin\Helpers\Seo;
 use TonkatsuPlugin\Structure\ArchiveConfig;
 use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\RedirectConfig;
 use TonkatsuPlugin\Structure\SiteConfig;
 use TonkatsuPlugin\Tests\Unit\BaseTestCase;
 
@@ -150,5 +151,71 @@ class SeoTest extends BaseTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         Seo::registerArchive(' ', new ArchiveConfig());
+    }
+
+    public function testRegisterRedirectKeepsRegistrationOrder(): void
+    {
+        $first = new RedirectConfig(from: '/b/', to: '/c/');
+        $second = new RedirectConfig(from: '/a/', to: '/c/');
+
+        Seo::registerRedirect($first);
+        Seo::registerRedirect($second);
+
+        $this->assertSame([$first, $second], Seo::getRedirects());
+    }
+
+    public function testDuplicateRedirectDies(): void
+    {
+        Seo::registerRedirect(new RedirectConfig(from: '/old/', to: '/new/'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('TONKATSU Redirect Registration Error');
+
+        // Same source, spelled differently.
+        Seo::registerRedirect(new RedirectConfig(from: 'old', to: '/other/'));
+    }
+
+    public function testSameSourceWithAnotherTypeIsNotADuplicate(): void
+    {
+        Seo::registerRedirect(new RedirectConfig(from: '/old/', to: '/new/'));
+        Seo::registerRedirect(new RedirectConfig(from: '/old/', to: '/new/', type: RedirectConfig::TYPE_PREFIX));
+
+        $this->assertCount(2, Seo::getRedirects());
+    }
+
+    public function testRegisterRedirectsAcceptsConfigsAndArrays(): void
+    {
+        $config = new RedirectConfig(from: '/a/', to: '/b/');
+
+        Seo::registerRedirects([
+            $config,
+            ['from' => '/closed/', 'status' => 410],
+            ['from' => '^news/(\d+)$', 'to' => '/news/$1/', 'type' => 'regex'],
+        ]);
+
+        $redirects = Seo::getRedirects();
+        $this->assertCount(3, $redirects);
+        $this->assertSame($config, $redirects[0]);
+        $this->assertSame(410, $redirects[1]->status);
+        $this->assertSame(RedirectConfig::TYPE_REGEX, $redirects[2]->type);
+    }
+
+    public function testRegisterRedirectsNamesTheEntryInErrors(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(esc_html("RedirectConfig 'redirect #2'"));
+
+        Seo::registerRedirects([
+            ['from' => '/a/', 'to' => '/b/'],
+            ['from' => '/c/', 'to' => '/d/', 'code' => 302],
+        ]);
+    }
+
+    public function testRegisterRedirectsRejectsOtherValues(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('redirect #1 must be a RedirectConfig or an array');
+
+        Seo::registerRedirects(['/a/']);
     }
 }

@@ -38,6 +38,7 @@ use TonkatsuPlugin\Init\AdminColumns;
 use TonkatsuPlugin\Init\AdminPage;
 use TonkatsuPlugin\Init\Conflict;
 use TonkatsuPlugin\Init\Head;
+use TonkatsuPlugin\Init\Redirects;
 use TonkatsuPlugin\Init\SearchVisibilityNotice;
 use TonkatsuPlugin\Init\Sitemap;
 
@@ -59,6 +60,7 @@ add_action('plugins_loaded', function () {
     }
 
     Head::register();
+    Redirects::register();
     Sitemap::register();
     AdminColumns::register();
 });

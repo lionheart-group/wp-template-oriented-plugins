@@ -16,6 +16,8 @@ Template-Oriented No-database Knowledge-graph & Tag Setup Utility (TONKATSU) han
 
 Everything is configured in the theme's PHP code, on `init`. Nothing is stored in the database and there is no settings screen, so the SEO configuration is reviewed, versioned and deployed together with the templates that render the pages. A read-only screen under Tools shows what the theme registered and what each page resolves to.
 
+Redirects (exact paths, path prefixes and regular expressions, including 410 Gone) are registered in the theme too, so moved URLs are kept with the code that moved them.
+
 Per-post values that editors maintain (for example in custom fields) are supplied through the `tonkatsu_post_values` filter.
 
 TONKATSU stands down while Rank Math, Yoast SEO, All in One SEO or SEOPress is active, and shows an admin notice instead.
