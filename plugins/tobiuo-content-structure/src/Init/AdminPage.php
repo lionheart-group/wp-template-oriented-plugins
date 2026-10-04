@@ -237,7 +237,7 @@ class AdminPage
     }
 
     /**
-     * Core's `post`: its archive and permalink structure, and where they come from.
+     * Core's `post`: its archive, and its permalink structure compared with the one the theme expects.
      *
      * @param bool $handled Whether TOBIUO applies the PostsConfig (no conflicting plugin).
      */
@@ -246,7 +246,7 @@ class AdminPage
         $config = $handled ? Registry::getPosts() : null;
         $archive = get_post_type_archive_link('post');
         $structure = (string) get_option('permalink_structure');
-        $fromTheme = $config !== null && $config->permalinkStructure() !== null;
+        $expected = Posts::structureMismatch($config, $structure);
         ?>
         <h2><?php echo esc_html__('Posts', 'tobiuo-content-structure'); ?></h2>
 
@@ -271,12 +271,13 @@ class AdminPage
                         <?php else : ?>
                             <code><?php echo esc_html($structure); ?></code>
                         <?php endif; ?>
-                        <br>
-                        <?php
-                        echo wp_kses(self::badgeHtml(self::TONE_INFO, $fromTheme
-                            ? __('From the theme (TOBIUO)', 'tobiuo-content-structure')
-                            : __('From Settings → Permalinks', 'tobiuo-content-structure')), self::ALLOWED_HTML);
-                        ?>
+                        <?php if ($expected !== null) : ?>
+                            <br><?php echo wp_kses(self::badgeHtml(self::TONE_WARNING, __('Differs from the theme', 'tobiuo-content-structure')), self::ALLOWED_HTML); ?>
+                            <br><?php echo esc_html__('Expected:', 'tobiuo-content-structure'); ?> <code><?php echo esc_html($expected); ?></code>
+                            <br><a href="<?php echo esc_url(admin_url('options-permalink.php')); ?>"><?php echo esc_html__('Change it in Settings → Permalinks', 'tobiuo-content-structure'); ?></a>
+                        <?php elseif ($config !== null && $config->permalinkStructure() !== null) : ?>
+                            <br><?php echo wp_kses(self::badgeHtml(self::TONE_INFO, __('Matches the theme', 'tobiuo-content-structure')), self::ALLOWED_HTML); ?>
+                        <?php endif; ?>
                     </td>
                 </tr>
             </tbody>

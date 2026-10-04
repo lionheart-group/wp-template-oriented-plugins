@@ -793,17 +793,3 @@ if (!function_exists('wp_safe_redirect')) {
 
 // The template functions, loaded by the plugin's main file at runtime
 require_once dirname(__DIR__) . '/src/functions.php';
-
-// Settings → Permalinks section, recorded for the tests.
-if (!function_exists('add_settings_section')) {
-    function add_settings_section($id, $title, $callback, $page, $args = []) {
-        $GLOBALS['__tobiuo_test_settings_sections'][] = ['id' => $id, 'title' => $title, 'callback' => $callback, 'page' => $page];
-    }
-}
-
-// Every capability is granted except those listed in $GLOBALS['__tobiuo_test_cannot'].
-if (!function_exists('current_user_can')) {
-    function current_user_can($capability, ...$args) {
-        return !in_array($capability, $GLOBALS['__tobiuo_test_cannot'] ?? [], true);
-    }
-}

@@ -17,9 +17,9 @@ use TobiuoPlugin\Helpers\Fields;
  * );
  * </code>
  *
- * The permalink becomes the site's permalink structure (Settings →
- * Permalinks) — `'/' . archive . structure` — so core's date, author,
- * category and tag archives move below the archive too.
+ * The permalink is the structure the theme expects the site's permalink
+ * structure (Settings → Permalinks) to be — `'/' . archive . structure`.
+ * TOBIUO does not set it; the admin page warns when the two differ.
  *
  * @package TobiuoPlugin\Structure
  */
@@ -53,8 +53,8 @@ class PostsConfig
         public readonly ?string $archive = null,
 
         /**
-         * Path of a post below the archive, e.g. `/%postname%/`. Null leaves
-         * the structure to Settings → Permalinks.
+         * Path of a post below the archive that the theme expects, e.g.
+         * `/%postname%/`. Null: no particular structure is expected.
          *
          * Only the tags core's permalink structure supports:
          * PermalinkConfig::CORE_TAGS and `%category%`. `dateArchive` and
@@ -140,9 +140,9 @@ class PostsConfig
     }
 
     /**
-     * The site-wide permalink structure this config gives, e.g. `/news/%postname%/`.
+     * The site-wide permalink structure this config expects, e.g. `/news/%postname%/`.
      *
-     * @return ?string Null when the structure is left to Settings → Permalinks.
+     * @return ?string Null when no particular structure is expected.
      */
     public function permalinkStructure(): ?string
     {
