@@ -22,7 +22,7 @@ class PostsTest extends BaseTestCase
         $this->assertSame(10, has_filter('pre_option_permalink_structure', [Posts::class, 'filterPermalinkStructure']));
         $this->assertSame(10, has_filter('post_type_archive_link', [Posts::class, 'filterArchiveLink']));
         $this->assertSame(10, has_filter('register_post_type_args', [Posts::class, 'filterPostTypeArgs']));
-        $this->assertSame(10, has_action('admin_notices', [Posts::class, 'renderPermalinkNotice']));
+        $this->assertSame(10, has_action('admin_init', [Posts::class, 'addPermalinkSection']));
     }
 
     public function testThePermalinkStructureIsLeftToTheOptionUntilConfigured(): void
@@ -281,12 +281,41 @@ class PostsTest extends BaseTestCase
         );
     }
 
-    public function testTheNoticeIsShownOnSettingsPermalinksOnly(): void
+    public function testThePermalinkSectionIsAddedWhenTheThemeSetsTheStructure(): void
     {
-        $this->assertTrue(Posts::shouldShowNoticeOn('options-permalink'));
-        $this->assertFalse(Posts::shouldShowNoticeOn('plugins'));
-        $this->assertFalse(Posts::shouldShowNoticeOn('tools_page_tobiuo-content-structure'));
-        $this->assertFalse(Posts::shouldShowNoticeOn('options-general'));
+        Posts::register();
+        Registry::registerPosts(new PostsConfig(archive: 'news', permalink: new PermalinkConfig(structure: '/%postname%/')));
+
+        Posts::addPermalinkSection();
+
+        $this->assertSame(['permalink'], array_column($GLOBALS['__tobiuo_test_settings_sections'] ?? [], 'page'));
+        $this->assertSame('tobiuo-content-structure', $GLOBALS['__tobiuo_test_settings_sections'][0]['id']);
+
+        ob_start();
+        Posts::renderPermalinkSection();
+        $html = (string) ob_get_clean();
+        $this->assertStringContainsString('<code>/news/%postname%/</code>', $html);
+    }
+
+    public function testNoPermalinkSectionWithoutAStructureFromTheTheme(): void
+    {
+        Posts::register();
+        Registry::registerPosts(new PostsConfig(archive: 'news'));
+
+        Posts::addPermalinkSection();
+
+        $this->assertSame([], $GLOBALS['__tobiuo_test_settings_sections'] ?? []);
+    }
+
+    public function testNoPermalinkSectionForUsersWhoCannotManageOptions(): void
+    {
+        Posts::register();
+        Registry::registerPosts(new PostsConfig(permalink: new PermalinkConfig(structure: '/%postname%/')));
+        $GLOBALS['__tobiuo_test_cannot'] = ['manage_options'];
+
+        Posts::addPermalinkSection();
+
+        $this->assertSame([], $GLOBALS['__tobiuo_test_settings_sections'] ?? []);
     }
 
     public function testCustomPostTypesStillRegisterAfterThePosts(): void

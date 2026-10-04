@@ -34,6 +34,8 @@ abstract class BaseTestCase extends TestCase
         '__tobiuo_test_queried_object',
         '__tobiuo_test_query_vars',
         '__tobiuo_test_redirect',
+        '__tobiuo_test_settings_sections',
+        '__tobiuo_test_cannot',
         'wp_rewrite',
         'wp',
     ];
