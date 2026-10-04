@@ -39,8 +39,8 @@ class Registration
             return;
         }
 
-        // Before anything is registered: it may change WP_Rewrite::$front,
-        // which the permastructs added below are built on.
+        // The posts archive first, as core registers `post` before the
+        // other post types.
         Posts::apply();
 
         foreach (Registry::getPostTypes() as $config) {

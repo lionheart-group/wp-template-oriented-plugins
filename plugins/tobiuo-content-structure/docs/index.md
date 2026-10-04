@@ -17,8 +17,8 @@ Here's a complete example showing all of them together:
 
 | When | What |
 |---|---|
-| `init`, priority below 99 (the default 10 is fine) | The theme calls `Registry::registerTaxonomy()` / `Registry::registerPostType()` / `Registry::registerPosts()`, in any order. Nothing reaches WordPress yet, except that `get_option('permalink_structure')` returns the `PostsConfig` structure from then on. |
-| `init`, priority 99 | TOBIUO first applies the `PostsConfig` (re-reads the permalink structure into `WP_Rewrite`, sets the posts archive), then calls `register_taxonomy()` for every taxonomy, then `register_post_type()` for every post type, then checks each `PermalinkConfig` against what is now registered (a bad config stops with `wp_die()` naming the post type and the tag). Then the action [`tobiuo_registered`](hooks/index.md#tobiuo_registered) fires, and TOBIUO replaces the permastructs and adds the archive rules. |
+| `init`, priority below 99 (the default 10 is fine) | The theme calls `Registry::registerTaxonomy()` / `Registry::registerPostType()` / `Registry::registerPosts()`, in any order. Nothing reaches WordPress yet. |
+| `init`, priority 99 | TOBIUO first applies the `PostsConfig` (sets the posts archive and adds its rules), then calls `register_taxonomy()` for every taxonomy, then `register_post_type()` for every post type, then checks each `PermalinkConfig` against what is now registered (a bad config stops with `wp_die()` naming the post type and the tag). Then the action [`tobiuo_registered`](hooks/index.md#tobiuo_registered) fires, and TOBIUO replaces the permastructs and adds the archive rules. |
 | Any later request | `get_permalink()` builds the links from the structure; a post requested through a wrong term path is redirected to its permalink. |
 
 Because TOBIUO registers everything at `init` 99, code that needs the post types or taxonomies to
@@ -33,9 +33,10 @@ that post type's `taxonomies` argument.
 ## Posts
 
 WordPress's own posts keep core's post type. [PostsConfig](settings/postsconfig.md) gives them an
-archive (`/news/`) and the permalink structure (`/news/%postname%/`) from theme code, replacing the
-structure stored by Settings → Permalinks. Because that structure is the site's, its front also
-prefixes core's date, author, category and tag archives — and every custom post type or taxonomy whose
+archive (`/news/`) from theme code, and states the permalink structure the theme expects
+(`/news/%postname%/`). That structure stays core's setting: set it on Settings → Permalinks, and
+**Tools → Content Structure (TOBIUO)** warns when it differs. Because that structure is the site's, its
+front also prefixes core's date, author, category and tag archives — and every custom post type or taxonomy whose
 `rewrite` has `with_front => true`.
 
 ## Permalinks
@@ -150,8 +151,8 @@ archives come before both.
 
 ## Admin page
 
-**Tools → Content Structure (TOBIUO)** shows the posts archive and the permalink structure in use (and
-whether it comes from the theme or from Settings → Permalinks), and lists the post types and
+**Tools → Content Structure (TOBIUO)** shows the posts archive and the permalink structure in use (with
+a warning when it differs from the one the theme expects), and lists the post types and
 taxonomies the theme registered, with
 their structure, the URL of the latest post, the archive URL, example date and author archive links,
 example term URLs, and whether the stored rewrite rules are complete. It is read-only. The capability
