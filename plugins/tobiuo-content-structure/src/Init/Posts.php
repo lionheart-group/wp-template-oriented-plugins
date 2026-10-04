@@ -42,7 +42,7 @@ class Posts
         add_filter('pre_option_permalink_structure', [static::class, 'filterPermalinkStructure']);
         add_filter('post_type_archive_link', [static::class, 'filterArchiveLink'], 10, 2);
         add_filter('register_post_type_args', [static::class, 'filterPostTypeArgs'], 10, 2);
-        add_action('admin_notices', [static::class, 'renderPermalinkNotice']);
+        add_action('admin_init', [static::class, 'addPermalinkSection']);
     }
 
     /**
@@ -301,35 +301,51 @@ class Posts
     }
 
     /**
-     * Settings → Permalinks only: its structure choice is overridden there.
+     * Add a section to Settings → Permalinks saying the structure comes from the theme.
      *
-     * @param string $screenId
-     * @return bool
+     * A settings section rather than an admin notice: it belongs to that one
+     * screen, and core renders it there (do_settings_sections('permalink')).
+     * `admin_init` runs after the hand-over on `init` 99, so the
+     * PostsConfig is final.
      */
-    public static function shouldShowNoticeOn(string $screenId): bool
+    public static function addPermalinkSection(): void
     {
-        return $screenId === 'options-permalink';
-    }
-
-    /**
-     * Say on Settings → Permalinks that the structure comes from the theme.
-     */
-    public static function renderPermalinkNotice(): void
-    {
-        $structure = self::$enabled ? Registry::getPosts()?->permalinkStructure() : null;
-        if ($structure === null || !current_user_can('manage_options')) {
+        if (self::configuredStructure() === null || !current_user_can('manage_options')) {
             return;
         }
 
-        $screen = get_current_screen();
-        if ($screen === null || !self::shouldShowNoticeOn($screen->id)) {
+        add_settings_section(
+            'tobiuo-content-structure',
+            __('Permalinks set by the theme (TOBIUO)', 'tobiuo-content-structure'),
+            [static::class, 'renderPermalinkSection'],
+            'permalink'
+        );
+    }
+
+    /**
+     * The section's content: the structure in use.
+     */
+    public static function renderPermalinkSection(): void
+    {
+        $structure = self::configuredStructure();
+        if ($structure === null) {
             return;
         }
 
         printf(
-            '<div class="notice notice-info"><p>%s <code>%s</code></p></div>',
+            '<p>%s <code>%s</code></p>',
             esc_html__('The permalink structure of posts is set in the theme\'s code with TOBIUO, so choosing another one here has no effect. In use:', 'tobiuo-content-structure'),
             esc_html($structure)
         );
+    }
+
+    /**
+     * The structure from the theme's PostsConfig, or null when TOBIUO doesn't set it.
+     *
+     * @return ?string
+     */
+    protected static function configuredStructure(): ?string
+    {
+        return self::$enabled ? Registry::getPosts()?->permalinkStructure() : null;
     }
 }

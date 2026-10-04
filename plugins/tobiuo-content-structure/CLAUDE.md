@@ -133,7 +133,7 @@ The spec was derived from reading CPTP. What is kept, and what is deliberately d
   `registerTaxonomy()`, `_builtin` at the hand-over (`Registry::refuseBuiltinTaxonomy()`).
 - **The post permalink is the site's permalink structure**, supplied by
   `pre_option_permalink_structure` as `'/' . archive . structure`. The option in the DB is never
-  written; Settings → Permalinks shows a notice (on that screen only) that saving there has no effect.
+  written; Settings → Permalinks gets a settings section (`add_settings_section(..., 'permalink')`, not an admin notice, after the WordPress.org review flagged notices under guideline 11) saying that saving there has no effect.
   Only core's tags plus `%category%` are allowed, and `dateArchive` / `authorArchive` / `dateFront`
   must stay default (core provides those archives, under the front) — checked in `PostsConfig`.
 - **Timing.** `WP_Rewrite` is constructed after `plugins_loaded` from the stored option, before the

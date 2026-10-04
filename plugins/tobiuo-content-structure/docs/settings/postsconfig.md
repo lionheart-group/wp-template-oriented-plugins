@@ -76,8 +76,9 @@ structure starts with a number, as core decides).
 ## How it is applied
 
 - `pre_option_permalink_structure` returns the structure, so `get_option('permalink_structure')`,
-  Settings → Permalinks and everything in core see it. **Settings → Permalinks** shows a notice that
-  the structure comes from the theme; choosing another one there has no effect.
+  Settings → Permalinks and everything in core see it. **Settings → Permalinks** gets a section
+  ("Permalinks set by the theme (TOBIUO)") saying the structure comes from the theme; choosing
+  another one there has no effect.
 - `WP_Rewrite` is built before the theme loads, from the stored option. At the hand-over (`init` 99)
   TOBIUO re-reads the structure into it — keeping the endpoints and rules added since — and moves
   what was already built on the old front to the new one: other post types' and taxonomies'
