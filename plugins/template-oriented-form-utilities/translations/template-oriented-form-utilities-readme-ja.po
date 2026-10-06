@@ -1,0 +1,389 @@
+# Translation of Plugins - TOFU (Template-Oriented Form Utilities) - Stable Readme (latest release) in Japanese
+# This file is distributed under the same license as the Plugins - TOFU (Template-Oriented Form Utilities) - Stable Readme (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: +0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/4.1.0\n"
+"Language: ja_JP\n"
+"Project-Id-Version: Plugins - TOFU (Template-Oriented Form Utilities) - Stable Readme (latest release)\n"
+
+#. Short description.
+msgid "Template-Oriented Form Utilities is a WordPress plugin that simplifies form creation, validation, and processing via template-based data management."
+msgstr "Template-Oriented Form Utilities は、テンプレートを軸にしたデータ管理で、フォームの作成・バリデーション・処理をシンプルにする WordPress プラグインです。"
+
+#. Plugin name.
+msgid "TOFU (Template-Oriented Form Utilities)"
+msgstr "TOFU (Template-Oriented Form Utilities)"
+
+#. Found in faq paragraph.
+msgid "In your theme's code. Tools -&gt; Forms (TOFU) shows them, read-only."
+msgstr "テーマのコードの中にあります。「ツール -&gt; フォーム (TOFU)」で、読み取り専用で確認できます。"
+
+#. Found in faq header.
+msgid "Where are the form settings?"
+msgstr "フォームの設定はどこにありますか？"
+
+#. Found in description paragraph.
+msgid "<a href=\"https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities\">https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities</a>"
+msgstr "<a href=\"https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities\">https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/template-oriented-form-utilities</a>"
+
+#. Found in description paragraph.
+msgid "Forms are configured in the theme's PHP code and nothing about them is stored in the database. A read-only screen under Tools shows each registered form's pages, mail, fields and features, and points out pages and mail templates that don't exist."
+msgstr "フォームはテーマの PHP コードで設定し、フォームに関する情報はデータベースに一切保存しません。「ツール」の下の読み取り専用の画面では、登録されている各フォームのページ・メール・入力項目・機能を確認でき、存在しないページやメールテンプレートも指摘します。"
+
+#. Found in description paragraph.
+msgid "GitHub and documentation for this plugin can be found at:"
+msgstr "このプラグインの GitHub リポジトリとドキュメントは、次の場所にあります。"
+
+#. Found in installation paragraph.
+msgid "OR…"
+msgstr "または…"
+
+#. Found in installation list item.
+msgid "Click \"Install\".. and then \"Activate plugin\"."
+msgstr "「今すぐインストール」をクリックし、続けて「プラグインを有効化」をクリックします。"
+
+#. Found in installation list item.
+msgid "Click \"upload\".. then browse to the .zip file downloaded from this page."
+msgstr "「プラグインのアップロード」をクリックし、このページからダウンロードした .zip ファイルを選択します。"
+
+#. Found in installation list item.
+msgid "Open the WP admin panel, and click \"Plugins\" -&gt; \"Add new\"."
+msgstr "WordPress の管理画面を開き、「プラグイン」-&gt;「新規追加」をクリックします。"
+
+#. Found in installation list item.
+msgid "Save the .zip file to a location on your computer."
+msgstr ".zip ファイルをコンピューターに保存します。"
+
+#. Found in installation list item.
+msgid "Download the plugin from this page."
+msgstr "このページからプラグインをダウンロードします。"
+
+#. Found in installation list item.
+msgid "Activate the plugin."
+msgstr "プラグインを有効化します。"
+
+#. Found in installation list item.
+msgid "Select the \"Template-Oriented Form Utilities\" plugin and click \"Install\"."
+msgstr "「Template-Oriented Form Utilities」プラグインを選び、「今すぐインストール」をクリックします。"
+
+#. Found in installation list item.
+msgid "In the browser input box, type \"Template-Oriented Form Utilities\"."
+msgstr "検索欄に「Template-Oriented Form Utilities」と入力します。"
+
+#. Found in installation list item.
+msgid "From the WP admin panel, click \"Plugins\" -&gt; \"Add new\"."
+msgstr "WordPress の管理画面で、「プラグイン」-&gt;「新規追加」をクリックします。"
+
+#. Found in description paragraph.
+msgid "This plugin relies on third-party services to protect your website from spam and automated attacks. Depending on your configuration, this plugin connects to the following services:"
+msgstr "このプラグインは、スパムや自動化された攻撃からサイトを守るために外部サービスを利用します。設定に応じて、次のサービスに接続します。"
+
+#. Found in description paragraph.
+msgid "Template-Oriented Form Utilities (TOFU) is designed to streamline the process of creating and managing forms within WordPress themes and plugins. By adopting a template-oriented approach, TOFU allows developers to define form structures and behaviors using reusable templates, making it easier to manage/maintain with team collaboration through version control systems."
+msgstr "Template-Oriented Form Utilities (TOFU) は、WordPress のテーマやプラグインの中でフォームを作成・管理する作業を効率化するためのプラグインです。テンプレートを軸にした考え方で、フォームの構造や動作を再利用できるテンプレートとして定義できるため、バージョン管理システムを使ったチーム開発でも管理・保守がしやすくなります。"
+
+#. Found in description list item.
+msgid "<strong>Links:</strong> <a href=\"https://www.cloudflare.com/privacypolicy/\">Cloudflare Privacy Policy</a>, <a href=\"https://www.cloudflare.com/website-terms/\">Cloudflare Website Terms</a>."
+msgstr "<strong>リンク：</strong> <a href=\"https://www.cloudflare.com/privacypolicy/\">Cloudflare プライバシーポリシー</a>、<a href=\"https://www.cloudflare.com/website-terms/\">Cloudflare ウェブサイト利用規約</a>。"
+
+#. Found in description list item.
+msgid "<strong>Service Provider:</strong> Cloudflare, Inc."
+msgstr "<strong>サービス提供者：</strong> Cloudflare, Inc."
+
+#. Found in description list item.
+msgid "<strong>Data sent:</strong> Browser/device characteristics and interaction data (privacy-friendly, does not use cookies for tracking)."
+msgstr "<strong>送信されるデータ：</strong> ブラウザーや端末の特性、操作に関するデータ（プライバシーに配慮しており、追跡のための Cookie は使いません）。"
+
+#. Found in description list item.
+msgid "<strong>When data is sent:</strong> When a user interacts with a form protected by Turnstile."
+msgstr "<strong>データが送信されるとき：</strong> Turnstile で保護されたフォームをユーザーが操作したとき。"
+
+#. Found in description list item.
+msgid "<strong>Purpose:</strong> Privacy-focused alternative for bot protection and spam prevention."
+msgstr "<strong>目的：</strong> プライバシーに配慮した、ボット対策とスパム防止の代替手段。"
+
+#. Found in description list item.
+msgid "<strong>Links:</strong> <a href=\"https://policies.google.com/privacy\">Google Privacy Policy</a>, <a href=\"https://policies.google.com/terms\">Google Terms of Service</a>."
+msgstr "<strong>リンク：</strong> <a href=\"https://policies.google.com/privacy\">Google プライバシーポリシー</a>、<a href=\"https://policies.google.com/terms\">Google 利用規約</a>。"
+
+#. Found in description list item.
+msgid "<strong>Service Provider:</strong> Google LLC."
+msgstr "<strong>サービス提供者：</strong> Google LLC."
+
+#. Found in description list item.
+msgid "<strong>Data sent:</strong> IP address, mouse movements, browser/device information, and duration of stay."
+msgstr "<strong>送信されるデータ：</strong> IP アドレス、マウスの動き、ブラウザーや端末の情報、滞在時間。"
+
+#. Found in description list item.
+msgid "<strong>When data is sent:</strong> When a page containing a reCAPTCHA-protected form is loaded or submitted."
+msgstr "<strong>データが送信されるとき：</strong> reCAPTCHA で保護されたフォームのあるページを読み込んだとき、またはフォームを送信したとき。"
+
+#. Found in description list item.
+msgid "<strong>Purpose:</strong> Protecting forms from spam and bot abuse."
+msgstr "<strong>目的：</strong> スパムやボットによる悪用からフォームを守ること。"
+
+#. Found in description header.
+msgid "Cloudflare Turnstile"
+msgstr "Cloudflare Turnstile"
+
+#. Found in description header.
+msgid "Google reCAPTCHA"
+msgstr "Google reCAPTCHA"
+
+#. Found in description header.
+msgid "External services"
+msgstr "外部サービス"
+
+#. Found in changelog list item.
+msgid "Escaped and sanitized request values flagged by Plugin Check."
+msgstr "Plugin Check で指摘されたリクエストの値を、エスケープ・無害化するようにしました。"
+
+#. Found in changelog list item.
+msgid "Declared <code>Requires at least: 6.0</code>, so translate.wordpress.org imports the plugin's strings."
+msgstr "<code>Requires at least: 6.0</code> を宣言しました。これにより、translate.wordpress.org がプラグインの文字列を取り込めるようになります。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: running the migrations a second time in the same request, after one had failed,\n"
+"stopped with a fatal error instead of retrying it."
+msgstr "修正：同じリクエストの中で、失敗したマイグレーションのあとにマイグレーションをもう一度実行すると、再試行されずに致命的なエラーで止まっていました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: the migration that adds the <code>data</code> and <code>submitted_at</code> columns compares column\n"
+"names exactly. With <code>LIKE</code>, the <code>_</code> in <code>submitted_at</code> matched any character, so a\n"
+"similarly named column could make the migration skip adding it."
+msgstr "修正：<code>data</code> 列と <code>submitted_at</code> 列を追加するマイグレーションで、列名を完全一致で比べるようにしました。<code>LIKE</code> では <code>submitted_at</code> の <code>_</code> が任意の1文字に一致するため、名前の似た列があると、列の追加が飛ばされることがありました。"
+
+#. Found in changelog list item.
+msgid ""
+"Added: a read-only screen under Tools -&gt; Forms (TOFU) that shows each registered form's\n"
+"pages, mail, fields and features, one tab per form. It points out pages and mail\n"
+"templates that don't exist, bot protection that is enabled but not registered, and\n"
+"placeholders that are not allowed fields. Secret keys are never shown. The screen uses\n"
+"the same <code>tofu_admin_page_capability</code> as the records screen. See docs/admin/index.md."
+msgstr "追加：「ツール -&gt; フォーム (TOFU)」に読み取り専用の画面を追加しました。登録されている各フォームのページ・メール・入力項目・機能を、フォームごとのタブで確認できます。存在しないページやメールテンプレート、有効なのに登録されていないボット対策、受け付ける項目に無い差し込みを指摘します。シークレットキーは表示しません。この画面は送信記録の画面と同じ <code>tofu_admin_page_capability</code> を使います。詳しくは docs/admin/index.md を参照してください。"
+
+#. Found in changelog list item.
+msgid "v0.1.2"
+msgstr "v0.1.2"
+
+#. Found in changelog list item.
+msgid ""
+"Added: <code>MailConfig::$returnPath</code> sets the Return-Path (envelope sender) of the plugin's\n"
+"emails, so bounces go to a chosen address instead of the server default. WordPress\n"
+"ignores a <code>Return-Path:</code> header passed to <code>wp_mail()</code>, so it is applied to PHPMailer's\n"
+"  Sender and only for the plugin's own messages. <code>Mail::setReturnPath()</code> lets a\n"
+"  tofu_pre_send_mail callback set it per recipient. See docs/settings/mailconfig.md."
+msgstr "追加：<code>MailConfig::$returnPath</code> で、プラグインが送るメールの Return-Path（エンベロープの差出人）を設定できるようにしました。これにより、エラーメールがサーバーの既定のアドレスではなく、指定したアドレスに届きます。WordPress は <code>wp_mail()</code> に渡された <code>Return-Path:</code> ヘッダーを無視するため、PHPMailer の Sender に、プラグイン自身のメールに限って設定します。<code>Mail::setReturnPath()</code> を使うと、tofu_pre_send_mail のコールバックから宛先ごとに設定できます。詳しくは docs/settings/mailconfig.md を参照してください。"
+
+#. Found in changelog list item.
+msgid "v0.1.1"
+msgstr "v0.1.1"
+
+#. Found in changelog list item.
+msgid ""
+"Changed: the plugin's own hidden field names now all use a <code>__tofu_</code> prefix, and a form may\n"
+"no longer declare a field name starting with <code>_tofu_</code> or <code>__tofu_</code> — <code>FormConfig</code> throws at\n"
+"registration instead of letting the collision silently drop the form's value. Breaking for\n"
+"AJAX/headless clients that hardcode those names; see the upgrade notice."
+msgstr "変更：プラグイン自身の hidden 項目の名前を、すべて <code>__tofu_</code> で始まる名前にしました。また、フォームで <code>_tofu_</code> または <code>__tofu_</code> で始まる項目名は使えなくなりました。名前がぶつかってフォームの値が黙って失われる代わりに、登録の時点で <code>FormConfig</code> が例外を投げます。これらの名前を直接書いている AJAX／ヘッドレスのクライアントには互換性のない変更です。アップグレードの注意を参照してください。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: a submission nonce is now bound to the form it was issued for. The redirect flow\n"
+"minted its nonce against a bare <code>input</code>/<code>confirm</code> action, so a nonce issued for one form\n"
+"verified against every other one; only the field name distinguished them, and a field name\n"
+"is a label the sender controls. The REST flow already did this."
+msgstr "修正：送信用の nonce を、発行したフォームに結び付けるようにしました。リダイレクトの流れでは nonce を <code>input</code>／<code>confirm</code> という共通のアクションで作っていたため、あるフォーム用に発行した nonce がほかのすべてのフォームでも通っていました。区別していたのは項目名だけで、項目名は送信者が自由に変えられます。REST の流れでは、もともとフォームに結び付けていました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: database migrations now run when the plugin is updated. The plugin listened for\n"
+"  upgrade_process_complete, which WordPress does not define — the hook is\n"
+"  upgrader_process_complete — so migrations had only ever run on activation. A site that\n"
+"installed before a migration was added and updated since never received it; updating to\n"
+"this version applies anything outstanding. Migrations are tracked in <code>wp_tofu_migrate</code> and\n"
+"already-applied ones are skipped, so there is nothing to do by hand."
+msgstr "修正：プラグインを更新したときに、データベースのマイグレーションが実行されるようになりました。プラグインは WordPress に存在しない upgrade_process_complete を待っていました（正しくは upgrader_process_complete です）。そのため、マイグレーションは有効化したときにしか実行されていませんでした。マイグレーションが追加される前にインストールし、その後に更新したサイトには適用されていませんでしたが、このバージョンに更新すると未適用の分が適用されます。マイグレーションは <code>wp_tofu_migrate</code> で管理していて、適用済みのものは飛ばすので、手作業は必要ありません。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: at most one session cookie is issued per response. A single response can save the\n"
+"session more than once, and each save sent its own redundant <code>Set-Cookie</code>."
+msgstr "修正：1つのレスポンスで発行するセッションの Cookie を、多くても1つにしました。1つのレスポンスの中でセッションが何度も保存されることがあり、そのたびに不要な <code>Set-Cookie</code> を送っていました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: <code>Form::setTemplate()</code> no longer writes to the session, and so no longer sends a\n"
+"  Set-Cookie, when a page is merely rendered. A theme calling it for each of its registered\n"
+"forms on every page load was issuing one cookie per form on every response — including\n"
+"pages with no form on them — which stops server and CDN page caches serving anything\n"
+"cached. The override is now carried to the following POST in a hidden field and persisted\n"
+"only when the visitor actually submits."
+msgstr "修正：<code>Form::setTemplate()</code> は、ページを表示しただけではセッションに書き込まなくなり、Set-Cookie も送らなくなりました。登録したフォームごとにページの読み込みのたびにこれを呼ぶテーマでは、フォームの無いページも含めてすべてのレスポンスでフォームの数だけ Cookie を発行していました。そのため、サーバーや CDN のページキャッシュがまったく効きませんでした。上書きした内容は、次の POST まで hidden 項目で引き継ぎ、訪問者が実際に送信したときだけ保存します。"
+
+#. Found in changelog list item.
+msgid ""
+"Added: a named custom validation rule can now be registered site-wide, via the\n"
+"  tofu_register_validation_rules action. The validator factory was previously unreachable,\n"
+"so this was not possible without editing the plugin."
+msgstr "追加：名前付きの独自のバリデーションルールを、tofu_register_validation_rules アクションでサイト全体に登録できるようになりました。これまではバリデーターのファクトリーに手が届かず、プラグインを書き換えないと登録できませんでした。"
+
+#. Found in changelog list item.
+msgid ""
+"Added: seven actions and filters, so code outside a form's own configuration can react to\n"
+"submissions and extend validation — <code>tofu_form_submitted</code>,\n"
+"  tofu_register_validation_rules, <code>tofu_pre_send_mail</code>, <code>tofu_validation_failed</code>,\n"
+"  tofu_redirect_url, <code>tofu_record_values</code> and <code>tofu_admin_page_capability</code>. They fire for\n"
+"the redirect and AJAX flows alike. See docs/hooks/index.md."
+msgstr "追加：7つのアクションとフィルターを追加しました。フォーム自身の設定の外にあるコードから、送信に反応したりバリデーションを拡張したりできます。<code>tofu_form_submitted</code>、tofu_register_validation_rules、<code>tofu_pre_send_mail</code>、<code>tofu_validation_failed</code>、tofu_redirect_url、<code>tofu_record_values</code>、<code>tofu_admin_page_capability</code> です。リダイレクトの流れでも AJAX の流れでも同じように動きます。詳しくは docs/hooks/index.md を参照してください。"
+
+#. Found in changelog list item.
+msgid "v0.1.0"
+msgstr "v0.1.0"
+
+#. Found in changelog list item.
+msgid "Tested against WordPress 7.1."
+msgstr "WordPress 7.1 で動作を確認しました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: none of the recorded-submissions admin screen's text had been extracted for\n"
+"translation since it was added in 0.0.4, so translators never received it. It is in the\n"
+".pot now, with Japanese supplied."
+msgstr "修正：送信記録の管理画面の文字列は、0.0.4 で追加して以来、翻訳用に取り出されておらず、翻訳者に届いていませんでした。今は .pot に含まれていて、日本語訳も用意しています。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: \"reCAPTCHA token is missing.\" and \"Turnstile token is missing.\" were the only\n"
+"bot-protection messages not passed through <code>__()</code>, so they stayed English even on a\n"
+"translated site."
+msgstr "修正：「reCAPTCHA token is missing.」と「Turnstile token is missing.」だけが、ボット対策のメッセージの中で <code>__()</code> を通っていなかったため、翻訳されたサイトでも英語のままでした。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: the plugin never called <code>load_plugin_textdomain()</code>, so its bundled Japanese\n"
+"translations were not loaded and validation, reCAPTCHA and Turnstile messages rendered\n"
+"in English on Japanese sites."
+msgstr "修正：プラグインが <code>load_plugin_textdomain()</code> を呼んでいなかったため、同梱の日本語訳が読み込まれず、日本語のサイトでもバリデーション・reCAPTCHA・Turnstile のメッセージが英語で表示されていました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: the session cookie is issued only when a session is actually saved. It was\n"
+"previously sent on every request, including pages with no form and the admin screens,\n"
+"which is enough to stop most full-page caches serving anything cached."
+msgstr "修正：セッションの Cookie は、セッションを実際に保存したときだけ発行するようにしました。これまではフォームの無いページや管理画面も含めて、すべてのリクエストで送っていたため、多くのページキャッシュが効かなくなっていました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: a file carried over to the confirm page is verified against the server's own\n"
+"session record, so a tampered form cannot claim an upload that is not there."
+msgstr "修正：確認ページに引き継いだファイルを、サーバー側のセッションの記録と照らし合わせるようにしました。改ざんされたフォームが、存在しないアップロードを主張できなくなりました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: <code>uploaded_file</code>, <code>mimes</code> and <code>extension</code> now work. They depended on a check that\n"
+"is never true in this plugin's request flow."
+msgstr "修正：<code>uploaded_file</code>、<code>mimes</code>、<code>extension</code> が動くようになりました。このプラグインのリクエストの流れでは決して真にならない条件に依存していました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: <code>after</code>, <code>before</code>, <code>extension</code> and <code>uuid</code> no longer raise a fatal error on\n"
+"ordinary input — a blank date field was enough to return a 500."
+msgstr "修正：<code>after</code>、<code>before</code>、<code>extension</code>、<code>uuid</code> が、普通の入力で致命的なエラーを起こさなくなりました。日付の項目が空なだけで 500 エラーになっていました。"
+
+#. Found in changelog list item.
+msgid "Fixed: <code>required</code> now recognises an empty file input as empty."
+msgstr "修正：<code>required</code> が、空のファイル入力を空として扱うようになりました。"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: a full-width space (U+3000) no longer satisfies <code>required</code>. It is what a Japanese\n"
+"IME emits for the space bar, so a field the visitor sees as empty could pass."
+msgstr "修正：全角スペース（U+3000）だけでは <code>required</code> を満たさなくなりました。日本語の IME でスペースキーを押すと全角スペースが入るため、訪問者には空に見える項目が通ってしまうことがありました。"
+
+#. Found in changelog list item.
+msgid ""
+"Added: <code>required_file</code> as the name of the required-file rule. <code>custom_required_file</code>,\n"
+"its name since 0.0.3, still works and runs the same code."
+msgstr "追加：ファイル必須のルールの名前として <code>required_file</code> を追加しました。0.0.3 からの名前 <code>custom_required_file</code> も引き続き使え、同じ処理を行います。"
+
+#. Found in changelog list item.
+msgid ""
+"Replaced the bundled validation library with an in-house engine. The plugin now has no\n"
+"runtime dependencies at all. Every rule name still resolves, so existing <code>rules:</code>\n"
+"configuration keeps working — see the upgrade notice for the behavioural differences."
+msgstr "同梱していたバリデーションのライブラリーを、自前のエンジンに置き換えました。これにより、プラグインは実行時に依存するライブラリーが一切無くなりました。すべてのルール名はそのまま使えるので、既存の <code>rules:</code> の設定はそのまま動きます。動作の違いについては、アップグレードの注意を参照してください。"
+
+#. Found in changelog list item.
+msgid "v0.0.7"
+msgstr "v0.0.7"
+
+#. Found in changelog list item.
+msgid ""
+"Fixed: AJAX form submissions with a field literally named <code>key</code> could fail with a\n"
+"\"form not found\" error, because the REST handlers read the form key from the merged\n"
+"request parameters instead of strictly from the URL route."
+msgstr "修正：<code>key</code> という名前の項目があるフォームを AJAX で送信すると、「form not found」のエラーで失敗することがありました。REST の処理が、フォームのキーを URL のルートからではなく、まとめたリクエストのパラメーターから読んでいたためです。"
+
+#. Found in changelog list item.
+msgid "v0.0.6"
+msgstr "v0.0.6"
+
+#. Found in changelog list item.
+msgid ""
+"The AJAX nonce endpoint (<code>GET /wp-json/tofu/v1/forms/{key}/nonce</code>) now also returns the\n"
+"reCAPTCHA/Turnstile site key when enabled, so cross-origin/headless clients no longer need\n"
+"to hardcode it separately from the server-side configuration."
+msgstr "AJAX の nonce のエンドポイント（<code>GET /wp-json/tofu/v1/forms/{key}/nonce</code>）が、reCAPTCHA／Turnstile が有効なときはそのサイトキーも返すようになりました。これにより、クロスオリジンやヘッドレスのクライアントで、サーバー側の設定とは別にサイトキーを書いておく必要が無くなりました。"
+
+#. Found in changelog list item.
+msgid "v0.0.5"
+msgstr "v0.0.5"
+
+#. Found in changelog list item.
+msgid ""
+"Added <code>Form::setTemplate()</code> to override a form's input/confirm/result URLs per visitor\n"
+"session, so a single registered form can be embedded on multiple pages (e.g. post\n"
+"templates); added <code>FormConfig::$dynamicTemplate</code> for forms configured this way."
+msgstr "フォームの入力・確認・完了の URL を訪問者のセッションごとに上書きできる <code>Form::setTemplate()</code> を追加しました。これにより、登録した1つのフォームを複数のページ（投稿のテンプレートなど）に埋め込めます。このように設定するフォームのために <code>FormConfig::$dynamicTemplate</code> を追加しました。"
+
+#. Found in changelog list item.
+msgid ""
+"Added optional database recording of form submissions (<code>saveToDatabase</code>), encrypted at\n"
+"rest, with an admin screen to view recorded data."
+msgstr "フォームの送信内容をデータベースに記録する機能（<code>saveToDatabase</code>、任意）を追加しました。保存する内容は暗号化し、記録を確認する管理画面も用意しています。"
+
+#. Found in changelog list item.
+msgid "v0.0.4"
+msgstr "v0.0.4"
+
+#. Found in changelog list item.
+msgid "Replaced validation library from wixel/gump to somnambulist/validation."
+msgstr "バリデーションのライブラリーを wixel/gump から somnambulist/validation に置き換えました。"
+
+#. Found in changelog list item.
+msgid "Fixed recaptcha issue when embedded multiple forms on the same page."
+msgstr "同じページに複数のフォームを埋め込んだときの reCAPTCHA の不具合を修正しました。"
+
+#. Found in changelog list item.
+msgid "Implemented Ajax form submission and validation with reCAPTCHA and Turnstile support."
+msgstr "reCAPTCHA と Turnstile に対応した、AJAX によるフォームの送信とバリデーションを実装しました。"
+
+#. Found in changelog list item.
+msgid "v0.0.3"
+msgstr "v0.0.3"
+
+#. Found in changelog list item.
+msgid "v0.0.2 - Arranged required PHP version to 8.1, added external services section to the readme."
+msgstr "v0.0.2 - 必要な PHP のバージョンを 8.1 にし、readme に外部サービスの節を追加しました。"
+
+#. Found in changelog list item.
+msgid "v0.0.1 - Initial release."
+msgstr "v0.0.1 - 最初のリリース。"
