@@ -1,8 +1,6 @@
 # TOBIUO
 
-<!-- Banner placeholder: add .github/banner-1544x500.jpg (the WordPress.org banner) and reference it here, as TONKATSU's README does:
 ![TOBIUO — Template-Oriented Builder of Items, URLs & Organization for WordPress](.github/banner-1544x500.jpg)
--->
 
 Template-Oriented Builder of Items, URLs & Organization
 
