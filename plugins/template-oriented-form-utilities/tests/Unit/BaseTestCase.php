@@ -21,6 +21,7 @@ abstract class BaseTestCase extends TestCase
         $GLOBALS['__tofu_redirects'] = [];
         $GLOBALS['__tofu_setcookie_calls'] = [];
         unset($GLOBALS['__tofu_wp_mail_result']);
+        $GLOBALS['__tofu_options'] = [];
         $this->resetSessionCookieState();
     }
 
@@ -35,6 +36,7 @@ abstract class BaseTestCase extends TestCase
         $GLOBALS['__tofu_redirects'] = [];
         $GLOBALS['__tofu_setcookie_calls'] = [];
         unset($GLOBALS['__tofu_wp_mail_result']);
+        $GLOBALS['__tofu_options'] = [];
         $this->resetSessionCookieState();
         parent::tearDown();
     }

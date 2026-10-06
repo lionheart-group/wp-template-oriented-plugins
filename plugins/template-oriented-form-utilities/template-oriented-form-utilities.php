@@ -42,6 +42,7 @@ use TofuPlugin\Helpers\Uploader;
 use TofuPlugin\Init\AdminPage;
 use TofuPlugin\Init\FormsPage;
 use TofuPlugin\Init\Initializer;
+use TofuPlugin\Init\Migrate;
 use TofuPlugin\Init\Endpoint;
 use TofuPlugin\Init\RestEndpoint;
 use TofuPlugin\Logger;
@@ -74,6 +75,12 @@ register_activation_hook(__FILE__, function () {
 register_deactivation_hook(__FILE__, function () {
     Initializer::deactivate();
 });
+
+// Run migrations not yet applied for this version, whatever way the files were
+// updated (the hooks below miss FTP uploads and deployments).
+add_action('init', function () {
+    Migrate::maybeMigrate(TOFU_VERSION);
+}, 0);
 
 // Register hooks that are fired when the plugin is upgraded.
 //
