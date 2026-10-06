@@ -6,7 +6,7 @@ WordPress plugins that are configured from theme PHP code. Nothing is stored in 
 |---|---|---|---|
 | **TOFU** — Template-Oriented Form Utilities | Forms: validation, confirm step, mail, records | [template-oriented-form-utilities](https://wordpress.org/plugins/template-oriented-form-utilities/) | [docs](plugins/template-oriented-form-utilities/docs/) |
 | **TONKATSU** — Template-Oriented No-database Knowledge-graph & Tag Setup Utility | SEO: title, meta, OGP, JSON-LD, sitemap adjustments | [tonkatsu-seo](https://wordpress.org/plugins/tonkatsu-seo/) | [docs](plugins/tonkatsu-seo/docs/) |
-| **TOBIUO** — Template-Oriented Builder of Items, URLs & Organization | Post types, taxonomies, permalinks and their archives | (not published yet) | [docs](plugins/tobiuo-content-structure/docs/) |
+| **TOBIUO** — Template-Oriented Builder of Items, URLs & Organization | Post types, taxonomies, permalinks and their archives | [tobiuo-content-structure](https://wordpress.org/plugins/tobiuo-content-structure/) | [docs](plugins/tobiuo-content-structure/docs/) |
 
 ## Layout
 

@@ -27,7 +27,7 @@ functions.php (on `init`, any priority < 99, any order)
             (static in-memory registry of Structure/ objects)
 
 init 99 — Init\Registration::handOver()
-    ├── Init\Posts::apply() — re-read the permalink structure into WP_Rewrite, `post` archive + rules
+    ├── Init\Posts::apply() — `post` archive (has_archive on the object) + rules
     ├── refuse post types and taxonomies core reports as `_builtin`
     ├── register_taxonomy() for every TaxonomyConfig, then register_post_type() for every PostTypeConfig
     ├── Registration::permalinkErrors() against what core now has → wp_die() on a bad config
@@ -35,7 +35,7 @@ init 99 — Init\Registration::handOver()
             └── Init\Rewrite::apply() — private rewrite tags, replaced permastruct, date/author rules
 
 request
-    ├── pre_option_permalink_structure / post_type_archive_link → Init\Posts
+    ├── post_type_archive_link → Init\Posts
     ├── post_type_link        → Init\Permalink::filterLink()
     ├── template_redirect (9) → Init\Redirect::maybeRedirect()
     └── get_archives_link     → Init\ArchiveLinks::filterArchivesLink()
@@ -50,7 +50,7 @@ content model and are registered either way.
 
 | Dir | Responsibility |
 |---|---|
-| `Init/` | WordPress integration: `Registration` (hand-over on `init` 99 + config checks), `Posts` (core `post`: permalink structure, archive), `Rewrite` (permastruct + archive rules, pure rule builders, missing-rules check), `Permalink` (`post_type_link`), `Redirect` (canonical 301), `ArchiveLinks` (date/author links, `wp_get_archives`), `Conflict` (CPTP detection + notice), `Activation` (rewrite-rule reset), `AdminPage` (read-only Tools page) |
+| `Init/` | WordPress integration: `Registration` (hand-over on `init` 99 + config checks), `Posts` (core `post`: archive, expected permalink structure), `Rewrite` (permastruct + archive rules, pure rule builders, missing-rules check), `Permalink` (`post_type_link`), `Redirect` (canonical 301), `ArchiveLinks` (date/author links, `wp_get_archives`), `Conflict` (CPTP detection + notice), `Activation` (rewrite-rule reset), `AdminPage` (read-only Tools page) |
 | `Helpers/` | `Registry` (the class themes call), `Fields` (key/type checks shared by every `fromArray()`) |
 | `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `PostTypeConfig`, `TaxonomyConfig`, `PermalinkConfig`, `PostsConfig`, each with `fromArray()` rejecting unknown keys and wrong types |
 | `functions.php` | `tobiuo_get_year_link()` / `_month_` / `_day_` / `tobiuo_get_author_link()`, thin wrappers over `ArchiveLinks` |
@@ -62,8 +62,8 @@ Every decision is a static pure function that takes what it needs as arguments:
 `Rewrite::permastruct()`, `tags()`, `permastructArgs()`, `archiveSlug()`, `dateFront()`,
 `dateRules()`, `authorRules()`, `missingRules()`; `Permalink::buildPath()`, `linkBase()`,
 `chooseTerm()`, `dateParts()`; `Redirect::target()`; `ArchiveLinks::parseDateUrl()`;
-`Registration::permalinkErrors()`. The WP-facing methods (`apply()`, `filterLink()`,
-`maybeRedirect()`, …) only gather inputs and apply results. Links and rules share
+`Registration::permalinkErrors()`; `Posts::archiveRules()`, `structureMismatch()`. The WP-facing
+methods (`apply()`, `filterLink()`, `maybeRedirect()`, …) only gather inputs and apply results. Links and rules share
 `Permalink::linkBase()` / `Rewrite::archiveSlug()`, so they cannot disagree about a slug.
 
 The unit stubs cannot model `WP_Rewrite::generate_rewrite_rules()` or `WP::parse_request()`. Any
@@ -131,20 +131,17 @@ The spec was derived from reading CPTP. What is kept, and what is deliberately d
   `Registration::handOver()` refuses anything core reports as `_builtin` (future core types).
 - **Built-in taxonomies are refused the same way**: `Consts::BUILTIN_TAXONOMIES` in
   `registerTaxonomy()`, `_builtin` at the hand-over (`Registry::refuseBuiltinTaxonomy()`).
-- **The post permalink is the site's permalink structure**, supplied by
-  `pre_option_permalink_structure` as `'/' . archive . structure`. The option in the DB is never
-  written; Settings → Permalinks shows a notice (on that screen only) that saving there has no effect.
+- **The post permalink is the site's permalink structure, and stays core's setting.** TOBIUO never
+  writes or filters `permalink_structure` (an earlier version supplied it through
+  `pre_option_permalink_structure` and re-initialised `WP_Rewrite` at the hand-over; Settings →
+  Permalinks then seemed to ignore the user's choice, and every way of explaining that on core's
+  screen — notice, settings section — raised review concerns). `PostsConfig::$permalink` is the
+  structure the theme *expects*; `Posts::structureMismatch()` (pure) compares
+  `'/' . archive . structure` with the stored option, and the admin page's Posts section shows
+  "Matches the theme" or a warning with the expected structure and a link to Settings → Permalinks.
+  Nothing is shown on Settings → Permalinks itself.
   Only core's tags plus `%category%` are allowed, and `dateArchive` / `authorArchive` / `dateFront`
   must stay default (core provides those archives, under the front) — checked in `PostsConfig`.
-- **Timing.** `WP_Rewrite` is constructed after `plugins_loaded` from the stored option, before the
-  theme loads, and the theme registers at `init` 10. So `Posts::apply()` (first thing in the
-  hand-over) runs `WP_Rewrite::init()` — what core runs after `set_permalink_structure()` — but
-  restores `endpoints`, `extra_rules` and `non_wp_rules`, which `init()` empties and plugins may have
-  filled on `init` already. Then what was built on the old front/root is moved: permastructs
-  (`rebasePermastructs()`: `with_front` ones on the front, others on the root) and core's archive rules
-  of post types with `has_archive` (`renameRules()` of exactly the four regexes
-  `WP_Post_Type::add_rewrite_rules()` produces, order kept). Arbitrary rules other code built from
-  `$wp_rewrite->front` before `init` 99 are not guessed at (documented).
 - **Archive.** Core registers `post` at `init` 0 with `rewrite => false`, before any theme config
   exists, so `register_post_type_args` is too late: `apply()` sets `has_archive` on the registered
   object (so `is_post_type_archive('post')` works) and adds core-shaped archive rules

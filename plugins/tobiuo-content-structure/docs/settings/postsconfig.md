@@ -1,8 +1,9 @@
 # PostsConfig
 
-The archive and permalink of WordPress's built-in **posts** (`post`). Register once with
-`Registry::registerPosts()`. TOBIUO does not register `post` again — core's post type stays as it is;
-only its archive and its permalink structure come from the theme.
+The archive of WordPress's built-in **posts** (`post`), and the permalink structure the theme expects for them. Register once with
+`Registry::registerPosts()`. TOBIUO does not register `post` again — core's post type stays as it is.
+The archive comes from the theme; the permalink structure stays core's setting (Settings →
+Permalinks), and the theme only states which one it expects.
 
 ## Usage
 
@@ -17,13 +18,16 @@ add_action('init', function () {
     }
 
     Registry::registerPosts(new PostsConfig(
-        archive: 'news',                                           // https://example.com/news/
-        permalink: new PermalinkConfig(structure: '/%postname%/'), // https://example.com/news/my-post/
+        archive: 'news', // TOBIUO builds the archive: https://example.com/news/
+
+        // Optional: the post URL structure the theme expects, below the archive (/news/%postname%/).
+        // TOBIUO does not apply it: set it on Settings → Permalinks. The Tools page compares the two.
+        permalink: new PermalinkConfig(structure: '/%postname%/'),
     ));
 });
 ```
 
-What the site then has:
+What the site then has, with Settings → Permalinks set to `/news/%postname%/`:
 
 | URL | What |
 |---|---|
@@ -59,13 +63,15 @@ here and inside `permalink`.
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `archive` | `?string` | No | `null` | Path of the posts archive: lowercase letters, digits and `-`, segments joined by `/`, no slash at either end (`news`, `info/news`). `null`: no archive of their own (core's posts page / home page, as without TOBIUO). |
-| `permalink` | `?PermalinkConfig` | No | `null` | Path of a post **below the archive**. `null` leaves the structure to Settings → Permalinks. |
+| `permalink` | `?PermalinkConfig` | No | `null` | Path of a post **below the archive** that the theme expects. `null`: the theme expects no particular structure. |
 
 ### permalink
 
-The structure becomes the site's permalink structure — what Settings → Permalinks would otherwise
-store — as `'/' . archive . structure`: `archive: 'news'` with `/%postname%/` gives
-`/news/%postname%/`. Without an archive the structure is used as written.
+The structure the site's permalink structure (Settings → Permalinks) should have, as
+`'/' . archive . structure`: `archive: 'news'` with `/%postname%/` expects `/news/%postname%/`.
+Without an archive the structure is expected as written. TOBIUO never writes or overrides the
+setting: set it on Settings → Permalinks (Custom Structure) on every environment.
+**Tools → Content Structure (TOBIUO)** compares the two and warns when they differ.
 
 Since this is core's own structure, only the tags core supports in it are allowed: `%postname%`
 `%post_id%` `%year%` `%monthnum%` `%day%` `%hour%` `%minute%` `%second%` `%author%` `%category%`.
@@ -75,13 +81,11 @@ structure starts with a number, as core decides).
 
 ## How it is applied
 
-- `pre_option_permalink_structure` returns the structure, so `get_option('permalink_structure')`,
-  Settings → Permalinks and everything in core see it. **Settings → Permalinks** shows a notice that
-  the structure comes from the theme; choosing another one there has no effect.
-- `WP_Rewrite` is built before the theme loads, from the stored option. At the hand-over (`init` 99)
-  TOBIUO re-reads the structure into it — keeping the endpoints and rules added since — and moves
-  what was already built on the old front to the new one: other post types' and taxonomies'
-  permastructs and core's archive rules for post types with `with_front`.
+- The permalink structure is not touched: post URLs, and the front below which core puts the date,
+  author, category and tag archives, come from Settings → Permalinks as usual.
+  **Tools → Content Structure (TOBIUO)** shows the stored structure and, when `permalink` is set,
+  "Matches the theme" or "Differs from the theme" with the expected structure and a link to
+  Settings → Permalinks.
 - Core registers `post` on `init` 0, before the theme's config exists, so the archive is set on the
   registered post type object (`has_archive`), and the archive rules are added — core never adds
   them for `post`, which it registers without rewrite rules.
@@ -91,7 +95,7 @@ structure starts with a number, as core decides).
 
 ## Notes
 
-- The front (`/news/`) also prefixes every custom post type and taxonomy whose `rewrite` has
+- The front of the structure (`/news/`) also prefixes every custom post type and taxonomy whose `rewrite` has
   `with_front => true` (the default) — `/news/event/my-event/`. Set `'with_front' => false` for those
   that should not sit below the posts.
 - A category or tag base set on Settings → Permalinks (`category_base`, `tag_base`) is a separate,
@@ -102,5 +106,3 @@ structure starts with a number, as core decides).
 - `tobiuo_get_year_link('post', …)` and the other template functions return core's own links
   (`get_year_link()`, `get_author_posts_url()`, …) for posts.
 - While Custom Post Type Permalinks is active, none of this is applied.
-- Code that read `$wp_rewrite->front` before `init` 99 (to build its own rules) saw the stored
-  structure's front.

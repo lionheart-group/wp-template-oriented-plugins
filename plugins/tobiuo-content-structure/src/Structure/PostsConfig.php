@@ -7,19 +7,19 @@ use TobiuoPlugin\Helpers\Fields;
 /**
  * Posts configuration class.
  *
- * The archive and permalink of core's built-in `post` post type, which
+ * The archive (built by TOBIUO) and the expected permalink structure of core's built-in `post` post type, which
  * TOBIUO does not register again. Register with `Registry::registerPosts()`.
  *
  * <code>
  * new PostsConfig(
- *     archive: 'news',                                         // https://example.com/news/
- *     permalink: new PermalinkConfig(structure: '/%postname%/'), // https://example.com/news/my-post/
+ *     archive: 'news',                                           // archive at https://example.com/news/
+ *     permalink: new PermalinkConfig(structure: '/%postname%/'), // expected: /news/%postname%/ (not applied)
  * );
  * </code>
  *
- * The permalink becomes the site's permalink structure (Settings →
- * Permalinks) — `'/' . archive . structure` — so core's date, author,
- * category and tag archives move below the archive too.
+ * The permalink is the structure the theme expects the site's permalink
+ * structure (Settings → Permalinks) to be — `'/' . archive . structure`.
+ * TOBIUO does not set it; the admin page warns when the two differ.
  *
  * @package TobiuoPlugin\Structure
  */
@@ -53,8 +53,8 @@ class PostsConfig
         public readonly ?string $archive = null,
 
         /**
-         * Path of a post below the archive, e.g. `/%postname%/`. Null leaves
-         * the structure to Settings → Permalinks.
+         * Path of a post below the archive that the theme expects, e.g.
+         * `/%postname%/`. Null: no particular structure is expected.
          *
          * Only the tags core's permalink structure supports:
          * PermalinkConfig::CORE_TAGS and `%category%`. `dateArchive` and
@@ -140,9 +140,9 @@ class PostsConfig
     }
 
     /**
-     * The site-wide permalink structure this config gives, e.g. `/news/%postname%/`.
+     * The site-wide permalink structure this config expects, e.g. `/news/%postname%/`.
      *
-     * @return ?string Null when the structure is left to Settings → Permalinks.
+     * @return ?string Null when no particular structure is expected.
      */
     public function permalinkStructure(): ?string
     {

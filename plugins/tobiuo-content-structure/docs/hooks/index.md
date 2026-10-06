@@ -132,10 +132,8 @@ the theme and other plugins, and run alongside TOBIUO's callbacks (at priority 1
 | Core hook | What TOBIUO does |
 |---|---|
 | `init` (priority 99) | Applies the `PostsConfig`, registers the taxonomies, then the post types, then fires `tobiuo_registered`. |
-| `pre_option_permalink_structure` | Returns the `PostsConfig` structure (`/news/%postname%/`) once the theme has registered one. |
 | `post_type_archive_link` | Returns the posts archive URL for `post` when `PostsConfig::$archive` is set. |
 | `register_post_type_args` | Keeps `has_archive` for `post` should it be registered again after the hand-over. |
-| `admin_notices` | On Settings → Permalinks only: says the structure comes from the theme. |
 | `post_type_link` | Builds the link of a post whose post type has a `PermalinkConfig`. A callback at a later priority sees TOBIUO's link. |
 | `template_redirect` (priority 9) | The canonical redirect, before core's `redirect_canonical()`. |
 | `get_archives_link` | Points `wp_get_archives( [ 'post_type' => … ] )` date links at the post type's date archives. |

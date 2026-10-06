@@ -3,6 +3,7 @@
 namespace TobiuoPlugin\Init;
 
 use TobiuoPlugin\Helpers\Registry;
+use TobiuoPlugin\Structure\PostsConfig;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -10,18 +11,15 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * The archive and permalink of core's `post` post type (Structure\PostsConfig).
+ * The archive of core's `post` post type, and the check of its expected permalink structure (Structure\PostsConfig).
  *
- * `post` is not registered again. Its permalink is the site's permalink
- * structure, so it is supplied through `pre_option_permalink_structure`; its
- * archive is set on the registered post type object and gets core-style
- * rules, since core registers `post` without rewrite rules of its own.
+ * `post` is not registered again. Its archive is set on the registered post
+ * type object and gets core-style rules, since core registers `post` without
+ * rewrite rules of its own (`init` 0, before the theme's config exists).
  *
- * Timing: WP_Rewrite is built after `plugins_loaded` from the stored
- * structure, and the theme registers its PostsConfig on `init` only after
- * that, and after core has registered `post` (`init` 0). So apply(), called
- * by Init\Registration at the hand-over, brings WP_Rewrite and the `post`
- * object up to date (see reinitRewrite()).
+ * Its permalink is the site's permalink structure, which stays core's
+ * setting (Settings → Permalinks). The PostsConfig only says which structure
+ * the theme expects; structureMismatch() compares the two for the admin page.
  */
 class Posts
 {
@@ -39,30 +37,12 @@ class Posts
     {
         self::$enabled = true;
 
-        add_filter('pre_option_permalink_structure', [static::class, 'filterPermalinkStructure']);
         add_filter('post_type_archive_link', [static::class, 'filterArchiveLink'], 10, 2);
         add_filter('register_post_type_args', [static::class, 'filterPostTypeArgs'], 10, 2);
-        add_action('admin_notices', [static::class, 'renderPermalinkNotice']);
     }
 
     /**
-     * `pre_option_permalink_structure` callback: the structure from the PostsConfig.
-     *
-     * Returns $pre (false: read the option) until the theme has registered a
-     * PostsConfig with a permalink.
-     *
-     * @param mixed $pre
-     * @return mixed
-     */
-    public static function filterPermalinkStructure(mixed $pre): mixed
-    {
-        $structure = self::$enabled ? Registry::getPosts()?->permalinkStructure() : null;
-
-        return $structure ?? $pre;
-    }
-
-    /**
-     * Bring WP_Rewrite and the `post` object in line with the PostsConfig.
+     * Give the `post` object the archive of the PostsConfig, and its rules.
      *
      * Called by Init\Registration::handOver() before it registers anything.
      */
@@ -71,15 +51,7 @@ class Posts
         global $wp_rewrite;
 
         $config = Registry::getPosts();
-        if (!self::$enabled || $config === null || !$wp_rewrite instanceof \WP_Rewrite) {
-            return;
-        }
-
-        if ($config->permalink !== null) {
-            self::reinitRewrite($wp_rewrite);
-        }
-
-        if ($config->archive === null) {
+        if (!self::$enabled || $config === null || $config->archive === null || !$wp_rewrite instanceof \WP_Rewrite) {
             return;
         }
 
@@ -93,126 +65,6 @@ class Posts
         foreach (self::expectedRules() as $regex => $query) {
             add_rewrite_rule($regex, $query, 'top');
         }
-    }
-
-    /**
-     * Re-read the permalink structure into WP_Rewrite, keeping what was added since.
-     *
-     * WP_Rewrite::init() is what core runs after changing the structure, but
-     * it also empties the endpoints, the 'bottom' rules and the non-WP rules,
-     * which plugins may have added on `init` already — those are put back.
-     * What was built on the old front or root is moved to the new one: the
-     * permastructs (core's categories and tags, other plugins' types) and
-     * core's archive rules of post types with an archive.
-     *
-     * @param \WP_Rewrite $wpRewrite
-     */
-    public static function reinitRewrite(\WP_Rewrite $wpRewrite): void
-    {
-        if ($wpRewrite->permalink_structure === get_option('permalink_structure')) {
-            return;
-        }
-
-        $oldFront = (string) $wpRewrite->front;
-        $oldRoot = (string) $wpRewrite->root;
-        $kept = [$wpRewrite->endpoints, $wpRewrite->extra_rules, $wpRewrite->non_wp_rules];
-
-        $wpRewrite->init();
-
-        [$wpRewrite->endpoints, $wpRewrite->extra_rules, $wpRewrite->non_wp_rules] = $kept;
-
-        if ($oldFront === $wpRewrite->front && $oldRoot === $wpRewrite->root) {
-            return;
-        }
-
-        $wpRewrite->extra_permastructs = self::rebasePermastructs(
-            $wpRewrite->extra_permastructs,
-            $oldFront,
-            $wpRewrite->front,
-            $oldRoot,
-            $wpRewrite->root
-        );
-
-        $moves = [];
-        foreach (get_post_types([], 'objects') as $postType) {
-            if (!$postType instanceof \WP_Post_Type || !$postType->has_archive || !is_array($postType->rewrite)) {
-                continue;
-            }
-
-            $slug = $postType->has_archive === true ? (string) ($postType->rewrite['slug'] ?? '') : (string) $postType->has_archive;
-            [$old, $new] = !empty($postType->rewrite['with_front'])
-                ? [substr($oldFront, 1) . $slug, substr($wpRewrite->front, 1) . $slug]
-                : [$oldRoot . $slug, $wpRewrite->root . $slug];
-
-            $moves += array_combine(
-                self::archiveRuleKeys($old, $wpRewrite->pagination_base, $wpRewrite->feeds),
-                self::archiveRuleKeys($new, $wpRewrite->pagination_base, $wpRewrite->feeds)
-            );
-        }
-
-        $wpRewrite->extra_rules_top = self::renameRules($wpRewrite->extra_rules_top, $moves);
-    }
-
-    /**
-     * Move permastructs from the old front (or root) to the new one.
-     *
-     * add_permastruct() prepends the front (`with_front`) or the root at the
-     * time it is called, so structures added before the hand-over carry the
-     * old one.
-     *
-     * @param array<string, mixed> $permastructs WP_Rewrite::$extra_permastructs.
-     * @param string $oldFront
-     * @param string $newFront
-     * @param string $oldRoot
-     * @param string $newRoot
-     * @return array<string, mixed>
-     */
-    public static function rebasePermastructs(array $permastructs, string $oldFront, string $newFront, string $oldRoot, string $newRoot): array
-    {
-        foreach ($permastructs as $name => $args) {
-            if (!is_array($args) || !isset($args['struct']) || !is_string($args['struct'])) {
-                continue;
-            }
-
-            [$old, $new] = !empty($args['with_front']) ? [$oldFront, $newFront] : [$oldRoot, $newRoot];
-
-            if ($old !== $new && str_starts_with($args['struct'], $old)) {
-                $permastructs[$name]['struct'] = $new . substr($args['struct'], strlen($old));
-            }
-        }
-
-        return $permastructs;
-    }
-
-    /**
-     * Rename rule regexes, keeping their order and queries.
-     *
-     * @param array<string, string> $rules
-     * @param array<string, string> $moves Old regex => new regex.
-     * @return array<string, string>
-     */
-    public static function renameRules(array $rules, array $moves): array
-    {
-        $renamed = [];
-        foreach ($rules as $regex => $query) {
-            $renamed[$moves[$regex] ?? $regex] = $query;
-        }
-
-        return $renamed;
-    }
-
-    /**
-     * The regexes core gives a post type archive, in core's order
-     * (WP_Post_Type::add_rewrite_rules()).
-     *
-     * @param string $archiveSlug Including the front or root, e.g. `news`.
-     * @param string $paginationBase WP_Rewrite::$pagination_base.
-     * @param string[] $feeds WP_Rewrite::$feeds, or [] for no feed rules.
-     * @return string[]
-     */
-    public static function archiveRuleKeys(string $archiveSlug, string $paginationBase, array $feeds): array
-    {
-        return array_keys(self::archiveRules($archiveSlug, $paginationBase, $feeds));
     }
 
     /**
@@ -301,35 +153,17 @@ class Posts
     }
 
     /**
-     * Settings → Permalinks only: its structure choice is overridden there.
+     * The structure the theme expects, when the stored one differs from it.
      *
-     * @param string $screenId
-     * @return bool
+     * @param ?PostsConfig $config The theme's PostsConfig, if any.
+     * @param string $stored The `permalink_structure` option.
+     * @return ?string The expected structure (`/news/%postname%/`), or null
+     *                 when the theme expects none or the stored one matches.
      */
-    public static function shouldShowNoticeOn(string $screenId): bool
+    public static function structureMismatch(?PostsConfig $config, string $stored): ?string
     {
-        return $screenId === 'options-permalink';
-    }
+        $expected = $config?->permalinkStructure();
 
-    /**
-     * Say on Settings → Permalinks that the structure comes from the theme.
-     */
-    public static function renderPermalinkNotice(): void
-    {
-        $structure = self::$enabled ? Registry::getPosts()?->permalinkStructure() : null;
-        if ($structure === null || !current_user_can('manage_options')) {
-            return;
-        }
-
-        $screen = get_current_screen();
-        if ($screen === null || !self::shouldShowNoticeOn($screen->id)) {
-            return;
-        }
-
-        printf(
-            '<div class="notice notice-info"><p>%s <code>%s</code></p></div>',
-            esc_html__('The permalink structure of posts is set in the theme\'s code with TOBIUO, so choosing another one here has no effect. In use:', 'tobiuo-content-structure'),
-            esc_html($structure)
-        );
+        return $expected !== null && $expected !== $stored ? $expected : null;
     }
 }

@@ -20,11 +20,13 @@ add_action('init', function () {
     }
 
     // WordPress's posts: archive at https://example.com/news/, posts at
-    // https://example.com/news/my-post/. The front /news/ also prefixes core's
-    // date, author, category and tag archives, and every post type below with
-    // 'with_front' => true — so they all set it to false.
+    // https://example.com/news/my-post/ once Settings → Permalinks is set to
+    // /news/%postname%/ (the Tools page warns until it is). The front /news/
+    // also prefixes core's date, author, category and tag archives, and every
+    // post type below with 'with_front' => true — so they all set it to false.
     Registry::registerPosts(new PostsConfig(
         archive: 'news',
+        // Expected, not applied: Settings → Permalinks should read /news/%postname%/
         permalink: new PermalinkConfig(structure: '/%postname%/'),
     ));
 
