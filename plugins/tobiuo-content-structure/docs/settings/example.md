@@ -26,6 +26,7 @@ add_action('init', function () {
     // post type below with 'with_front' => true — so they all set it to false.
     Registry::registerPosts(new PostsConfig(
         archive: 'news',
+        // Expected, not applied: Settings → Permalinks should read /news/%postname%/
         permalink: new PermalinkConfig(structure: '/%postname%/'),
     ));
 

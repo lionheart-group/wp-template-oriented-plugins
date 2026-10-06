@@ -7,13 +7,13 @@ use TobiuoPlugin\Helpers\Fields;
 /**
  * Posts configuration class.
  *
- * The archive and permalink of core's built-in `post` post type, which
+ * The archive (built by TOBIUO) and the expected permalink structure of core's built-in `post` post type, which
  * TOBIUO does not register again. Register with `Registry::registerPosts()`.
  *
  * <code>
  * new PostsConfig(
- *     archive: 'news',                                         // https://example.com/news/
- *     permalink: new PermalinkConfig(structure: '/%postname%/'), // https://example.com/news/my-post/
+ *     archive: 'news',                                           // archive at https://example.com/news/
+ *     permalink: new PermalinkConfig(structure: '/%postname%/'), // expected: /news/%postname%/ (not applied)
  * );
  * </code>
  *

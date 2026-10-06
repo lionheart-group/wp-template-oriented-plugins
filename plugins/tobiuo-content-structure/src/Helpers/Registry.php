@@ -110,7 +110,7 @@ class Registry
     }
 
     /**
-     * Configure the archive and permalink of core's `post` post type.
+     * Configure the archive of core's `post` post type, and the permalink structure the theme expects for it.
      *
      * `post` itself stays core's: it is not registered again. Call once,
      * with the same timing as registerPostType():
@@ -118,7 +118,7 @@ class Registry
      * <code>
      * Registry::registerPosts(new PostsConfig(
      *     archive: 'news',
-     *     permalink: new PermalinkConfig(structure: '/%postname%/'),
+     *     permalink: new PermalinkConfig(structure: '/%postname%/'), // expected, not applied
      * ));
      * </code>
      *
@@ -238,7 +238,7 @@ class Registry
             sprintf(
                 'Post type "%s" is built into WordPress and cannot be registered with TOBIUO.%s',
                 esc_html($name),
-                $name === 'post' ? ' Use Registry::registerPosts(new PostsConfig(...)) to set its archive and permalink.' : ''
+                $name === 'post' ? ' Use Registry::registerPosts(new PostsConfig(...)) to give it an archive.' : ''
             ),
             'TOBIUO Post Type Registration Error',
             ['response' => 500]

@@ -1,6 +1,6 @@
 # PostsConfig
 
-The archive and permalink of WordPress's built-in **posts** (`post`). Register once with
+The archive of WordPress's built-in **posts** (`post`), and the permalink structure the theme expects for them. Register once with
 `Registry::registerPosts()`. TOBIUO does not register `post` again — core's post type stays as it is.
 The archive comes from the theme; the permalink structure stays core's setting (Settings →
 Permalinks), and the theme only states which one it expects.
@@ -18,8 +18,11 @@ add_action('init', function () {
     }
 
     Registry::registerPosts(new PostsConfig(
-        archive: 'news',                                           // https://example.com/news/
-        permalink: new PermalinkConfig(structure: '/%postname%/'), // https://example.com/news/my-post/
+        archive: 'news', // TOBIUO builds the archive: https://example.com/news/
+
+        // Optional: the post URL structure the theme expects, below the archive (/news/%postname%/).
+        // TOBIUO does not apply it: set it on Settings → Permalinks. The Tools page compares the two.
+        permalink: new PermalinkConfig(structure: '/%postname%/'),
     ));
 });
 ```
