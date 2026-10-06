@@ -47,7 +47,13 @@ AJAX/headless forms via `TofuPlugin\Init\RestEndpoint` — see `docs/ajax/`.
 | `Consts.php` | Plugin-wide constants (query/cookie/nonce keys, `SESSION_EXPIRY`, `REST_NAMESPACE=tofu/v1`, upload/log subfolders) |
 | `Logger.php` | Debug log, active only when `WP_DEBUG === true`, appended to `wp-content/uploads/tofu-logs/`. Line format is byte-compatible with the Monolog output it replaced, so files spanning the change stay greppable; write failures are swallowed so logging can never take a submission down |
 
-### DB tables (created on activation via `migrations/`)
+### DB tables (created via `migrations/`)
+
+Migrations run when the stored `tofu_db_version` option differs from `TOFU_VERSION`, checked on `init`
+(priority 0) on any request — `Migrate::maybeMigrate()`. Activation and `upgrader_process_complete` alone
+miss updates made by replacing files (FTP, deployments), which is how sites built from the template are
+updated. The option is written only when every migration succeeded, so a failure is retried. A new
+migration must be added to the list in `Migrate::migrate()` and be safe to run twice.
 
 | Table | Purpose |
 |---|---|

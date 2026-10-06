@@ -4,7 +4,7 @@ Tags: forms, utilities, template-oriented
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -163,6 +163,12 @@ In your theme's code. Tools -> Forms (TOFU) shows them, read-only.
       stopped with a fatal error instead of retrying it.
     - Declared `Requires at least: 6.0`, so translate.wordpress.org imports the plugin's strings.
     - Escaped and sanitized request values flagged by Plugin Check.
+* v0.1.3
+    - Fixed: database migrations now also run when the plugin's files are replaced without
+      WordPress's updater (FTP, deployments). The plugin compares the stored `tofu_db_version`
+      with its own version on `init` and runs any outstanding migration once; a failed one is
+      retried on the next request.
+    - Requires WordPress 6.5.
 
 
 == Upgrade Notice ==

@@ -13,6 +13,11 @@ class Migrate
     const TABLE_SUFFIX = 'tofu_migrate';
 
     /**
+     * Option holding the plugin version whose migrations have all run.
+     */
+    const VERSION_OPTION = 'tofu_db_version';
+
+    /**
      * Migration objects already loaded in this request, keyed by file path.
      *
      * @var array<string, Migration>
@@ -73,14 +78,55 @@ class Migrate
     }
 
     /**
+     * Run the migrations once per plugin version, on any request.
+     *
+     * Activation and `upgrader_process_complete` miss updates made by
+     * replacing the plugin's files (FTP, deployments), so `init` compares the
+     * stored version first — one autoloaded option, no query when it matches.
+     * It runs on the front end too: a form saving a record must not meet a
+     * table without the columns it writes. Migrations are idempotent, so two
+     * requests running them at once do no harm.
+     *
+     * @param string $version The plugin's version (TOFU_VERSION).
+     * @param ?callable(): bool $runner Runs the migrations; migrate() by default.
+     * @return bool Whether the migrations ran.
+     */
+    public static function maybeMigrate(string $version, ?callable $runner = null): bool
+    {
+        if (!static::needsMigration(get_option(static::VERSION_OPTION), $version)) {
+            return false;
+        }
+
+        $runner ??= [static::class, 'migrate'];
+        if ($runner() === true) {
+            update_option(static::VERSION_OPTION, $version, true);
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether the stored version calls for running the migrations.
+     *
+     * @param mixed $stored get_option() result (false when missing).
+     * @param string $version
+     * @return bool
+     */
+    public static function needsMigration(mixed $stored, string $version): bool
+    {
+        return $stored !== $version;
+    }
+
+    /**
      * Execute migrations
      *
-     * @return void
+     * @return bool True when every migration has been applied (now or before).
      */
-    public static function migrate(): void
+    public static function migrate(): bool
     {
         global $wpdb;
         static::checkMigrateTable();
+        $complete = true;
 
         foreach ([
             '2024-08-29_00-00-00_init-records',
@@ -98,6 +144,7 @@ class Migrate
             $migrateClass = static::loadMigration(TOFU_PLUGIN_DIR . '/migrations/' . $migrate . '.php');
             if ($migrateClass === null) {
                 Logger::error("Migration {$migrate} does not return a Migration object.");
+                $complete = false;
                 continue;
             }
             $sql = $migrateClass->sql();
@@ -107,6 +154,7 @@ class Migrate
                 $result = $wpdb->query($sql);
                 if ($result === false) {
                     Logger::error("Migration {$migrate} raw query failed: " . $wpdb->last_error);
+                    $complete = false;
                     continue;
                 }
             } else {
@@ -124,6 +172,8 @@ class Migrate
                 'updated_at' => $updated_at,
             ]);
         }
+
+        return $complete;
     }
 
     /**
