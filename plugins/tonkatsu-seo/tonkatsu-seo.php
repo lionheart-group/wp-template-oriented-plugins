@@ -9,7 +9,7 @@
  * Plugin Name: TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility)
  * Plugin URI: https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tonkatsu-seo
  * Description: TONKATSU outputs SEO metadata, structured data and sitemap adjustments configured entirely in theme code, with no settings stored in the database.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: tonkatsu-seo
@@ -27,7 +27,7 @@ defined( 'ABSPATH' ) || exit;
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('TONKATSU_VERSION', '0.0.1');
+define('TONKATSU_VERSION', '0.0.2');
 define('TONKATSU_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TONKATSU_PLUGIN_FILE', __FILE__);
 

@@ -4,7 +4,7 @@ Tags: seo, meta, open graph, json-ld, sitemap
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.0.1
+Stable tag: 0.0.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -62,6 +62,11 @@ No. It adjusts WordPress core's sitemap at /wp-sitemap.xml.
 
 
 == Changelog ==
+
+= 0.0.2 =
+* Added: redirects registered in theme code with `Seo::registerRedirects()` — exact, prefix and (when declared) regex matches, with 301, 302, 307, 308 and 410. Listed on Tools -> SEO (TONKATSU), which warns about redirects that hide a registered page and about chained redirects. They stand down while another SEO plugin is active. See docs/settings/redirectconfig.md.
+* Added: an opt-in redirect log (`SiteConfig::$logRedirects`). It keeps hit counts per redirect and each hit for `redirectLogDays` days (default 90) in two tables, without IP addresses or user agents, and lists them on the Tools page. Uninstalling the plugin removes the tables. Settings are still never stored in the database.
+* Requires WordPress 6.5.
 
 = 0.0.1 =
 * Initial release.
