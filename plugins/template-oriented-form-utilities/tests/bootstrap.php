@@ -545,3 +545,17 @@ if (!defined('COOKIE_DOMAIN')) {
 
 // Namespace-level mock for setcookie() — must be in its own file
 require_once __DIR__ . '/bootstrap-helpers.php';
+
+// Options, backed by $GLOBALS['__tofu_options'].
+if (!function_exists('get_option')) {
+    function get_option($option, $default = false) {
+        return array_key_exists($option, $GLOBALS['__tofu_options'] ?? []) ? $GLOBALS['__tofu_options'][$option] : $default;
+    }
+}
+
+if (!function_exists('update_option')) {
+    function update_option($option, $value, $autoload = null) {
+        $GLOBALS['__tofu_options'][$option] = $value;
+        return true;
+    }
+}

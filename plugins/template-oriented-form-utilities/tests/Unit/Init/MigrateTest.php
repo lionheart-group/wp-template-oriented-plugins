@@ -50,4 +50,55 @@ class MigrateTest extends BaseTestCase
             unlink($file);
         }
     }
+
+    public function testNeedsMigrationWhenTheStoredVersionDiffers(): void
+    {
+        $this->assertTrue(Migrate::needsMigration(false, '0.1.3'));
+        $this->assertTrue(Migrate::needsMigration('0.1.2', '0.1.3'));
+        $this->assertFalse(Migrate::needsMigration('0.1.3', '0.1.3'));
+    }
+
+    public function testMaybeMigrateRunsOnceAndStoresTheVersion(): void
+    {
+        $runs = 0;
+        $runner = function () use (&$runs): bool {
+            $runs++;
+            return true;
+        };
+
+        $this->assertTrue(Migrate::maybeMigrate('0.1.3', $runner));
+        $this->assertFalse(Migrate::maybeMigrate('0.1.3', $runner));
+
+        $this->assertSame(1, $runs);
+        $this->assertSame('0.1.3', $GLOBALS['__tofu_options'][Migrate::VERSION_OPTION]);
+    }
+
+    public function testAFailedMigrationIsRetriedOnTheNextRequest(): void
+    {
+        $runs = 0;
+        $runner = function () use (&$runs): bool {
+            $runs++;
+            return $runs > 1;
+        };
+
+        Migrate::maybeMigrate('0.1.3', $runner);
+        $this->assertArrayNotHasKey(Migrate::VERSION_OPTION, $GLOBALS['__tofu_options']);
+
+        Migrate::maybeMigrate('0.1.3', $runner);
+        $this->assertSame(2, $runs);
+        $this->assertSame('0.1.3', $GLOBALS['__tofu_options'][Migrate::VERSION_OPTION]);
+    }
+
+    public function testANewVersionRunsTheMigrationsAgain(): void
+    {
+        $GLOBALS['__tofu_options'][Migrate::VERSION_OPTION] = '0.1.2';
+        $runs = 0;
+
+        Migrate::maybeMigrate('0.1.3', function () use (&$runs): bool {
+            $runs++;
+            return true;
+        });
+
+        $this->assertSame(1, $runs);
+    }
 }
