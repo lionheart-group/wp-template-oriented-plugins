@@ -11,7 +11,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * The archive and permalink of core's `post` post type (Structure\PostsConfig).
+ * The archive of core's `post` post type, and the check of its expected permalink structure (Structure\PostsConfig).
  *
  * `post` is not registered again. Its archive is set on the registered post
  * type object and gets core-style rules, since core registers `post` without

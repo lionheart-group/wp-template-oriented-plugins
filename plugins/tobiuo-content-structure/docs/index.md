@@ -7,7 +7,7 @@ TOBIUO is configured in your WordPress theme's `functions.php` (on `init`) using
 - [PostTypeConfig](settings/posttypeconfig.md) — a post type, registered with `Registry::registerPostType()`
   - [PermalinkConfig](settings/permalinkconfig.md) — its URL structure and its date / author archives
 - [TaxonomyConfig](settings/taxonomyconfig.md) — a taxonomy, registered with `Registry::registerTaxonomy()`
-- [PostsConfig](settings/postsconfig.md) — the archive and permalink of WordPress's built-in posts, registered with `Registry::registerPosts()`
+- [PostsConfig](settings/postsconfig.md) — the archive of WordPress's built-in posts and the permalink structure the theme expects for them, registered with `Registry::registerPosts()`
 
 Here's a complete example showing all of them together:
 
