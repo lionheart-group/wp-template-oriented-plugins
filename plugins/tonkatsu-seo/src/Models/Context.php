@@ -3,6 +3,7 @@
 namespace TonkatsuPlugin\Models;
 
 use TonkatsuPlugin\Helpers\Seo;
+use TonkatsuPlugin\Helpers\Url;
 
 /**
  * What is being rendered: the request type, the queried object, and the
@@ -342,7 +343,7 @@ class Context
         return new self(
             type: self::TYPE_OTHER,
             path: $path,
-            url: home_url(user_trailingslashit(self::encodePath($path))),
+            url: home_url(user_trailingslashit(Url::encodePath($path))),
         );
     }
 
@@ -366,7 +367,7 @@ class Context
             return $post instanceof \WP_Post ? $post : null;
         }
 
-        $id = url_to_postid(home_url(user_trailingslashit(self::encodePath($path))));
+        $id = url_to_postid(home_url(user_trailingslashit(Url::encodePath($path))));
         if ($id > 0) {
             $post = get_post($id);
             if ($post instanceof \WP_Post) {
@@ -407,14 +408,24 @@ class Context
     }
 
     /**
+     * The sanitized REQUEST_URI (path and query string), or ''.
+     *
+     * @return string
+     */
+    public static function requestUri(): string
+    {
+        $uri = isset($_SERVER['REQUEST_URI']) ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+
+        return is_string($uri) ? $uri : '';
+    }
+
+    /**
      * @param string $home
      * @return string
      */
     private static function requestPath(string $home): string
     {
-        $uri = isset($_SERVER['REQUEST_URI']) ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])) : '';
-
-        return self::relativePath(is_string($uri) ? $uri : '', $home);
+        return self::relativePath(self::requestUri(), $home);
     }
 
     /**
@@ -479,17 +490,6 @@ class Context
         }
 
         return $trail;
-    }
-
-    /**
-     * Percent-encode each segment, for building a URL from a decoded path.
-     *
-     * @param string $path
-     * @return string
-     */
-    private static function encodePath(string $path): string
-    {
-        return implode('/', array_map('rawurlencode', explode('/', $path)));
     }
 
     /**

@@ -231,6 +231,8 @@ the theme and other plugins, and run alongside TONKATSU's callbacks (at priority
 | `wp_robots` | Adds `noindex` / `nofollow`. |
 | `wp_head` (priority 1) | Prints description, non-singular canonical, OGP, Twitter Card, JSON-LD. |
 | `wp_sitemaps_*` | See [SitemapConfig](../settings/sitemapconfig.md). |
+| `template_redirect` (priority 0) | Runs the registered redirects and 410s, before core's `redirect_canonical`. See [RedirectConfig](../settings/redirectconfig.md). |
+| `allowed_redirect_hosts` | Adds the hosts of absolute redirect targets, during TONKATSU's own redirect only. |
 
 ---
 

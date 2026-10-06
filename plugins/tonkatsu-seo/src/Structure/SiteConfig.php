@@ -85,6 +85,25 @@ class SiteConfig
          * @var bool
          */
         public readonly bool $includeParentTitles = false,
+
+        /**
+         * Record every redirect and 410 TONKATSU answers in the database:
+         * a count per rule and one row per request.
+         *
+         * The only thing TONKATSU ever stores. No IP address or user agent is
+         * kept, only whether the user agent looked like a bot.
+         *
+         * @var bool
+         */
+        public readonly bool $logRedirects = false,
+
+        /**
+         * Days the per-request rows are kept. Older rows are deleted now and
+         * then as new ones are written; the counts per rule are kept.
+         *
+         * @var int
+         */
+        public readonly int $redirectLogDays = 90,
     )
     {
         if ($this->siteName !== null && trim($this->siteName) === '') {
@@ -109,6 +128,12 @@ class SiteConfig
                     "SiteConfig: twitterSite '%s' must be an account name starting with '@', e.g. '@example'.",
                     esc_html($this->twitterSite)
                 )
+            );
+        }
+
+        if ($this->redirectLogDays < 1) {
+            throw new \InvalidArgumentException(
+                sprintf('SiteConfig: redirectLogDays must be 1 or more, got %d.', (int) $this->redirectLogDays)
             );
         }
 

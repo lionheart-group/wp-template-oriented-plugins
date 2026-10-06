@@ -26,6 +26,8 @@ $files = [
     'tonkatsu-seo.php',
     'index.php',
     'readme.txt',
+    // Drops the redirect log tables when the plugin is deleted.
+    'uninstall.php',
     // Used to generate the autoloader below, and shipped alongside vendor/.
     'composer.json',
 ];

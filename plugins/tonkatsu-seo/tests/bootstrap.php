@@ -281,3 +281,79 @@ if (!function_exists('wp_print_inline_script_tag')) {
         echo "<script{$attrs}>\n" . trim($data, "\n\r ") . "\n</script>\n";
     }
 }
+
+if (!defined('DAY_IN_SECONDS')) {
+    define('DAY_IN_SECONDS', 86400);
+}
+
+if (!function_exists('update_option')) {
+    function update_option(string $option, $value, $autoload = null): bool {
+        $GLOBALS['__tonkatsu_test_options'][$option] = $value;
+        return true;
+    }
+}
+
+/**
+ * $wpdb stand-in that records what would be sent, after TOFU's.
+ *
+ * prepare() substitutes the placeholders (%i backtick-quoted, %s quoted), so a
+ * test can assert on the finished SQL in $queries; insert() records the table
+ * and row in $inserts. get_var() returns $nextVar for the SHOW TABLES checks.
+ * BaseTestCase replaces it with a fresh one before every test.
+ */
+class TonkatsuTestWpdb
+{
+    public $prefix = 'wp_';
+
+    /** @var list<string> */
+    public array $queries = [];
+
+    /** @var list<array{string, array<string, mixed>}> */
+    public array $inserts = [];
+
+    /** @var mixed */
+    public $nextVar = null;
+
+    public function prepare($query, ...$args) {
+        $index = 0;
+
+        return preg_replace_callback('/%([sdi])/', function ($m) use (&$index, $args) {
+            $value = $args[$index++] ?? '';
+            return match ($m[1]) {
+                'd' => (string) (int) $value,
+                'i' => '`' . str_replace('`', '``', (string) $value) . '`',
+                default => "'" . addslashes((string) $value) . "'",
+            };
+        }, $query);
+    }
+
+    public function esc_like($text) {
+        return addcslashes((string) $text, '_%\\');
+    }
+
+    public function get_charset_collate() {
+        return 'DEFAULT CHARSET=utf8mb4';
+    }
+
+    public function query($query) {
+        $this->queries[] = $query;
+        return 1;
+    }
+
+    public function insert($table, $data, $format = null) {
+        $this->inserts[] = [$table, $data];
+        return 1;
+    }
+
+    public function get_var($query = null, $x = 0, $y = 0) {
+        $this->queries[] = $query;
+        return $this->nextVar;
+    }
+
+    public function get_results($query = null, $output = OBJECT) {
+        $this->queries[] = $query;
+        return [];
+    }
+}
+
+$GLOBALS['wpdb'] = new TonkatsuTestWpdb();

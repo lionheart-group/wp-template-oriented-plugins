@@ -5,8 +5,9 @@
 WordPress plugin (PHP 8.1+, GPLv3+) that outputs SEO metadata — title, meta description,
 canonical, robots, OGP, Twitter Card, JSON-LD — and adjusts core's `/wp-sitemap.xml`. Replaces Rank
 Math. All configuration lives in theme PHP, registered on `init` into an in-memory static registry:
-**nothing is stored in the database and there is no settings UI** (there is a read-only admin
-*viewer*, see below). Sibling of TOFU (`../template-oriented-form-utilities/`) and follows its
+**no configuration is stored in the database and there is no settings UI** (there is a read-only admin
+*viewer*, see below). The one exception is data, not configuration: the optional redirect log
+(`SiteConfig::$logRedirects`, see below). Sibling of TOFU (`../template-oriented-form-utilities/`) and follows its
 conventions.
 
 **Namespace:** `TonkatsuPlugin\` (PSR-4, mapped to `src/`)
@@ -23,7 +24,7 @@ architecture, conventions, and dev workflow.
 
 ```
 functions.php (on `init`)
-    └── TonkatsuPlugin\Helpers\Seo::setSite() / registerPage() / registerArchive() / registerTaxonomy()
+    └── TonkatsuPlugin\Helpers\Seo::setSite() / registerPage() / registerArchive() / registerTaxonomy() / registerRedirects()
             (static in-memory registry of Structure/ objects)
 
 request
@@ -34,7 +35,8 @@ request
 ```
 
 The plugin bootstrap hooks `plugins_loaded`: `Init\Conflict::detect()` first (another SEO plugin
-active → only an admin notice), otherwise `Init\Head::register()` and `Init\Sitemap::register()`.
+active → only an admin notice), otherwise `Init\Head::register()`, `Init\Redirects::register()` and
+`Init\Sitemap::register()`.
 It cannot run in the main file's body because Yoast (`wordpress-seo`) loads after TONKATSU
 alphabetically. `plugins_loaded` still precedes `init`, which `Sitemap::deferCoreServer()` needs.
 
@@ -42,10 +44,10 @@ alphabetically. `plugins_loaded` still precedes `init`, which `Sitemap::deferCor
 
 | Dir | Responsibility |
 |---|---|
-| `Init/` | WordPress integration: `Head` (title/robots/canonical filters + `wp_head` output), `Sitemap` (core `wp_sitemaps_*` filters; moves core's sitemap bootstrap to `init` 20), `Conflict` (Rank Math/Yoast/AIOSEO/SEOPress detection + notice), `AdminPage` (read-only Tools page) |
-| `Helpers/` | `Seo` (the class themes call — the registry and `normalizePath()`), `Url` (pure URL validation/absolutizing shared by `Structure/` and `Resolver`) |
-| `Models/` | `Context` (readonly value; WP-dependent static factories `fromQuery()`/`forPost()`/`forPath()`/`findPost()`), `Resolver` (all priority logic; constructor takes every input so it is unit-testable) |
-| `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `SiteConfig`, `OrganizationConfig`, `SitemapConfig`, `PageConfig` (+ `fromArray()` rejecting unknown keys), `ArchiveConfig` |
+| `Init/` | WordPress integration: `Head` (title/robots/canonical filters + `wp_head` output), `Sitemap` (core `wp_sitemaps_*` filters; moves core's sitemap bootstrap to `init` 20), `Redirects` (`template_redirect` 0; the pure `match()` decides, `redirect()` only reads the request and responds), `Conflict` (Rank Math/Yoast/AIOSEO/SEOPress detection + notice), `AdminPage` (read-only Tools page) |
+| `Helpers/` | `Seo` (the class themes call — the registry and `normalizePath()`), `Url` (pure URL validation/absolutizing/per-segment encoding shared by `Structure/`, `Resolver`, `Context` and `Redirects`) |
+| `Models/` | `Context` (readonly value; WP-dependent static factories `fromQuery()`/`forPost()`/`forPath()`/`findPost()`), `Resolver` (all priority logic; constructor takes every input so it is unit-testable), `RedirectLog` (the redirect log tables: schema, install gate, writes, reads) |
+| `Structure/` | Immutable config objects, PHP 8.1 promoted `readonly` properties + named args, validated in the constructor (`InvalidArgumentException`): `SiteConfig`, `OrganizationConfig`, `SitemapConfig`, `PageConfig` (+ `fromArray()` rejecting unknown keys), `ArchiveConfig`, `RedirectConfig` (+ `fromArray()`) |
 | `Consts.php` | Plugin-wide constants (admin slug, priorities, JSON-LD flags, conflicting plugin constants, locale map) |
 
 ### Resolution order
@@ -62,7 +64,41 @@ never look up a `PageConfig`. Documented in full in `docs/index.md`; keep the tw
 `Context` factory or in `Resolver::fromContext()`, so the logic stays testable with a hand-built
 `Context`. `Context::fromQuery()` is not unit-tested; smoke-test it against a real install.
 
+`Init\Redirects` follows the same split: `match()` takes the registered redirects, the request path
+(`Context::relativePath()` form), the query string and the home URL, and returns
+`{status, location}` without touching WordPress; `redirect()` and the 410 path (`set_404()` +
+`status_header(410)`) are smoke-tested on a real install. The configured hosts are added to
+`allowed_redirect_hosts` only while TONKATSU's own `wp_safe_redirect()` runs (`$redirecting`), so the
+site's other redirects (`redirect_to` on the login screen) are not widened.
+
 ---
+
+### Redirect log (the only database writes)
+
+Off by default; `SiteConfig::$logRedirects` turns it on. `Models\RedirectLog` owns two tables,
+`{prefix}tonkatsu_redirect_stats` (count and last hit per rule, keyed by
+`md5(type . ' ' . path)` — the same key as Seo's registry) and `{prefix}tonkatsu_redirect_log`
+(one row per request). No IP address or user agent is stored; `isBot()` keeps only a flag.
+
+- **Schema**: one `CREATE TABLE` per table in `RedirectLog::schema()`, applied with `dbDelta()`
+  (keep its formatting: one column per line, `PRIMARY KEY  (col)` with two spaces, `KEY name (col)`).
+  Change the schema → raise `Consts::DB_VERSION`. Data migrations, if ever needed, get a
+  per-version step then.
+- **Install gate**: `maybeInstall()` on `init` at `Consts::REDIRECT_LOG_INIT_PRIORITY` (100, after
+  the theme registered SiteConfig), only while logging is on and the `tonkatsu_db_version` option
+  differs from `DB_VERSION`; the option is updated only when both tables exist afterwards. Same
+  idea as TOFU's `Migrate::maybeMigrate()`: file-based updates never fire activation hooks.
+- **Writes**: `Init\Redirects` calls `RedirectLog::record()` just before `wp_safe_redirect()`
+  (only when `wp_validate_redirect()` passed) and before `gone()` for 410. `record()` does nothing
+  while logging is off or the stored version does not match (tables not ready). The stats row is
+  one `INSERT … ON DUPLICATE KEY UPDATE`. Rows older than `redirectLogDays` are purged on one
+  write in `PURGE_ODDS` (100); the stats are never purged. Not registered in conflict mode.
+- **Reads**: `AdminPage` (Hits / Last hit columns, `&view=redirect-log` with paging and a rule
+  filter). No delete button.
+- **Uninstall**: `uninstall.php` drops both tables and the option (every site on multisite). It is
+  in `build-release.php`'s allow-list.
+- All SQL goes through `$wpdb->prepare()` with `%i`, hence `Requires at least` 6.5. Unit tests use
+  the recording `$wpdb` stub in `tests/bootstrap.php` (`TonkatsuTestWpdb`, fresh per test).
 
 ## Development
 
@@ -76,7 +112,7 @@ php scripts/build-release.php --zip   # build and also produce build/<slug>-<ver
 ```
 
 `build-release.php` copies an **allow-list** (`src/`, `assets/` plus the root files, including
-`composer.json`) into `build/` and regenerates a classmap autoloader. Adapted from TOFU's.
+`composer.json` and `uninstall.php`) into `build/` and regenerates a classmap autoloader. Adapted from TOFU's.
 
 Translations: none are bundled. WordPress.org serves them from translate.wordpress.org by slug
 (`tonkatsu-seo`), so there is no `languages/` directory and no `load_plugin_textdomain()`.

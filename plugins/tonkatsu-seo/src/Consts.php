@@ -39,6 +39,22 @@ final class Consts
     public const SITEMAP_INIT_PRIORITY = 20;
 
     /**
+     * Version of the redirect log tables (Models\RedirectLog::schema()).
+     *
+     * Raise it whenever the schema changes; the tables are brought up to date
+     * on the next request, whatever way the plugin's files were updated.
+     */
+    public const DB_VERSION = '1';
+
+    /**
+     * `init` priority the redirect log tables are created at.
+     *
+     * After the theme's own `init` callback (10) has registered SiteConfig,
+     * which says whether the log is wanted at all.
+     */
+    public const REDIRECT_LOG_INIT_PRIORITY = 100;
+
+    /**
      * Flags for the JSON-LD block.
      *
      * JSON_HEX_TAG is not optional: with JSON_UNESCAPED_SLASHES a string

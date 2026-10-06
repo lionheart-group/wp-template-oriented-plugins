@@ -36,6 +36,8 @@ add_action('init', function () {
 | `organization` | `?OrganizationConfig` | No | `null` | See [OrganizationConfig](organizationconfig.md). `null` outputs no `Organization` node. |
 | `sitemap` | `SitemapConfig` | No | `new SitemapConfig()` | See [SitemapConfig](sitemapconfig.md). |
 | `includeParentTitles` | `bool` | No | `false` | Add the parent pages' titles to a child page's `<title>`, nearest first: `Staff \| About \| Example`. The page's own part still follows the usual priority (post values, PageConfig, post title); parents use their post titles. Pages only (hierarchical singular), not `og:title`. |
+| `logRedirects` | `bool` | No | `false` | Log every redirect and 410 TONKATSU answers in the database: a count per rule and one row per request. See [the redirect log](redirectconfig.md#redirect-log). |
+| `redirectLogDays` | `int` | No | `90` | Days the per-request rows of the redirect log are kept. Must be 1 or more. The counts per rule are kept. |
 
 ## Notes
 
@@ -45,3 +47,5 @@ add_action('init', function () {
   bootstrap to `init` 20 so that it sees this configuration.
 - Calling `Seo::setSite()` a second time replaces the first configuration.
 - Without `Seo::setSite()` the defaults above apply.
+- `logRedirects` is the only setting that makes TONKATSU write to the database, and what it writes
+  is the log, never configuration.

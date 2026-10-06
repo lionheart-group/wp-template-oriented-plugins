@@ -18,6 +18,16 @@ class SiteConfigTest extends BaseTestCase
         $this->assertNull($config->organization);
         $this->assertInstanceOf(SitemapConfig::class, $config->sitemap);
         $this->assertTrue($config->sitemap->enabled);
+        $this->assertFalse($config->logRedirects);
+        $this->assertSame(90, $config->redirectLogDays);
+    }
+
+    public function testAcceptsRedirectLogSettings(): void
+    {
+        $config = new SiteConfig(logRedirects: true, redirectLogDays: 1);
+
+        $this->assertTrue($config->logRedirects);
+        $this->assertSame(1, $config->redirectLogDays);
     }
 
     public function testAcceptsAFullConfiguration(): void
@@ -50,6 +60,8 @@ class SiteConfigTest extends BaseTestCase
             'twitter with invalid chars'  => [['twitterSite' => '@exa-mple']],
             'locale without region'       => [['locale' => 'ja']],
             'locale with hyphen'          => [['locale' => 'ja-JP']],
+            'zero log days'               => [['redirectLogDays' => 0]],
+            'negative log days'           => [['redirectLogDays' => -1]],
         ];
     }
 

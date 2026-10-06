@@ -4,6 +4,7 @@ namespace TonkatsuPlugin\Helpers;
 
 use TonkatsuPlugin\Structure\ArchiveConfig;
 use TonkatsuPlugin\Structure\PageConfig;
+use TonkatsuPlugin\Structure\RedirectConfig;
 use TonkatsuPlugin\Structure\SiteConfig;
 
 /**
@@ -44,6 +45,13 @@ class Seo
      * @var array<string, ArchiveConfig>
      */
     protected static array $taxonomies = [];
+
+    /**
+     * Redirect configurations in registration order, keyed by type and source.
+     *
+     * @var array<string, RedirectConfig>
+     */
+    protected static array $redirects = [];
 
     /**
      * Register the site configuration.
@@ -245,6 +253,90 @@ class Seo
     public static function getTaxonomies(): array
     {
         return self::$taxonomies;
+    }
+
+    /**
+     * Register a redirect, or a path that answers 410 (Gone).
+     *
+     * <code>
+     * Seo::registerRedirect(new RedirectConfig(from: '/old-page/', to: '/new-page/'));
+     * </code>
+     *
+     * Redirects run on `template_redirect`, so registering on `init` is
+     * enough. The same source registered twice (exact and prefix compare the
+     * normalized path, regex the pattern) calls wp_die().
+     *
+     * @param RedirectConfig $config
+     * @return void
+     */
+    public static function registerRedirect(RedirectConfig $config): void
+    {
+        $key = $config->type . ' ' . $config->path;
+
+        if (array_key_exists($key, self::$redirects)) {
+            $source = $config->type === RedirectConfig::TYPE_REGEX
+                ? $config->path
+                : '/' . $config->path . ($config->path !== '' ? '/' : '');
+
+            wp_die(
+                sprintf('Redirect (%s) from "%s" is already registered.', esc_html($config->type), esc_html($source)),
+                'TONKATSU Redirect Registration Error',
+                ['response' => 500]
+            );
+        }
+
+        self::$redirects[$key] = $config;
+    }
+
+    /**
+     * Register several redirects at once, e.g. from a definition file.
+     *
+     * Values may be RedirectConfig instances or arrays accepted by
+     * RedirectConfig::fromArray():
+     *
+     * <code>
+     * Seo::registerRedirects([
+     *     ['from' => '/old-page/', 'to' => '/new-page/'],
+     *     ['from' => '/old-dir/', 'to' => '/new-dir/', 'type' => 'prefix'],
+     *     ['from' => '/closed/', 'status' => 410],
+     * ]);
+     * </code>
+     *
+     * @param array<array-key, RedirectConfig|array<array-key, mixed>> $redirects
+     * @return void
+     */
+    public static function registerRedirects(array $redirects): void
+    {
+        $number = 0;
+
+        foreach ($redirects as $config) {
+            $number++;
+            $label = 'redirect #' . $number;
+
+            if (is_array($config)) {
+                $config = RedirectConfig::fromArray($config, $label);
+            }
+
+            if (!$config instanceof RedirectConfig) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Seo::registerRedirects(): %s must be a RedirectConfig or an array, got %s.',
+                    esc_html($label),
+                    esc_html(get_debug_type($config))
+                ));
+            }
+
+            self::registerRedirect($config);
+        }
+    }
+
+    /**
+     * Get all registered redirects, in registration order.
+     *
+     * @return list<RedirectConfig>
+     */
+    public static function getRedirects(): array
+    {
+        return array_values(self::$redirects);
     }
 
     /**
