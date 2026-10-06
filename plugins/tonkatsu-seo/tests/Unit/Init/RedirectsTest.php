@@ -15,7 +15,7 @@ class RedirectsTest extends BaseTestCase
 
     /**
      * @param list<RedirectConfig> $redirects
-     * @return ?array{status: int, location: ?string}
+     * @return ?array{status: int, location: ?string, config: RedirectConfig}
      */
     private function match(array $redirects, string $requestUri, string $home = self::HOME): ?array
     {
@@ -41,9 +41,10 @@ class RedirectsTest extends BaseTestCase
      */
     public function testExactMatchesAnySpellingOfThePath(string $uri): void
     {
-        $match = $this->match([new RedirectConfig(from: '/old-page/', to: '/new-page/')], $uri);
+        $config = new RedirectConfig(from: '/old-page/', to: '/new-page/');
+        $match = $this->match([$config], $uri);
 
-        $this->assertSame(['status' => 301, 'location' => 'https://example.com/new-page/'], $match);
+        $this->assertSame(['status' => 301, 'location' => 'https://example.com/new-page/', 'config' => $config], $match);
     }
 
     public function testExactDoesNotMatchBelowTheSource(): void
@@ -76,16 +77,18 @@ class RedirectsTest extends BaseTestCase
 
     public function testStatusIsPassedThrough(): void
     {
-        $match = $this->match([new RedirectConfig(from: '/campaign/', to: 'https://example.org/', status: 302)], '/campaign/');
+        $config = new RedirectConfig(from: '/campaign/', to: 'https://example.org/', status: 302);
+        $match = $this->match([$config], '/campaign/');
 
-        $this->assertSame(['status' => 302, 'location' => 'https://example.org/'], $match);
+        $this->assertSame(['status' => 302, 'location' => 'https://example.org/', 'config' => $config], $match);
     }
 
     public function testGoneHasNoLocation(): void
     {
-        $match = $this->match([new RedirectConfig(from: '/closed/', status: 410)], '/closed/?a=1');
+        $config = new RedirectConfig(from: '/closed/', status: 410);
+        $match = $this->match([$config], '/closed/?a=1');
 
-        $this->assertSame(['status' => 410, 'location' => null], $match);
+        $this->assertSame(['status' => 410, 'location' => null, 'config' => $config], $match);
     }
 
     public function testPrefixCarriesTheRestOfThePathOver(): void
@@ -139,11 +142,27 @@ class RedirectsTest extends BaseTestCase
         $this->assertSame('https://example.com/regex/', $this->match($redirects, '/other/')['location'] ?? null);
     }
 
+    /**
+     * The log counts the rule that applied, not the first one registered.
+     */
+    public function testMatchNamesTheRuleThatApplied(): void
+    {
+        $redirects = [
+            new RedirectConfig(from: '.*', to: '/regex/', type: RedirectConfig::TYPE_REGEX),
+            new RedirectConfig(from: '/docs/', to: '/prefix/', type: RedirectConfig::TYPE_PREFIX),
+            new RedirectConfig(from: '/docs/a/', to: '/exact/'),
+        ];
+
+        $this->assertSame($redirects[2], $this->match($redirects, '/docs/a/')['config'] ?? null);
+        $this->assertSame($redirects[1], $this->match($redirects, '/docs/b/')['config'] ?? null);
+        $this->assertSame($redirects[0], $this->match($redirects, '/other/')['config'] ?? null);
+    }
+
     public function testRegexSubstitutesGroups(): void
     {
         $redirects = [new RedirectConfig(from: '^news/(\d+)$', to: '/topics/$1/', type: RedirectConfig::TYPE_REGEX)];
 
-        $this->assertSame(['status' => 301, 'location' => 'https://example.com/topics/123/'], $this->match($redirects, '/news/123'));
+        $this->assertSame(['status' => 301, 'location' => 'https://example.com/topics/123/', 'config' => $redirects[0]], $this->match($redirects, '/news/123'));
         $this->assertNull($this->match($redirects, '/news/abc'));
     }
 
@@ -292,5 +311,13 @@ class RedirectsTest extends BaseTestCase
         $this->assertSame('a/b', Redirects::sitePath('/a/b/', 'https://example.com/wp/'));
         $this->assertSame('a', Redirects::sitePath('https://EXAMPLE.com/wp/a/', 'https://example.com/wp/'));
         $this->assertNull(Redirects::sitePath('https://example.org/a/', 'https://example.com/'));
+    }
+
+    public function testRegisterCreatesTheLogTablesAfterTheThemesInit(): void
+    {
+        Redirects::register();
+
+        $this->assertNotEmpty($GLOBALS['__tonkatsu_hooks']['init'][\TonkatsuPlugin\Consts::REDIRECT_LOG_INIT_PRIORITY] ?? []);
+        $this->assertGreaterThan(10, \TonkatsuPlugin\Consts::REDIRECT_LOG_INIT_PRIORITY);
     }
 }

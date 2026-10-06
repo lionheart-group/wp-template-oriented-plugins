@@ -1,7 +1,7 @@
 === TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility) ===
 Contributors: lionheartgroup
 Tags: seo, meta, open graph, json-ld, sitemap
-Requires at least: 6.0
+Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 0.0.1
@@ -14,9 +14,9 @@ TONKATSU outputs SEO metadata, structured data and sitemap adjustments configure
 
 Template-Oriented No-database Knowledge-graph & Tag Setup Utility (TONKATSU) handles the SEO output of a WordPress site — title, meta description, canonical, robots, Open Graph, Twitter Card and JSON-LD — and adjusts WordPress core's XML sitemaps.
 
-Everything is configured in the theme's PHP code, on `init`. Nothing is stored in the database and there is no settings screen, so the SEO configuration is reviewed, versioned and deployed together with the templates that render the pages. A read-only screen under Tools shows what the theme registered and what each page resolves to.
+Everything is configured in the theme's PHP code, on `init`. No configuration is stored in the database and there is no settings screen, so the SEO configuration is reviewed, versioned and deployed together with the templates that render the pages. A read-only screen under Tools shows what the theme registered and what each page resolves to.
 
-Redirects (exact paths, path prefixes and regular expressions, including 410 Gone) are registered in the theme too, so moved URLs are kept with the code that moved them.
+Redirects (exact paths, path prefixes and regular expressions, including 410 Gone) are registered in the theme too, so moved URLs are kept with the code that moved them. Optionally, TONKATSU logs the redirects it answers — the only data it ever stores in the database.
 
 Per-post values that editors maintain (for example in custom fields) are supplied through the `tonkatsu_post_values` filter.
 
@@ -48,6 +48,10 @@ Then register the configuration in your theme — see the documentation.
 = Where are the settings? =
 
 In your theme's code. Tools -> SEO (TONKATSU) shows them, read-only.
+
+= What does TONKATSU store in the database? =
+
+No settings. With the redirect log turned on in the theme (SiteConfig `logRedirects`), it stores a hit count per redirect and one row per redirect answered — the requested URL, the target, the status, the referrer without its query string and whether the visitor looked like a bot — in two tables of its own, plus their schema version in the `tonkatsu_db_version` option. No IP addresses or user agents are stored, and rows are deleted after 90 days by default. Deleting the plugin removes the tables and the option.
 
 = Does TONKATSU generate its own sitemap? =
 

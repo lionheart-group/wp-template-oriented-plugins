@@ -2,9 +2,11 @@
 
 namespace TonkatsuPlugin\Init;
 
+use TonkatsuPlugin\Consts;
 use TonkatsuPlugin\Helpers\Seo;
 use TonkatsuPlugin\Helpers\Url;
 use TonkatsuPlugin\Models\Context;
+use TonkatsuPlugin\Models\RedirectLog;
 use TonkatsuPlugin\Structure\RedirectConfig;
 
 // If this file is called directly, abort.
@@ -42,6 +44,12 @@ class Redirects
     {
         add_action('template_redirect', [static::class, 'redirect'], self::PRIORITY);
         add_filter('allowed_redirect_hosts', [static::class, 'filterAllowedHosts']);
+
+        // Create the log tables once SiteConfig says they are wanted. A closure,
+        // because `init` passes an empty string maybeInstall() would take as its installer.
+        add_action('init', static function (): void {
+            RedirectLog::maybeInstall();
+        }, Consts::REDIRECT_LOG_INIT_PRIORITY);
     }
 
     /**
@@ -64,6 +72,7 @@ class Redirects
         }
 
         if ($match['location'] === null) {
+            self::log($match, $uri);
             self::gone();
             return;
         }
@@ -73,6 +82,7 @@ class Redirects
         // wp_safe_redirect() would send a visitor to /wp-admin/ when the host
         // is not allowed; leave the request alone instead.
         if (wp_validate_redirect($match['location'], '') !== '') {
+            self::log($match, $uri);
             wp_safe_redirect($match['location'], $match['status'], 'TONKATSU');
             exit;
         }
@@ -135,13 +145,14 @@ class Redirects
      *                        slashes at either end; '' is the front page).
      * @param string $query   The request's query string, without '?'.
      * @param string $homeUrl home_url('/'); root-relative targets are relative to it.
-     * @return ?array{status: int, location: ?string} location is null for 410.
+     * @return ?array{status: int, location: ?string, config: RedirectConfig}
+     *     location is null for 410; config is the redirect that matched.
      */
     public static function match(array $redirects, string $path, string $query, string $homeUrl): ?array
     {
         foreach (self::candidates($redirects, $path) as [$config, $remainder, $groups]) {
             if ($config->to === null) {
-                return ['status' => $config->status, 'location' => null];
+                return ['status' => $config->status, 'location' => null, 'config' => $config];
             }
 
             $location = self::location($config, $remainder, $groups, $query, $homeUrl);
@@ -150,7 +161,7 @@ class Redirects
                 continue;
             }
 
-            return ['status' => $config->status, 'location' => $location];
+            return ['status' => $config->status, 'location' => $location, 'config' => $config];
         }
 
         return null;
@@ -333,6 +344,20 @@ class Redirects
         $targetQuery = wp_parse_url($location, PHP_URL_QUERY);
 
         return (is_string($targetQuery) ? $targetQuery : '') === $query;
+    }
+
+    /**
+     * Record the redirect about to be answered (when SiteConfig::$logRedirects is on).
+     *
+     * @param array{status: int, location: ?string, config: RedirectConfig} $match
+     * @param string $uri The request URI.
+     */
+    private static function log(array $match, string $uri): void
+    {
+        $referrer = isset($_SERVER['HTTP_REFERER']) ? sanitize_url(wp_unslash($_SERVER['HTTP_REFERER'])) : '';
+        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+
+        RedirectLog::record($match['config'], $uri, $match['location'], $referrer, $userAgent);
     }
 
     /**

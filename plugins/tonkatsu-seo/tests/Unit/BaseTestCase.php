@@ -52,6 +52,7 @@ abstract class BaseTestCase extends TestCase
     private function reset(): void
     {
         $GLOBALS['__tonkatsu_hooks'] = [];
+        $GLOBALS['wpdb'] = new \TonkatsuTestWpdb();
         unset(
             $GLOBALS['__tonkatsu_test_locale'],
             $GLOBALS['__tonkatsu_test_home_url'],

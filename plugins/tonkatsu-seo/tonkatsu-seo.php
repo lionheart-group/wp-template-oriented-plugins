@@ -8,12 +8,12 @@
  * @wordpress-plugin
  * Plugin Name: TONKATSU (Template-Oriented No-database Knowledge-graph & Tag Setup Utility)
  * Plugin URI: https://github.com/lionheart-group/wp-template-oriented-plugins/tree/master/plugins/tonkatsu-seo
- * Description: TONKATSU outputs SEO metadata, structured data and sitemap adjustments configured entirely in theme code, with nothing stored in the database.
+ * Description: TONKATSU outputs SEO metadata, structured data and sitemap adjustments configured entirely in theme code, with no settings stored in the database.
  * Version: 0.0.1
  * Author: lionheartgroup
  * Author URI: https://www.lionheart.co.jp/
  * Text Domain: tonkatsu-seo
- * Requires at least: 6.0
+ * Requires at least: 6.5
  * Requires PHP: 8.1
  * License: GPL-3.0+
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt

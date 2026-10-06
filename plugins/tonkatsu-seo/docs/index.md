@@ -83,6 +83,9 @@ Sources are paths normalized like page paths; `to` starting with `/` is relative
 The query string is carried over. Exact sources are checked first, then prefixes (longest first),
 then regexes. Details in [RedirectConfig](settings/redirectconfig.md).
 
+With `SiteConfig::$logRedirects` on, every redirect is also logged in the database (see
+[What is stored in the database](#what-is-stored-in-the-database)).
+
 ## Hooks
 
 [Actions and filters reference](hooks/index.md)
@@ -91,7 +94,8 @@ then regexes. Details in [RedirectConfig](settings/redirectconfig.md).
 
 **Tools → SEO (TONKATSU)** lists what the theme registered and, for every registered page, the values
 it resolves to. The redirects are listed too, with a warning when one takes over a registered page or
-leads to another redirect. It is read-only. The capability required to see it is `manage_options`, filterable
+leads to another redirect; with the redirect log on, also their hit counts and a link to the
+**Redirect log** (newest first, 25 per page, filterable by rule). It is read-only. The capability required to see it is `manage_options`, filterable
 with [`tonkatsu_admin_page_capability`](hooks/index.md#tonkatsu_admin_page_capability).
 
 **Pages** gets **SEO title**, **Description** and **Robots** columns showing what every page
@@ -103,6 +107,16 @@ description, as a visitor's browser receives them. A note marks values that came
 While **Settings → Reading → Discourage search engines** is checked, core outputs every page as
 `noindex, nofollow` and turns the sitemaps off. The robots columns say so, and a warning is shown
 on the TONKATSU page and the list screens with SEO columns.
+
+## What is stored in the database
+
+No configuration, ever: it lives in the theme's code and is registered on every request.
+
+The only data TONKATSU writes is the redirect log, and only while `SiteConfig::$logRedirects` is
+on: two tables (`{prefix}tonkatsu_redirect_stats`, `{prefix}tonkatsu_redirect_log`) and the
+`tonkatsu_db_version` option recording their schema version. No IP address or user agent is
+stored, and per-request rows are deleted after `redirectLogDays`. Deleting the plugin drops the
+tables and the option. Details in [RedirectConfig → Redirect log](settings/redirectconfig.md#redirect-log).
 
 ## Other SEO plugins
 

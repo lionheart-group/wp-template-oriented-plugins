@@ -108,9 +108,43 @@ a regex).
   (`noindex`). Core's 404 guessing (`redirect_canonical`) is skipped for it.
 - An existing page or post at a source path is no longer reachable: the redirect runs first.
 
+### Redirect log
+
+With `SiteConfig::$logRedirects` on, every redirect and 410 TONKATSU answers is recorded:
+
+```php
+Seo::setSite(new SiteConfig(
+    logRedirects: true,
+    // redirectLogDays: 90, // days the per-request rows are kept
+));
+```
+
+- Two tables are created on the first request after logging is turned on (on `init`, after the
+  theme's own callback), and again whenever a TONKATSU update changes them. The schema version is
+  kept in the `tonkatsu_db_version` option.
+  - `{prefix}tonkatsu_redirect_stats`: one row per rule, with its hit count and last hit (UTC). A
+    rule is identified by its type and normalized source, so changing its `to` or `status` keeps
+    its count.
+  - `{prefix}tonkatsu_redirect_log`: one row per request: the requested URI (path and query
+    string), the location (none for 410), the status, the referrer without its query string and
+    fragment, whether the user agent looked like a bot, and the time (UTC).
+- **No IP address or user agent is stored.** The user agent is only checked for `bot`, `crawl`,
+  `spider`, `slurp` and a few other crawler names; an empty one counts as a bot.
+- A redirect is recorded just before it is sent, and only when it is sent (a target refused by
+  `wp_safe_redirect()` is not). 404s are not recorded.
+- Rows older than `redirectLogDays` are deleted now and then as new ones are written (on about one
+  write in a hundred). The counts per rule are kept. There is no button to clear the log.
+- While the tables are missing (their creation failed, or the database user may not create tables)
+  nothing is recorded and redirects work as usual.
+- Turning logging off stops the writes; the tables and their rows stay until the plugin is deleted,
+  which drops them.
+- **Tools → SEO (TONKATSU)** adds **Hits** and **Last hit** columns to the redirects, and links to
+  the **Redirect log** (`tools.php?page=tonkatsu-seo&view=redirect-log`): 25 rows per page, newest
+  first, filterable by rule, times in the site's timezone.
+
 ### Elsewhere
 
-- **Tools → SEO (TONKATSU)** lists the redirects, warning when an exact source is a path registered
+- **Tools → SEO (TONKATSU)** lists the redirects (with their hit counts when logging is on), warning when an exact source is a path registered
   with `Seo::registerPage()` (that page becomes unreachable), and when a same-site target is itself
   redirected (a chain).
 - While another SEO plugin is active (see [Other SEO plugins](../index.md#other-seo-plugins)),
