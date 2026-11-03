@@ -42,9 +42,12 @@ which core lists in `/wp-sitemap.xml` with the others.
 - Each entry is a URL string, or `['url' => ..., 'lastmod' => ...]`. Any other key throws.
 - A URL is root-relative (`/lp/campaign/`, made absolute against the site's host, also when WordPress
   is installed in a subdirectory) or an absolute `http(s)` URL. A fragment (`#`) throws.
-- An absolute URL on **another host** is not listed: the sitemap protocol only allows URLs on the
-  sitemap's own host. The host is only known at runtime, so this does not throw; the admin page marks
-  the URL instead. Each URL is listed once.
+- Non-ASCII characters are percent-encoded in the sitemap (`/lp/日本語/` →
+  `/lp/%E6%97%A5%E6%9C%AC%E8%AA%9E/`). `%xx` already written is kept, so both spellings are one URL.
+- An absolute URL on **another host or scheme** is not listed: the sitemap protocol only allows URLs
+  with the sitemap's own protocol and host, so `http://example.com/lp/` is left out on
+  `https://example.com/`. The home URL is only known at runtime, so this does not throw; the admin
+  page marks the URL instead. Each URL is listed once.
 - Up to 2000 URLs per page (core's `wp_sitemaps_max_urls`); more are split into
   `/wp-sitemap-static-2.xml` and so on.
 - The sitemap is not served when there is no URL to list, when sitemaps are off (`enabled: false`,
@@ -73,7 +76,7 @@ core's `get_home_path()` decides).
 - A URL outside the home URL's path (`/lp/` on a site whose home URL is `/blog/`) has no file.
 
 Tools → SEO (TONKATSU) shows each URL with its lastmod, and a **File not found** badge when no file
-was found (the URL is still listed; check for a typo) or **Another host: left out**.
+was found (the URL is still listed; check for a typo) or **Another host or scheme: left out**.
 
 ## Noindex pages
 

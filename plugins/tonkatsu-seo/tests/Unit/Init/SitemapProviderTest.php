@@ -75,10 +75,38 @@ class SitemapProviderTest extends BaseTestCase
         $this->assertSame('https://example.com/x/', SitemapProvider::resolveUrl('https://example.com/x/', 'https://example.org/'));
     }
 
+    public function testResolveUrlEncodesNonAscii(): void
+    {
+        $encoded = 'https://example.com/lp/%E6%97%A5%E6%9C%AC%E8%AA%9E/';
+        $this->assertSame($encoded, SitemapProvider::resolveUrl('/lp/日本語/', 'https://example.com/'));
+        $this->assertSame($encoded, SitemapProvider::resolveUrl('https://example.com/lp/日本語/', 'https://example.com/'));
+        // Already encoded stays as written.
+        $this->assertSame($encoded, SitemapProvider::resolveUrl($encoded, 'https://example.com/'));
+        $this->assertSame(
+            'https://example.com/lp/?q=%E6%97%A5',
+            SitemapProvider::resolveUrl('/lp/?q=日', 'https://example.com/')
+        );
+    }
+
+    public function testListedTreatsEncodedAndUnencodedAsOneUrl(): void
+    {
+        $this->assertSame(
+            [['loc' => 'https://example.com/lp/%E6%97%A5/', 'lastmod' => null]],
+            SitemapProvider::listed([
+                ['url' => '/lp/日/', 'lastmod' => null],
+                ['url' => '/lp/%E6%97%A5/', 'lastmod' => '2026-10-01'],
+                ['url' => 'http://example.com/lp/other/', 'lastmod' => null],
+            ], 'https://example.com/')
+        );
+    }
+
     public function testIsSameSite(): void
     {
         $this->assertTrue(SitemapProvider::isSameSite('https://example.com/lp/', 'https://example.com/'));
-        $this->assertTrue(SitemapProvider::isSameSite('http://EXAMPLE.com/lp/', 'https://example.com/blog/'));
+        $this->assertTrue(SitemapProvider::isSameSite('HTTPS://EXAMPLE.com/lp/', 'https://example.com/blog/'));
+        // The sitemap protocol requires the sitemap's own protocol too.
+        $this->assertFalse(SitemapProvider::isSameSite('http://example.com/lp/', 'https://example.com/'));
+        $this->assertFalse(SitemapProvider::isSameSite('https://example.com/lp/', 'http://example.com/'));
         $this->assertTrue(SitemapProvider::isSameSite('/lp/', 'https://example.com/'));
         $this->assertFalse(SitemapProvider::isSameSite('https://www.example.com/lp/', 'https://example.com/'));
         $this->assertFalse(SitemapProvider::isSameSite('https://example.com:8443/lp/', 'https://example.com/'));

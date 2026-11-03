@@ -629,7 +629,7 @@ class AdminPage
                         ?>
                     <?php endif; ?>
                     <?php if (!$extra['listed']) : ?>
-                        <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Another host: left out', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                        <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Another host or scheme: left out', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
                     <?php elseif ($extra['file'] === null) : ?>
                         <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('File not found', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
                     <?php endif; ?>

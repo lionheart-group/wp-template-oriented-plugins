@@ -91,7 +91,7 @@ class SitemapProvider extends \WP_Sitemaps_Provider
      * Every extraUrls entry with what the sitemap and the admin page need.
      *
      * - `loc`: the absolute URL.
-     * - `listed`: false for a URL on another host, which is left out.
+     * - `listed`: false for a URL on another host or scheme, which is left out.
      * - `file`: the file found for the URL, or null.
      * - `lastmod`: the value written in the sitemap, or null.
      *
@@ -121,7 +121,8 @@ class SitemapProvider extends \WP_Sitemaps_Provider
     }
 
     /**
-     * The entries that go into the sitemap: absolute, on the site's host, each URL once.
+     * The entries that go into the sitemap: absolute, encoded, on the site's
+     * scheme and host, each URL once.
      *
      * @param list<array{url: string, lastmod: ?string}> $entries
      * @param string $homeUrl
@@ -141,9 +142,13 @@ class SitemapProvider extends \WP_Sitemaps_Provider
     }
 
     /**
-     * Make a root-relative URL absolute, as the rest of TONKATSU does.
+     * Make a root-relative URL absolute, as the rest of TONKATSU does, and
+     * percent-encode what the sitemap protocol requires to be encoded.
      *
      * Relative to the host root, also on a site installed in a subdirectory.
+     * Non-ASCII characters after the host (`/lp/日本語/`) are encoded; `%xx`
+     * already written stays as it is, so an encoded and an unencoded spelling
+     * of one URL give the same `loc`.
      *
      * @param string $url
      * @param string $homeUrl
@@ -151,11 +156,38 @@ class SitemapProvider extends \WP_Sitemaps_Provider
      */
     public static function resolveUrl(string $url, string $homeUrl): string
     {
-        return Url::absolute($url, $homeUrl);
+        if (Url::isRootRelative($url)) {
+            return Url::absolute(self::encodeNonAscii($url), $homeUrl);
+        }
+
+        if (preg_match('#^([a-z][a-z0-9+.-]*://[^/?\#]*)(.*)$#is', $url, $m) === 1) {
+            return $m[1] . self::encodeNonAscii($m[2]);
+        }
+
+        return $url;
     }
 
     /**
-     * Whether an absolute URL is on the home URL's host (any scheme).
+     * Percent-encode every byte outside printable ASCII.
+     *
+     * @param string $value
+     * @return string
+     */
+    private static function encodeNonAscii(string $value): string
+    {
+        return (string) preg_replace_callback(
+            '/[^\x21-\x7e]+/',
+            static fn (array $m): string => rawurlencode($m[0]),
+            $value
+        );
+    }
+
+    /**
+     * Whether an absolute URL has the home URL's scheme, host and port.
+     *
+     * The sitemap protocol only allows URLs with the sitemap's own protocol
+     * and host, and the sitemap is served from the home URL, so
+     * `http://example.com/lp/` is left out on `https://example.com/`.
      *
      * @param string $url
      * @param string $homeUrl
@@ -173,7 +205,8 @@ class SitemapProvider extends \WP_Sitemaps_Provider
             return false;
         }
 
-        return strcasecmp($target['host'], $home['host']) === 0
+        return strcasecmp($target['scheme'] ?? '', $home['scheme'] ?? '') === 0
+            && strcasecmp($target['host'], $home['host']) === 0
             && ($target['port'] ?? null) === ($home['port'] ?? null);
     }
 

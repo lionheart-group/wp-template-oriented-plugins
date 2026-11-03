@@ -54,8 +54,9 @@ class SitemapConfig
          * Each entry is a URL string, or `['url' => ..., 'lastmod' => ...]`
          * to write the last modified date instead of reading it from the
          * file. URLs are root-relative (`/lp/campaign/`) or absolute http(s)
-         * URLs on the site's own host; absolute URLs on another host are left
-         * out of the sitemap, as the sitemap protocol does not allow them.
+         * URLs on the site's own scheme and host; absolute URLs on another
+         * host or scheme are left out of the sitemap, as the sitemap protocol
+         * does not allow them. Non-ASCII characters are percent-encoded.
          *
          * @var array<int, string|array{url: string, lastmod?: string}>
          */
