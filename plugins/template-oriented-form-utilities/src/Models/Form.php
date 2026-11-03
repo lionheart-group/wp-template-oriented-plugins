@@ -105,6 +105,14 @@ class Form
                         $this->errors->addError($field, $message);
                     }
                 }
+
+                // Errors are shown once. They stay in memory for this request's
+                // templates, and are dropped from the session just before the
+                // template is loaded, so a reload no longer shows them again.
+                // See clearSessionErrorsBeforeTemplate() for why it is this hook.
+                if ($this->errors->hasErrors()) {
+                    \add_filter('template_include', [$this, 'clearSessionErrorsBeforeTemplate'], PHP_INT_MAX);
+                }
             }
 
             if (isset($sessionValues['files']) && $sessionValues['files']) {
@@ -259,7 +267,17 @@ class Form
      */
     protected function storeSession(?string $flushValue = null): void
     {
-        Session::save($this->config->key, [
+        Session::save($this->config->key, $this->sessionPayload($flushValue));
+    }
+
+    /**
+     * The data stored in the Session table.
+     *
+     * @return array<string, mixed>
+     */
+    protected function sessionPayload(?string $flushValue): array
+    {
+        return [
             'values' => $this->values->toArray(),
             'errors' => $this->errors->toArray(),
             'files' => $this->files->toArray(),
@@ -269,7 +287,56 @@ class Form
                 'resultPath' => $this->templateOverride->resultPath,
                 'confirmPath' => $this->templateOverride->confirmPath,
             ],
-        ]);
+        ];
+    }
+
+    /**
+     * `template_include` callback: clear the session errors, then hand the
+     * template back unchanged.
+     *
+     * Hooked by the constructor when the session held errors. `template_include`
+     * runs only once every `template_redirect` callback has finished, so a
+     * request that is redirected on the way to the input page — WordPress's
+     * redirect_canonical() adding a trailing slash, http -> https, a redirect
+     * plugin — exits before reaching it and the errors survive until the page
+     * that actually shows them. HEAD, favicon, robots.txt, feed and trackback
+     * requests also exit before it, so they never clear the errors.
+     *
+     * @param mixed $template Path of the template WordPress is about to load.
+     * @return mixed The same template.
+     */
+    public function clearSessionErrorsBeforeTemplate(mixed $template): mixed
+    {
+        $this->clearSessionErrors();
+
+        return $template;
+    }
+
+    /**
+     * Drop the validation errors from the session, keeping everything else.
+     *
+     * Without it the errors stayed until the form was sent, so every reload of
+     * the input page showed them again. They are still available in memory for
+     * the page being rendered, so the visitor sees them once; the values stay
+     * in the session so the input page can still show them.
+     *
+     * Only a GET clears them. A POST is a submission, which validates again
+     * and stores its own errors, and a HEAD request must not change state.
+     */
+    public function clearSessionErrors(): void
+    {
+        $method = isset($_SERVER['REQUEST_METHOD'])
+            ? strtoupper(\sanitize_text_field(\wp_unslash($_SERVER['REQUEST_METHOD'])))
+            : '';
+
+        if ($method !== 'GET') {
+            return;
+        }
+
+        $payload = $this->sessionPayload($this->flushValue);
+        $payload['errors'] = [];
+
+        Session::save($this->config->key, $payload);
     }
 
     /**
