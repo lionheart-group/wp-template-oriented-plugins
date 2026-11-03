@@ -12,7 +12,7 @@ TONKATSU outputs SEO metadata, structured data and sitemap adjustments configure
 
 == Description ==
 
-Template-Oriented No-database Knowledge-graph & Tag Setup Utility (TONKATSU) handles the SEO output of a WordPress site — title, meta description, canonical, robots, Open Graph, Twitter Card and JSON-LD — and adjusts WordPress core's XML sitemaps.
+Template-Oriented No-database Knowledge-graph & Tag Setup Utility (TONKATSU) handles the SEO output of a WordPress site — title, meta description, canonical, robots, Open Graph, Twitter Card and JSON-LD — and adjusts WordPress core's XML sitemaps. Static pages outside WordPress, such as landing pages, can be added to the sitemap too.
 
 Everything is configured in the theme's PHP code, on `init`. No configuration is stored in the database and there is no settings screen, so the SEO configuration is reviewed, versioned and deployed together with the templates that render the pages. A read-only screen under Tools shows what the theme registered and what each page resolves to.
 
@@ -55,7 +55,7 @@ No settings. With the redirect log turned on in the theme (SiteConfig `logRedire
 
 = Does TONKATSU generate its own sitemap? =
 
-No. It adjusts WordPress core's sitemap at /wp-sitemap.xml.
+No. It adjusts WordPress core's sitemap at /wp-sitemap.xml. Static pages outside WordPress written in the theme are added to it as one more sitemap, /wp-sitemap-static-1.xml.
 
 == Screenshots ==
 

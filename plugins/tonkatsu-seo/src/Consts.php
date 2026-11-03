@@ -39,6 +39,14 @@ final class Consts
     public const SITEMAP_INIT_PRIORITY = 20;
 
     /**
+     * Name of the sitemap provider for SitemapConfig::$extraUrls.
+     *
+     * Core's rewrite rule only routes `[a-z]+` names, which gives
+     * `/wp-sitemap-static-1.xml`.
+     */
+    public const SITEMAP_STATIC_PROVIDER = 'static';
+
+    /**
      * Version of the redirect log tables (Models\RedirectLog::schema()).
      *
      * Raise it whenever the schema changes; the tables are brought up to date

@@ -206,7 +206,14 @@ if (!function_exists('get_option')) {
 // with $GLOBALS['__tonkatsu_test_sitemap_server']->registry->providers['posts'] = ...;
 if (!class_exists('WP_Sitemaps_Provider')) {
     abstract class WP_Sitemaps_Provider {
+        protected $name = '';
+        protected $object_type = '';
+
         abstract public function get_url_list($page_num, $object_subtype = '');
+
+        public function get_max_num_pages($object_subtype = '') {
+            return 0;
+        }
     }
 }
 
@@ -218,6 +225,19 @@ if (!class_exists('WP_Sitemaps_Registry')) {
         public function get_provider($name) {
             return $this->providers[$name] ?? null;
         }
+
+        // Same filter as core's add_provider(), so excludeProviders applies.
+        public function add_provider($name, WP_Sitemaps_Provider $provider) {
+            if (isset($this->providers[$name])) {
+                return false;
+            }
+            $provider = apply_filters('wp_sitemaps_add_provider', $provider, $name);
+            if (!$provider instanceof WP_Sitemaps_Provider) {
+                return false;
+            }
+            $this->providers[$name] = $provider;
+            return true;
+        }
     }
 }
 
@@ -228,12 +248,23 @@ if (!class_exists('WP_Sitemaps')) {
         public function __construct() {
             $this->registry = new WP_Sitemaps_Registry();
         }
+
+        public function sitemaps_enabled() {
+            return (bool) apply_filters('wp_sitemaps_enabled', (bool) get_option('blog_public', '1'));
+        }
     }
 }
 
 if (!function_exists('wp_sitemaps_get_server')) {
     function wp_sitemaps_get_server() {
         return $GLOBALS['__tonkatsu_test_sitemap_server'] ??= new WP_Sitemaps();
+    }
+}
+
+// A test changes the limit with add_filter('wp_sitemaps_max_urls', ...).
+if (!function_exists('wp_sitemaps_get_max_urls')) {
+    function wp_sitemaps_get_max_urls($object_type) {
+        return apply_filters('wp_sitemaps_max_urls', 2000, $object_type);
     }
 }
 

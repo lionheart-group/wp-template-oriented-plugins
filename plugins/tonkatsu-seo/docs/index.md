@@ -63,7 +63,8 @@ even if it is reached through another URL. Everything else uses the request URI.
 - `<meta name="description">`, Open Graph (`og:site_name`, `og:title`, `og:description`,
   `og:type`, `og:url`, `og:image`, `og:locale`), Twitter Card (`twitter:card`, `twitter:site`) and
   a JSON-LD `@graph` (`WebSite`, `Organization`, `BreadcrumbList`) on `wp_head`.
-- Sitemap adjustments to core's `/wp-sitemap.xml` — see [SitemapConfig](settings/sitemapconfig.md).
+- Sitemap adjustments to core's `/wp-sitemap.xml`, and a sitemap for pages outside WordPress
+  (static landing pages) — see [SitemapConfig](settings/sitemapconfig.md).
 
 ## Redirects
 
