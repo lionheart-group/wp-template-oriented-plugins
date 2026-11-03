@@ -6,6 +6,12 @@ The input page is where users fill out and submit the form. This page handles:
 - Showing validation errors (when form is resubmitted with errors)
 - Pre-populating fields with previously entered values
 
+Validation errors are shown once: on the input page the visitor is sent back to after a failed
+submission. They are removed from the session just before that page's template is loaded, so
+reloading it shows the form without them. A redirect on the way there (such as WordPress adding a
+trailing slash) does not count, so the errors are still shown on the page the visitor lands on.
+The entered values stay until the form is sent.
+
 ## Table of Contents
 
 - [Basic Structure](#basic-structure)

@@ -4,7 +4,7 @@ Tags: forms, utilities, template-oriented
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -169,6 +169,10 @@ In your theme's code. Tools -> Forms (TOFU) shows them, read-only.
       with its own version on `init` and runs any outstanding migration once; a failed one is
       retried on the next request.
     - Requires WordPress 6.5.
+* v0.1.4
+    - Fixed: validation errors were shown again every time the input page was reloaded. They
+      are now shown once, on the page the visitor is sent back to; the entered values are
+      kept until the form is sent.
 
 
 == Upgrade Notice ==
