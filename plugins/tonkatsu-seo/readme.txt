@@ -4,7 +4,7 @@ Tags: seo, meta, open graph, json-ld, sitemap
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.0.2
+Stable tag: 0.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -62,6 +62,9 @@ No. It adjusts WordPress core's sitemap at /wp-sitemap.xml. Static pages outside
 
 
 == Changelog ==
+
+= 0.0.3 =
+* Added: static pages outside WordPress, such as landing pages, can be listed in the sitemap with SitemapConfig's `extraUrls`. They get a sitemap of their own, /wp-sitemap-static-1.xml, listed in /wp-sitemap.xml. lastmod is the written value, else the modification time of the file the URL points to. URLs on another host or scheme, or outside the home URL, are left out. Tools -> SEO (TONKATSU) shows each URL and warns when no file was found. See docs/settings/sitemapconfig.md.
 
 = 0.0.2 =
 * Added: redirects registered in theme code with `Seo::registerRedirects()` — exact, prefix and (when declared) regex matches, with 301, 302, 307, 308 and 410. Listed on Tools -> SEO (TONKATSU), which warns about redirects that hide a registered page and about chained redirects. They stand down while another SEO plugin is active. See docs/settings/redirectconfig.md.
