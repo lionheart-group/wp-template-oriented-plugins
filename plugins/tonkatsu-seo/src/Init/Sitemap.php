@@ -14,7 +14,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Adjusts WordPress core's sitemaps (`/wp-sitemap.xml`) from SitemapConfig
- * and the registered pages. TONKATSU generates no sitemap of its own.
+ * and the registered pages. The only sitemap TONKATSU adds lists the URLs
+ * outside WordPress written in SitemapConfig::$extraUrls (SitemapProvider).
  */
 class Sitemap
 {
@@ -44,6 +45,33 @@ class Sitemap
         add_filter('wp_sitemaps_post_types', [static::class, 'filterPostTypes']);
         add_filter('wp_sitemaps_taxonomies', [static::class, 'filterTaxonomies']);
         add_filter('wp_sitemaps_posts_pre_url_list', [static::class, 'filterPreUrlList'], 10, 3);
+        add_action('wp_sitemaps_init', [static::class, 'registerStaticProvider']);
+    }
+
+    /**
+     * Add the provider for SitemapConfig::$extraUrls.
+     *
+     * Core fires `wp_sitemaps_init` right after building its server, which
+     * deferCoreServer() moved to `init` 20, so the theme's SiteConfig is
+     * already registered. Core fires it even when sitemaps are disabled
+     * (not public, `enabled: false`) without adding its own providers; this
+     * one stays out then too. Nothing is added when no URL would be listed.
+     * The registry passes it through `wp_sitemaps_add_provider`, so
+     * `excludeProviders: ['static']` removes it like a core provider.
+     *
+     * @param mixed $server
+     */
+    public static function registerStaticProvider(mixed $server): void
+    {
+        if (!$server instanceof \WP_Sitemaps || !$server->sitemaps_enabled()) {
+            return;
+        }
+
+        if (SitemapProvider::listed(Seo::getSite()->sitemap->extraUrlEntries(), home_url('/')) === []) {
+            return;
+        }
+
+        $server->registry->add_provider(Consts::SITEMAP_STATIC_PROVIDER, new SitemapProvider());
     }
 
     /**

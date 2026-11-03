@@ -190,6 +190,10 @@ class AdminPage
                         <th scope="row"><?php echo esc_html__('Excluded taxonomies', 'tonkatsu-seo'); ?></th>
                         <td><?php echo esc_html(self::displayList($site->sitemap->excludeTaxonomies)); ?></td>
                     </tr>
+                    <tr>
+                        <th scope="row"><?php echo esc_html__('Additional URLs', 'tonkatsu-seo'); ?></th>
+                        <td><?php self::renderExtraUrls(); ?></td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -583,6 +587,60 @@ class AdminPage
         }
 
         return '/' . $redirect->path . ($redirect->path !== '' ? '/' : '');
+    }
+
+    /**
+     * The URLs outside WordPress (SitemapConfig::$extraUrls): the static
+     * sitemap's URL, then each URL with its lastmod and warnings.
+     */
+    protected static function renderExtraUrls(): void
+    {
+        $entries = Seo::getSite()->sitemap->extraUrlEntries();
+        if ($entries === []) {
+            echo '—';
+            return;
+        }
+
+        $homeUrl = home_url('/');
+        $described = SitemapProvider::describe($entries, $homeUrl, SitemapProvider::root());
+        $count = count(SitemapProvider::listed($entries, $homeUrl));
+        $provider = wp_sitemaps_get_server()->registry->get_provider(Consts::SITEMAP_STATIC_PROVIDER);
+        ?>
+        <p>
+            <?php
+            /* translators: %d: number of URLs listed in the static sitemap */
+            echo esc_html(sprintf(_n('%d URL', '%d URLs', $count, 'tonkatsu-seo'), $count));
+            ?>
+            <?php if ($provider instanceof \WP_Sitemaps_Provider) : ?>
+                <?php $sitemapUrl = $provider->get_sitemap_url('', 1); ?>
+                — <a href="<?php echo esc_url($sitemapUrl); ?>"><?php echo esc_html($sitemapUrl); ?></a>
+            <?php elseif (Conflict::detect() !== null) : ?>
+                <br><span class="description"><?php echo esc_html__('Not served: another SEO plugin is active, so TONKATSU leaves the sitemaps to it.', 'tonkatsu-seo'); ?></span>
+            <?php else : ?>
+                <br><span class="description"><?php echo esc_html__('Not served: sitemaps are disabled, search engines are discouraged, the static provider is excluded, or no URL is listed.', 'tonkatsu-seo'); ?></span>
+            <?php endif; ?>
+        </p>
+        <ul>
+            <?php foreach ($described as $extra) : ?>
+                <li>
+                    <code><?php echo esc_html($extra['loc']); ?></code>
+                    <?php if ($extra['lastmod'] !== null) : ?>
+                        <?php
+                        /* translators: %s: last modified date written in the sitemap */
+                        echo esc_html(sprintf(__('Last modified: %s', 'tonkatsu-seo'), $extra['lastmod']));
+                        ?>
+                    <?php endif; ?>
+                    <?php if ($extra['excluded'] === 'host') : ?>
+                        <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Another host or scheme: left out', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                    <?php elseif ($extra['excluded'] === 'path') : ?>
+                        <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Outside the home URL: left out', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                    <?php elseif ($extra['file'] === null) : ?>
+                        <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('File not found', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php
     }
 
     /**
