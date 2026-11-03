@@ -614,8 +614,10 @@ class AdminPage
             <?php if ($provider instanceof \WP_Sitemaps_Provider) : ?>
                 <?php $sitemapUrl = $provider->get_sitemap_url('', 1); ?>
                 — <a href="<?php echo esc_url($sitemapUrl); ?>"><?php echo esc_html($sitemapUrl); ?></a>
+            <?php elseif (Conflict::detect() !== null) : ?>
+                <br><span class="description"><?php echo esc_html__('Not served: another SEO plugin is active, so TONKATSU leaves the sitemaps to it.', 'tonkatsu-seo'); ?></span>
             <?php else : ?>
-                <br><span class="description"><?php echo esc_html__('Not served: sitemaps are disabled, search engines are discouraged, or the static provider is excluded.', 'tonkatsu-seo'); ?></span>
+                <br><span class="description"><?php echo esc_html__('Not served: sitemaps are disabled, search engines are discouraged, the static provider is excluded, or no URL is listed.', 'tonkatsu-seo'); ?></span>
             <?php endif; ?>
         </p>
         <ul>
@@ -628,8 +630,10 @@ class AdminPage
                         echo esc_html(sprintf(__('Last modified: %s', 'tonkatsu-seo'), $extra['lastmod']));
                         ?>
                     <?php endif; ?>
-                    <?php if (!$extra['listed']) : ?>
+                    <?php if ($extra['excluded'] === 'host') : ?>
                         <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Another host or scheme: left out', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
+                    <?php elseif ($extra['excluded'] === 'path') : ?>
+                        <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('Outside the home URL: left out', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
                     <?php elseif ($extra['file'] === null) : ?>
                         <?php echo wp_kses(AdminColumns::badgeHtml(AdminColumns::badge(AdminColumns::TONE_WARNING, __('File not found', 'tonkatsu-seo'))), AdminColumns::ALLOWED_HTML); ?>
                     <?php endif; ?>

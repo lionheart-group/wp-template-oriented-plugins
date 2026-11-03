@@ -48,6 +48,10 @@ which core lists in `/wp-sitemap.xml` with the others.
   with the sitemap's own protocol and host, so `http://example.com/lp/` is left out on
   `https://example.com/`. The home URL is only known at runtime, so this does not throw; the admin
   page marks the URL instead. Each URL is listed once.
+- A URL **outside the home URL's path** is not listed either: the sitemaps are served from the home
+  URL, and the protocol only allows URLs under the sitemap's directory. On a site whose home URL is
+  `https://example.com/blog/`, `/blog/lp/` is listed and `/lp/` is left out. (WordPress installed in a
+  subdirectory with the home URL at the root is not affected.)
 - Up to 2000 URLs per page (core's `wp_sitemaps_max_urls`); more are split into
   `/wp-sitemap-static-2.xml` and so on.
 - The sitemap is not served when there is no URL to list, when sitemaps are off (`enabled: false`,
@@ -73,10 +77,10 @@ core's `get_home_path()` decides).
 - Any other path → that file. A directory without the trailing slash is not found.
 - A path with a `..` segment, or one that resolves outside that directory (through a symbolic link,
   say), is not looked up.
-- A URL outside the home URL's path (`/lp/` on a site whose home URL is `/blog/`) has no file.
 
 Tools → SEO (TONKATSU) shows each URL with its lastmod, and a **File not found** badge when no file
-was found (the URL is still listed; check for a typo) or **Another host or scheme: left out**.
+was found (the URL is still listed; check for a typo), **Another host or scheme: left out** or
+**Outside the home URL: left out**.
 
 ## Noindex pages
 

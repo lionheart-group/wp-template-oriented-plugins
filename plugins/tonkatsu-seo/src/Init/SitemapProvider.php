@@ -91,29 +91,32 @@ class SitemapProvider extends \WP_Sitemaps_Provider
      * Every extraUrls entry with what the sitemap and the admin page need.
      *
      * - `loc`: the absolute URL.
-     * - `listed`: false for a URL on another host or scheme, which is left out.
+     * - `listed`: false for a URL that is left out, see exclusion().
+     * - `excluded`: why it is left out (exclusion()), or null.
      * - `file`: the file found for the URL, or null.
      * - `lastmod`: the value written in the sitemap, or null.
      *
      * @param list<array{url: string, lastmod: ?string}> $entries
      * @param string $homeUrl
      * @param string $root
-     * @return list<array{url: string, loc: string, listed: bool, file: ?string, lastmod: ?string}>
+     * @return list<array{url: string, loc: string, listed: bool, excluded: ?string, file: ?string, lastmod: ?string}>
      */
     public static function describe(array $entries, string $homeUrl, string $root): array
     {
         $described = [];
         foreach ($entries as $entry) {
             $loc = self::resolveUrl($entry['url'], $homeUrl);
-            $listed = self::isSameSite($loc, $homeUrl);
+            $excluded = self::exclusion($loc, $homeUrl);
+            $listed = $excluded === null;
             $file = $listed ? self::fileFor($loc, $homeUrl, $root) : null;
 
             $described[] = [
-                'url'     => $entry['url'],
-                'loc'     => $loc,
-                'listed'  => $listed,
-                'file'    => $file,
-                'lastmod' => $listed ? self::lastmod($entry['lastmod'], $file) : null,
+                'url'      => $entry['url'],
+                'loc'      => $loc,
+                'listed'   => $listed,
+                'excluded' => $excluded,
+                'file'     => $file,
+                'lastmod'  => $listed ? self::lastmod($entry['lastmod'], $file) : null,
             ];
         }
 
@@ -121,8 +124,8 @@ class SitemapProvider extends \WP_Sitemaps_Provider
     }
 
     /**
-     * The entries that go into the sitemap: absolute, encoded, on the site's
-     * scheme and host, each URL once.
+     * The entries that go into the sitemap: absolute, encoded, not left out
+     * by exclusion(), each URL once.
      *
      * @param list<array{url: string, lastmod: ?string}> $entries
      * @param string $homeUrl
@@ -133,7 +136,7 @@ class SitemapProvider extends \WP_Sitemaps_Provider
         $listed = [];
         foreach ($entries as $entry) {
             $loc = self::resolveUrl($entry['url'], $homeUrl);
-            if (!isset($listed[$loc]) && self::isSameSite($loc, $homeUrl)) {
+            if (!isset($listed[$loc]) && self::exclusion($loc, $homeUrl) === null) {
                 $listed[$loc] = ['loc' => $loc, 'lastmod' => $entry['lastmod']];
             }
         }
@@ -180,6 +183,34 @@ class SitemapProvider extends \WP_Sitemaps_Provider
             static fn (array $m): string => rawurlencode($m[0]),
             $value
         );
+    }
+
+    /**
+     * Why a URL is left out of the sitemap, or null when it is listed.
+     *
+     * The sitemap protocol only allows URLs with the sitemap's own protocol
+     * and host, under the directory the sitemap is in. Core serves every
+     * sitemap from the home URL, so on a site whose home URL is
+     * `https://example.com/blog/`, `/lp/` is outside it.
+     *
+     * - `host`: another scheme, host or port (isSameSite()).
+     * - `path`: outside the home URL's path (pathFromHome()).
+     *
+     * @param string $loc Absolute URL, see resolveUrl().
+     * @param string $homeUrl
+     * @return 'host'|'path'|null
+     */
+    public static function exclusion(string $loc, string $homeUrl): ?string
+    {
+        if (!self::isSameSite($loc, $homeUrl)) {
+            return 'host';
+        }
+
+        if (self::pathFromHome($loc, $homeUrl) === null) {
+            return 'path';
+        }
+
+        return null;
     }
 
     /**

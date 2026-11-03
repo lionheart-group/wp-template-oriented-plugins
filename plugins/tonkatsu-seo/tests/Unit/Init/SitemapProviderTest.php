@@ -216,6 +216,37 @@ class SitemapProviderTest extends BaseTestCase
         $this->assertSame(0, SitemapProvider::pageCount(0, 2000));
     }
 
+    public function testExclusion(): void
+    {
+        $this->assertNull(SitemapProvider::exclusion('https://example.com/lp/', 'https://example.com/'));
+        $this->assertNull(SitemapProvider::exclusion('https://example.com/blog/lp/', 'https://example.com/blog/'));
+        $this->assertSame('host', SitemapProvider::exclusion('https://other.example.org/lp/', 'https://example.com/'));
+        $this->assertSame('host', SitemapProvider::exclusion('http://example.com/lp/', 'https://example.com/'));
+        // The sitemaps are served from the home URL, so only URLs under it are allowed.
+        $this->assertSame('path', SitemapProvider::exclusion('https://example.com/lp/', 'https://example.com/blog/'));
+        $this->assertSame('path', SitemapProvider::exclusion('https://example.com/blogger/', 'https://example.com/blog/'));
+    }
+
+    public function testListedDropsUrlsOutsideTheHomePath(): void
+    {
+        $this->assertSame(
+            [['loc' => 'https://example.com/blog/lp/', 'lastmod' => null]],
+            SitemapProvider::listed([
+                ['url' => '/lp/', 'lastmod' => null],
+                ['url' => '/blog/lp/', 'lastmod' => null],
+            ], 'https://example.com/blog/')
+        );
+    }
+
+    public function testDescribeMarksUrlsOutsideTheHomePath(): void
+    {
+        $described = SitemapProvider::describe([['url' => '/lp/', 'lastmod' => '2026-10-01']], 'https://example.com/blog/', $this->root);
+
+        $this->assertFalse($described[0]['listed']);
+        $this->assertSame('path', $described[0]['excluded']);
+        $this->assertNull($described[0]['lastmod']);
+    }
+
     public function testDescribe(): void
     {
         $this->file('lp/a/index.html', gmmktime(0, 0, 0, 10, 1, 2026));
@@ -223,15 +254,15 @@ class SitemapProviderTest extends BaseTestCase
         $this->assertSame(
             [
                 [
-                    'url' => '/lp/a/', 'loc' => 'https://example.com/lp/a/', 'listed' => true,
+                    'url' => '/lp/a/', 'loc' => 'https://example.com/lp/a/', 'listed' => true, 'excluded' => null,
                     'file' => (string) realpath($this->root . '/lp/a/index.html'), 'lastmod' => '2026-10-01T00:00:00+00:00',
                 ],
                 [
-                    'url' => '/lp/b/', 'loc' => 'https://example.com/lp/b/', 'listed' => true,
+                    'url' => '/lp/b/', 'loc' => 'https://example.com/lp/b/', 'listed' => true, 'excluded' => null,
                     'file' => null, 'lastmod' => '2026-09-01',
                 ],
                 [
-                    'url' => 'https://other.example.org/', 'loc' => 'https://other.example.org/', 'listed' => false,
+                    'url' => 'https://other.example.org/', 'loc' => 'https://other.example.org/', 'listed' => false, 'excluded' => 'host',
                     'file' => null, 'lastmod' => null,
                 ],
             ],
