@@ -133,7 +133,7 @@ Math, carry across:
 | Rank Math | TONKATSU |
 |---|---|
 | Titles & Meta → Global → separator | `SiteConfig::$separator` |
-| Titles & Meta → Local SEO → name / logo / social profiles | `OrganizationConfig` |
+| Titles & Meta → Local SEO → name / logo / social profiles / address / phone | `OrganizationConfig` |
 | Titles & Meta → Social Meta → Twitter username | `SiteConfig::$twitterSite` |
 | Titles & Meta → Global → OpenGraph thumbnail | `SiteConfig::$defaultOgImage` |
 | Per-page title / description / robots set in the editor | `Seo::registerPage()`, or `tonkatsu_post_values` reading your own custom fields |

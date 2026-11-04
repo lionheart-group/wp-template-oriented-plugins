@@ -128,8 +128,22 @@ apply_filters( 'tonkatsu_json_ld', array $graph, Context $context );
 ```
 
 `$graph` is a list of nodes: `WebSite` always, `Organization` when `SiteConfig::$organization` is
-set, and `BreadcrumbList` for pages of a hierarchical post type and for archives. Append, alter or
-remove nodes. Return `[]` to print no JSON-LD at all; a non-array return value keeps the defaults.
+set, and `BreadcrumbList` for singular pages and archives. Append, alter or remove nodes.
+
+The breadcrumbs start at the home page, then:
+
+- a page of a hierarchical post type: its ancestors, then the page;
+- a post of a post type with an archive: the archive, then the post (`Home > News > Post`);
+- a term archive: the post type's archive when the taxonomy belongs to exactly one post type that has
+  one, the term's ancestors, then the term (`Home > Cases > Category`).
+
+An archive in the middle of the trail is named by the `title` registered for it with
+`Seo::registerArchive()`. Without one, the `post` archive is named by the posts page's title when a
+posts page is set (Settings → Reading), and any other archive by the post type's plural label. To
+name the posts' archive yourself, register it: `Seo::registerArchive('post', new ArchiveConfig(title:
+'News'))` — that title is also the posts page's `<title>`. The current item is named by its
+resolved title. No archive is added when its URL is the home URL (the `post` type while the front
+page lists the posts). Return `[]` to print no JSON-LD at all; a non-array return value keeps the defaults.
 
 ```php
 add_filter( 'tonkatsu_json_ld', function ( $graph, $context ) {

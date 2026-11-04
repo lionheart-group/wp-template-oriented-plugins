@@ -7,6 +7,7 @@ use TonkatsuPlugin\Helpers\Seo;
 use TonkatsuPlugin\Helpers\Url;
 use TonkatsuPlugin\Models\Context;
 use TonkatsuPlugin\Models\Resolver;
+use TonkatsuPlugin\Structure\OrganizationConfig;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -423,13 +424,16 @@ class Head
 
         if ($organization !== null) {
             $node = [
-                '@type' => 'Organization',
+                '@type' => $organization->type,
                 '@id'   => $home . '#organization',
                 'name'  => $organization->name,
                 'url'   => $organization->url !== null
                     ? Url::absolute($organization->url, $home)
                     : $home,
             ];
+            if ($organization->alternateName !== null && trim($organization->alternateName) !== '') {
+                $node['alternateName'] = $organization->alternateName;
+            }
             if ($organization->logo !== null) {
                 $node['logo'] = [
                     '@type' => 'ImageObject',
@@ -438,6 +442,21 @@ class Head
             }
             if ($organization->sameAs !== []) {
                 $node['sameAs'] = array_values($organization->sameAs);
+            }
+            if ($organization->address !== []) {
+                // Keep schema.org's order regardless of how the theme wrote it.
+                $address = ['@type' => 'PostalAddress'];
+                foreach (OrganizationConfig::ADDRESS_KEYS as $key) {
+                    if (isset($organization->address[$key])) {
+                        $address[$key] = $organization->address[$key];
+                    }
+                }
+                $node['address'] = $address;
+            }
+            foreach (['telephone', 'faxNumber', 'foundingDate'] as $property) {
+                if ($organization->{$property} !== null && trim($organization->{$property}) !== '') {
+                    $node[$property] = $organization->{$property};
+                }
             }
             $graph[] = $node;
         }

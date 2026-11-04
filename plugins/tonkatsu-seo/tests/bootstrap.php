@@ -268,6 +268,38 @@ if (!function_exists('wp_sitemaps_get_max_urls')) {
     }
 }
 
+// Post type archive links a test sets, e.g.
+// $GLOBALS['__tonkatsu_test_archive_links']['post'] = 'https://example.com/news/';
+// Each call is counted in $GLOBALS['__tonkatsu_test_archive_link_calls'][$post_type].
+if (!function_exists('get_post_type_archive_link')) {
+    function get_post_type_archive_link($post_type) {
+        $GLOBALS['__tonkatsu_test_archive_link_calls'][$post_type] =
+            ($GLOBALS['__tonkatsu_test_archive_link_calls'][$post_type] ?? 0) + 1;
+        return $GLOBALS['__tonkatsu_test_archive_links'][$post_type] ?? false;
+    }
+}
+
+// No post type objects: a test that needs a label passes it to archiveLabel().
+if (!function_exists('get_post_type_object')) {
+    function get_post_type_object($post_type) {
+        return null;
+    }
+}
+
+// Titles a test sets, e.g. $GLOBALS['__tonkatsu_test_titles'][7] = 'News';
+if (!function_exists('get_the_title')) {
+    function get_the_title($post = 0) {
+        $id = is_object($post) ? $post->ID : (int) $post;
+        return $GLOBALS['__tonkatsu_test_titles'][$id] ?? '';
+    }
+}
+
+if (!function_exists('wp_strip_all_tags')) {
+    function wp_strip_all_tags($text, $remove_breaks = false) {
+        return trim(strip_tags((string) $text));
+    }
+}
+
 // Permalinks a test sets, e.g. $GLOBALS['__tonkatsu_test_permalinks'][12] = 'https://example.com/a/';
 if (!function_exists('get_permalink')) {
     function get_permalink($post = 0, $leavename = false) {
