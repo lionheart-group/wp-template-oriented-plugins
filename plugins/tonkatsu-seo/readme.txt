@@ -4,7 +4,7 @@ Tags: seo, meta, open graph, json-ld, sitemap
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 0.0.3
+Stable tag: 0.0.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -62,6 +62,10 @@ No. It adjusts WordPress core's sitemap at /wp-sitemap.xml. Static pages outside
 
 
 == Changelog ==
+
+= 0.0.4 =
+* Added: OrganizationConfig takes `type` (a schema.org subtype such as `Corporation`), `alternateName`, `address` (printed as a PostalAddress), `telephone`, `faxNumber` and `foundingDate`. Properties left at their defaults are not printed. See docs/settings/organizationconfig.md.
+* Changed: the JSON-LD BreadcrumbList now covers posts of every post type and puts the post type's archive before posts and term archives (Home > News > Post, Home > Cases > Category). The archive is named by the title registered with `Seo::registerArchive()`, else, for posts, by the posts page's title, else by the post type's label.
 
 = 0.0.3 =
 * Added: static pages outside WordPress, such as landing pages, can be listed in the sitemap with SitemapConfig's `extraUrls`. They get a sitemap of their own, /wp-sitemap-static-1.xml, listed in /wp-sitemap.xml. lastmod is the written value, else the modification time of the file the URL points to. URLs on another host or scheme, or outside the home URL, are left out. Tools -> SEO (TONKATSU) shows each URL and warns when no file was found. See docs/settings/sitemapconfig.md.
