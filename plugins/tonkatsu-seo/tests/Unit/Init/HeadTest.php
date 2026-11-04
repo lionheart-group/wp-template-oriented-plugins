@@ -326,6 +326,62 @@ class HeadTest extends BaseTestCase
         );
     }
 
+    public function testJsonLdOrganizationLocalDetails(): void
+    {
+        Seo::setSite(new SiteConfig(
+            siteName: 'Example Site',
+            organization: new OrganizationConfig(
+                name: '株式会社サンプル',
+                type: 'Corporation',
+                alternateName: 'Sample Co., Ltd.',
+                // Written out of order; printed in schema.org's order.
+                address: ['streetAddress' => '錦3丁目1-1', 'postalCode' => '460-0003', 'addressCountry' => 'JP'],
+                telephone: '+81-52-000-0000',
+                foundingDate: '1983',
+            ),
+        ));
+        $resolver = $this->useContext(new Context(type: Context::TYPE_FRONT, url: 'https://example.com/'));
+
+        $organization = Head::jsonLd($resolver)[1];
+
+        $this->assertSame('Corporation', $organization['@type']);
+        $this->assertSame('Sample Co., Ltd.', $organization['alternateName']);
+        $this->assertSame(
+            ['@type' => 'PostalAddress', 'postalCode' => '460-0003', 'addressCountry' => 'JP', 'streetAddress' => '錦3丁目1-1'],
+            $organization['address']
+        );
+        $this->assertSame('+81-52-000-0000', $organization['telephone']);
+        $this->assertSame('1983', $organization['foundingDate']);
+        $this->assertArrayNotHasKey('faxNumber', $organization);
+    }
+
+    public function testJsonLdOrganizationLeavesOutWhatIsNotSet(): void
+    {
+        Seo::setSite(new SiteConfig(organization: new OrganizationConfig(name: 'Example Inc.')));
+        $resolver = $this->useContext(new Context(type: Context::TYPE_FRONT, url: 'https://example.com/'));
+
+        $organization = Head::jsonLd($resolver)[1];
+
+        $this->assertSame(['@type', '@id', 'name', 'url'], array_keys($organization));
+        $this->assertSame('Organization', $organization['@type']);
+    }
+
+    public function testJsonLdOrganizationLeavesOutBlankValues(): void
+    {
+        // Values a theme reads from options or custom fields may be blank.
+        Seo::setSite(new SiteConfig(organization: new OrganizationConfig(
+            name: 'Example Inc.',
+            alternateName: ' ',
+            telephone: '',
+            faxNumber: "\t",
+        )));
+        $resolver = $this->useContext(new Context(type: Context::TYPE_FRONT, url: 'https://example.com/'));
+
+        $organization = Head::jsonLd($resolver)[1];
+
+        $this->assertSame(['@type', '@id', 'name', 'url'], array_keys($organization));
+    }
+
     public function testNoOrganizationOrBreadcrumbsUnlessThereAreAny(): void
     {
         $resolver = $this->useContext(new Context(type: Context::TYPE_FRONT, url: 'https://example.com/'));

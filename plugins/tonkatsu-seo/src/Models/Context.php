@@ -15,6 +15,14 @@ use TonkatsuPlugin\Helpers\Url;
  */
 class Context
 {
+    /**
+     * postTypeArchiveCrumb() results for this request, keyed by post type
+     * and home URL. Null results are kept too.
+     *
+     * @var array<string, ?array{name: string, url: string}>
+     */
+    private static array $archiveCrumbs = [];
+
     public const TYPE_FRONT = 'front';
     public const TYPE_HOME = 'home';
     public const TYPE_SINGULAR = 'singular';
@@ -232,7 +240,10 @@ class Context
                 taxonomy: $object->taxonomy,
                 title: self::plainText($object->name),
                 description: self::plainText(term_description($object->term_id)),
-                breadcrumbs: self::termBreadcrumbs($object),
+                breadcrumbs: self::withArchiveCrumb(
+                    self::termBreadcrumbs($object),
+                    self::taxonomyArchiveCrumb($object->taxonomy, $home)
+                ),
                 paged: $paged,
             );
         }
@@ -302,8 +313,15 @@ class Context
         $breadcrumbs = [];
         if ($type === self::TYPE_HOME && $url !== null && $title !== null) {
             $breadcrumbs = [['name' => $title, 'url' => $url]];
-        } elseif ($type === self::TYPE_SINGULAR && is_post_type_hierarchical($post->post_type)) {
-            $breadcrumbs = self::postBreadcrumbs($post, $url, $title);
+        } elseif ($type === self::TYPE_SINGULAR) {
+            // Ancestors for hierarchical post types, behind the post type's
+            // archive when it has one (Home > News > Post).
+            $breadcrumbs = self::withArchiveCrumb(
+                is_post_type_hierarchical($post->post_type)
+                    ? self::postBreadcrumbs($post, $url, $title)
+                    : (($url !== null && $title !== null) ? [['name' => $title, 'url' => $url]] : []),
+                self::postTypeArchiveCrumb($post->post_type, $home)
+            );
         }
 
         return new self(
@@ -440,6 +458,146 @@ class Context
         }
 
         return get_pagenum_link($paged);
+    }
+
+    /**
+     * The crumb for a post type's archive, which goes before its posts and
+     * the terms of its taxonomies.
+     *
+     * The title registered with Seo::registerArchive() names it, as it names
+     * the archive's own last crumb; otherwise the post type's label does.
+     * Null when there is no archive URL, or it is the home URL (the `post`
+     * type when the front page lists the posts).
+     *
+     * @param string $postType
+     * @param ?string $url get_post_type_archive_link()
+     * @param ?string $label The post type's plain-text plural label.
+     * @param string $homeUrl
+     * @return ?array{name: string, url: string}
+     */
+    public static function archiveCrumb(string $postType, ?string $url, ?string $label, string $homeUrl): ?array
+    {
+        if ($url === null || $url === '' || rtrim($url, '/') === rtrim($homeUrl, '/')) {
+            return null;
+        }
+
+        $title = Seo::getArchive($postType)?->title;
+        $name = ($title !== null && trim($title) !== '') ? $title : $label;
+        if ($name === null || trim($name) === '') {
+            return null;
+        }
+
+        return ['name' => $name, 'url' => $url];
+    }
+
+    /**
+     * The one post type a taxonomy belongs to, or null when it is shared by
+     * several (no single archive to put before its terms) or by none.
+     *
+     * @param array<mixed> $objectTypes The taxonomy's `object_type`.
+     * @return ?string
+     */
+    public static function taxonomyPostType(array $objectTypes): ?string
+    {
+        $objectTypes = array_values(array_unique(array_filter($objectTypes, 'is_string')));
+
+        return count($objectTypes) === 1 ? $objectTypes[0] : null;
+    }
+
+    /**
+     * $trail with $archive in front, unless the trail is empty or already
+     * starts with that URL.
+     *
+     * @param list<array{name: string, url: string}> $trail
+     * @param ?array{name: string, url: string} $archive
+     * @return list<array{name: string, url: string}>
+     */
+    public static function withArchiveCrumb(array $trail, ?array $archive): array
+    {
+        if ($archive === null || $trail === [] || $trail[0]['url'] === $archive['url']) {
+            return $trail;
+        }
+
+        return array_merge([$archive], $trail);
+    }
+
+    /**
+     * The name an archive crumb falls back to when no title is registered
+     * for the archive with Seo::registerArchive().
+     *
+     * For `post`, the posts page's title when one is set (its archive URL is
+     * that page, which calls itself by its own title); otherwise the post
+     * type's plural label.
+     *
+     * @param string $postType
+     * @param ?string $label The post type's plain-text plural label.
+     * @param ?string $postsPageTitle The posts page's plain-text title, or null when none is set.
+     * @return ?string
+     */
+    public static function archiveLabel(string $postType, ?string $label, ?string $postsPageTitle): ?string
+    {
+        if ($postType === 'post' && $postsPageTitle !== null && trim($postsPageTitle) !== '') {
+            return $postsPageTitle;
+        }
+
+        return $label;
+    }
+
+    /**
+     * The crumb for a post type's archive, see archiveCrumb().
+     *
+     * Computed once per post type and request: it is the same for every post
+     * of the type, and Context::forPost() runs for many posts at a time in
+     * the sitemap and the admin lists. The archives it reads are registered
+     * on `init`, before any Context is built.
+     *
+     * @param string $postType
+     * @param string $home
+     * @return ?array{name: string, url: string}
+     */
+    public static function postTypeArchiveCrumb(string $postType, string $home): ?array
+    {
+        $key = $postType . "\0" . $home;
+        if (array_key_exists($key, self::$archiveCrumbs)) {
+            return self::$archiveCrumbs[$key];
+        }
+
+        $link = get_post_type_archive_link($postType);
+        $object = get_post_type_object($postType);
+
+        $postsPageTitle = null;
+        $postsPage = (int) get_option('page_for_posts');
+        if ($postType === 'post' && get_option('show_on_front') === 'page' && $postsPage > 0) {
+            $postsPageTitle = self::plainText(get_the_title($postsPage));
+        }
+
+        return self::$archiveCrumbs[$key] = self::archiveCrumb(
+            $postType,
+            is_string($link) ? $link : null,
+            self::archiveLabel(
+                $postType,
+                $object instanceof \WP_Post_Type ? self::plainText($object->labels->name ?? null) : null,
+                $postsPageTitle
+            ),
+            $home
+        );
+    }
+
+    /**
+     * @param string $taxonomy
+     * @param string $home
+     * @return ?array{name: string, url: string}
+     */
+    private static function taxonomyArchiveCrumb(string $taxonomy, string $home): ?array
+    {
+        $object = get_taxonomy($taxonomy);
+        if (!$object instanceof \WP_Taxonomy) {
+            return null;
+        }
+
+        $postType = self::taxonomyPostType((array) $object->object_type);
+
+        return $postType !== null ? self::postTypeArchiveCrumb($postType, $home) : null;
     }
 
     /**

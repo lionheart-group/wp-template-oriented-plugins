@@ -7,6 +7,7 @@ use TonkatsuPlugin\Helpers\Seo;
 use TonkatsuPlugin\Init\Head;
 use TonkatsuPlugin\Init\Redirects;
 use TonkatsuPlugin\Init\Sitemap;
+use TonkatsuPlugin\Models\Context;
 
 /**
  * Base test case class for TonkatsuPlugin tests
@@ -58,7 +59,10 @@ abstract class BaseTestCase extends TestCase
             $GLOBALS['__tonkatsu_test_home_url'],
             $GLOBALS['__tonkatsu_test_options'],
             $GLOBALS['__tonkatsu_test_permalinks'],
-            $GLOBALS['__tonkatsu_test_sitemap_server']
+            $GLOBALS['__tonkatsu_test_sitemap_server'],
+            $GLOBALS['__tonkatsu_test_archive_links'],
+            $GLOBALS['__tonkatsu_test_archive_link_calls'],
+            $GLOBALS['__tonkatsu_test_titles']
         );
 
         $statics = [
@@ -70,6 +74,7 @@ abstract class BaseTestCase extends TestCase
             [Head::class, 'resolver', null],
             [Redirects::class, 'redirecting', false],
             [Sitemap::class, 'excludedPostIds', []],
+            [Context::class, 'archiveCrumbs', []],
             [Sitemap::class, 'buildingUrlList', false],
         ];
 
